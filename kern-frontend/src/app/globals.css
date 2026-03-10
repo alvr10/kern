@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+:root {
+  --background: #050505;
+  --foreground: #ffffff;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 64px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Apply overflow hidden only on desktop (not tablets) */
+@media (min-width: 1024px) {
+  body {
+    overflow: hidden;
+  }
+}
+
+img, video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Grid overlay for desktop design - 12 columns with 48px margins and 24px gutters */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: var(--space-5);
+  width: calc(100vw - 96px);
+  height: 100vh;
+  z-index: 9999;
+  pointer-events: none;
+  background-size: calc((100% + 24px) / 12) 100%;
+  background-image: repeating-linear-gradient(
+    to right,
+    rgba(255, 0, 0, 0.1) 0px,
+    rgba(255, 0, 0, 0.1) calc(100% - 24px),
+    transparent calc(100% - 24px),
+    transparent 100%
+  );
+}
+
+@media (min-width: 1024px) and (max-width: 1365px) {
+  body::before {
+    left: var(--space-3);
+    width: calc(100vw - 48px);
+    background-size: calc((100% + 24px) / 12) 100%;
+    background-image: repeating-linear-gradient(
+      to right,
+      rgba(255, 0, 0, 0.1) 0px,
+      rgba(255, 0, 0, 0.1) calc(100% - 24px),
+      transparent calc(100% - 24px),
+      transparent 100%
+    );
+  }
+}
+
+/* Grid overlay for tablet design - 8 columns with 32px margins and 20px gutters */
+@media (max-width: 1023px), (min-width: 1024px) and (max-aspect-ratio: 4/3) {
+  body::before {
+    left: var(--space-4);
+    width: calc(100vw - 64px);
+    background-size: calc((100% + 20px) / 8) 100%;
+    background-image: repeating-linear-gradient(
+      to right,
+      rgba(0, 255, 0, 0.1) 0px,
+      rgba(0, 255, 0, 0.1) calc(100% - 20px),
+      transparent calc(100% - 20px),
+      transparent 100%
+    );
+  }
+}
+
+/* Grid overlay for mobile design - 4 columns with 24px margins and 16px gutters */
+@media (max-width: 767px) {
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: var(--space-3);
+    width: calc(100vw - 48px);
+    height: 100vh;
+    z-index: 9999;
+    pointer-events: none;
+    background-size: calc((100% + 16px) / 4) 100%;
+    background-image: repeating-linear-gradient(
+      to right,
+      rgba(0, 0, 255, 0.1) 0px,
+      rgba(0, 0, 255, 0.1) calc(100% - 16px),
+      transparent calc(100% - 16px),
+      transparent 100%
+    );
+  }
+}
