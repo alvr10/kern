@@ -1,8 +1,391 @@
+// ============================================================
+// Kern — Social Content Management Platform
+// Prisma Schema (Supabase-compatible)
+//
+// Auth is fully delegated to Supabase Auth (auth.users table).
+// The `profiles` model shadows auth.users via a DB trigger so
+// the app never touches the auth schema directly.
+//
+// Setup required in Supabase:
+//   1. Run the trigger SQL at the bottom of this file in the
+//      Supabase SQL editor.
+// ============================================================
+
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["partialIndexes"]
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
 }
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum MemberRole {
+  ADMIN   // Manage org, members, billing
+  EDITOR  // Create/edit content, use AI
+  VIEWER  // Review and approve only
+}
+
+enum ContentStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum SocialPlatform {
+  TWITTER
+  LINKEDIN
+  INSTAGRAM
+  FACEBOOK
+  TIKTOK
+}
+
+enum AiActionType {
+  GENERATE  // Generate post from a brief
+  REWRITE   // Change tone or length
+  ADAPT     // Reformat for a specific platform
+  IMPROVE   // General quality improvement
+}
+
+enum NotificationType {
+  INVITATION
+  TOKEN_ALERT_80
+  TOKEN_ALERT_100
+  CONTENT_APPROVED
+  CONTENT_REJECTED
+  PLAN_UPGRADED
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+// ============================================================
+// PROFILES
+// One row per Supabase Auth user. Created automatically by the
+// trigger below — never insert manually.
+// `id` = auth.users.id (UUID from Supabase).
+// ============================================================
+
+model Profile {
+  id        String  @id // Supabase Auth UUID — no default, set by trigger
+  email     String  @unique
+  name      String
+  avatarUrl String?
+  timezone  String  @default("UTC")
+
+  notifyTokenAlerts Boolean @default(true)
+  notifyApprovals   Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships     Membership[]
+  contentPieces   ContentPiece[]
+  contentReviews  ContentReview[]
+  aiGenerations   AiGeneration[]
+  comments        Comment[]
+  sentInvitations Invitation[]   @relation("InvitedBy")
+  notifications   Notification[]
+
+  @@map("profiles")
+}
+
+// ============================================================
+// PLANS & SUBSCRIPTIONS
+// ============================================================
+
+model Plan {
+  id                   String  @id @default(cuid())
+  name                 String  @unique // "Free" | "Starter" | "Pro"
+  slug                 String  @unique
+  monthlyTokenLimit    Int
+  memberLimit          Int
+  projectLimit         Int
+  priceMonthlyUsd      Decimal @db.Decimal(10, 2)
+  stripePriceIdMonthly String?
+  stripePriceIdYearly  String?
+  features             Json    @default("[]")
+  isActive             Boolean @default(true)
+
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id             String             @id @default(cuid())
+  organizationId String             @unique
+  planId         String
+  status         SubscriptionStatus @default(TRIALING)
+
+  // Stripe
+  stripeCustomerId        String?  @unique
+  stripeSubscriptionId    String?  @unique
+  stripeCurrentPeriodEnd  DateTime?
+  stripeCancelAtPeriodEnd Boolean  @default(false)
+
+  // Token usage — resets each billing period via Stripe webhook
+  tokensUsed         Int     @default(0)
+  tokensLimit        Int     // snapshot of plan limit at subscription time
+  tokensAlertSent80  Boolean @default(false)
+  tokensAlertSent100 Boolean @default(false)
+
+  trialEndsAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan         Plan         @relation(fields: [planId], references: [id])
+
+  @@index([planId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+// ============================================================
+// ORGANIZATIONS & MEMBERSHIP
+// ============================================================
+
+model Organization {
+  id         String    @id @default(cuid())
+  name       String
+  slug       String    @unique
+  logoUrl    String?
+  // Brand voice profile stored as JSON for flexibility
+  // Shape: { tone, style, keywords: string[], avoidWords: string[] }
+  brandVoice Json?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime? // soft delete
+
+  subscription  Subscription?
+  memberships   Membership[]
+  projects      Project[]
+  invitations   Invitation[]
+  notifications Notification[]
+
+  @@index([slug])
+  @@map("organizations")
+}
+
+model Membership {
+  id             String     @id @default(cuid())
+  profileId      String
+  organizationId String
+  role           MemberRole @default(EDITOR)
+  joinedAt       DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  profile      Profile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, organizationId])
+  @@index([organizationId])
+  @@index([role])
+  @@map("memberships")
+}
+
+model Invitation {
+  id             String           @id @default(cuid())
+  organizationId String
+  invitedById    String
+  email          String
+  role           MemberRole       @default(EDITOR)
+  token          String           @unique @default(cuid())
+  status         InvitationStatus @default(PENDING)
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime         @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy    Profile      @relation("InvitedBy", fields: [invitedById], references: [id])
+
+  @@index([organizationId])
+  @@index([email])
+  @@index([token])
+  @@map("invitations")
+}
+
+// ============================================================
+// PROJECTS & CONTENT
+// ============================================================
+
+model Project {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  color          String?  // hex, used for UI colour coding
+  isArchived     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization  Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contentPieces ContentPiece[]
+
+  @@index([organizationId])
+  @@index([isArchived])
+  @@map("projects")
+}
+
+model ContentPiece {
+  id             String         @id @default(cuid())
+  projectId      String
+  authorId       String
+  title          String
+  body           String         @db.Text
+  status         ContentStatus  @default(DRAFT)
+  platform       SocialPlatform
+  hashtags       String[]       @default([])
+  mediaUrls      String[]       @default([])
+  kanbanPosition Int            @default(0) // ordering within the Kanban column
+  scheduledAt    DateTime?      // drives the calendar view
+  publishedAt    DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  deletedAt      DateTime?      // soft delete
+
+  project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author        Profile         @relation(fields: [authorId], references: [id])
+  aiGenerations AiGeneration[]
+  reviews       ContentReview[]
+  comments      Comment[]
+
+  @@index([projectId])
+  @@index([authorId])
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("content_pieces")
+}
+
+model ContentReview {
+  id             String   @id @default(cuid())
+  contentPieceId String
+  reviewerId     String
+  approved       Boolean
+  comment        String?  @db.Text
+  createdAt      DateTime @default(now())
+
+  contentPiece ContentPiece @relation(fields: [contentPieceId], references: [id], onDelete: Cascade)
+  reviewer     Profile      @relation(fields: [reviewerId], references: [id])
+
+  @@index([contentPieceId])
+  @@index([reviewerId])
+  @@map("content_reviews")
+}
+
+model Comment {
+  id             String    @id @default(cuid())
+  contentPieceId String
+  authorId       String
+  parentId       String?   // null = top-level; set = threaded reply
+  body           String    @db.Text
+  resolvedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  contentPiece ContentPiece @relation(fields: [contentPieceId], references: [id], onDelete: Cascade)
+  author       Profile      @relation(fields: [authorId], references: [id])
+  parent       Comment?     @relation("Replies", fields: [parentId], references: [id])
+  replies      Comment[]    @relation("Replies")
+
+  @@index([contentPieceId])
+  @@index([parentId])
+  @@map("comments")
+}
+
+// ============================================================
+// AI USAGE
+// ============================================================
+
+model AiGeneration {
+  id             String          @id @default(cuid())
+  contentPieceId String?         // nullable: generation can happen before saving the piece
+  profileId      String
+  organizationId String          // used to debit Subscription.tokensUsed
+
+  action           AiActionType
+  platform         SocialPlatform?
+  prompt           String          @db.Text
+  result           String          @db.Text
+  tokensInput      Int
+  tokensOutput     Int
+  tokensTotal      Int
+  modelUsed        String          // e.g. "gpt-4o", "claude-3-5-sonnet"
+  estimatedCostUsd Decimal?        @db.Decimal(10, 6)
+
+  createdAt DateTime @default(now())
+
+  contentPiece ContentPiece? @relation(fields: [contentPieceId], references: [id], onDelete: SetNull)
+  profile      Profile       @relation(fields: [profileId], references: [id])
+
+  @@index([contentPieceId])
+  @@index([profileId])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("ai_generations")
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+
+model Notification {
+  id             String           @id @default(cuid())
+  profileId      String
+  organizationId String?
+  type           NotificationType
+  body           String           @db.Text
+  metadata       Json?            // e.g. { inviteToken, contentPieceId }
+  readAt         DateTime?
+  createdAt      DateTime         @default(now())
+
+  profile      Profile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@index([profileId])
+  @@index([readAt])
+  @@map("notifications")
+}
+
+// ============================================================
+// SUPABASE TRIGGER — paste this into the Supabase SQL editor
+// ============================================================
+//
+// create or replace function public.handle_new_user()
+// returns trigger
+// language plpgsql
+// security definer set search_path = public
+// as $$
+// begin
+//   insert into public.profiles (id, email, name, avatar_url)
+//   values (
+//     new.id,
+//     new.email,
+//     coalesce(new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
+//     new.raw_user_meta_data->>'avatar_url'
+//   );
+//   return new;
+// end;
+// $$;
+//
+// create or replace trigger on_auth_user_created
+//   after insert on auth.users
+//   for each row execute procedure public.handle_new_user();

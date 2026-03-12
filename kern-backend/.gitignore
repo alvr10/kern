@@ -81,3 +81,5 @@ yarn.lock
 # Security scan results
 trivy-results.sarif
 /src/generated/prisma
+
+/src/generated/prisma
