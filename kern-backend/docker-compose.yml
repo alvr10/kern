@@ -21,6 +21,25 @@ services:
       retries: 5
       start_period: 20s
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: kern-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-kern}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-kernpass}
+    networks:
+      - kern-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
   # ─── API Gateway — only port exposed to the outside ──────────────────────────
   api-gateway:
     build:
@@ -63,6 +82,9 @@ services:
       SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
     networks:
       - kern-network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
   # ─── Organizations Service ────────────────────────────────────────────────────
   organizations-service:
@@ -144,6 +166,8 @@ services:
       - kern-network
     depends_on:
       mongodb:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
   # ─── Billing Service ──────────────────────────────────────────────────────────

@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { createProxyMiddleware } from 'http-proxy-middleware';
+import { PinoLoggerService, HttpLoggerMiddleware } from '@kern/shared';
 
 // Map of route prefixes → upstream service URLs (internal Docker network)
 const ROUTES: Record<string, string> = {
@@ -23,6 +24,11 @@ async function bootstrap() {
   // Access the underlying Express instance to register proxy middleware
   const express = app.getHttpAdapter().getInstance();
 
+  // Attach the Pino Logger to intercept all incoming requests BEFORE they get proxied
+  const pinoLogger = app.get(PinoLoggerService);
+  const loggerMiddleware = new HttpLoggerMiddleware(pinoLogger);
+  express.use((req, res, next) => loggerMiddleware.use(req, res, next));
+
   for (const [prefix, target] of Object.entries(ROUTES)) {
     express.use(
       prefix,
@@ -40,6 +46,13 @@ async function bootstrap() {
   }
 
   await app.listen(3000);
+  console.log(`██╗  ██╗███████╗██████╗ ███╗   ██╗
+██║ ██╔╝██╔════╝██╔══██╗████╗  ██║
+█████╔╝ █████╗  ██████╔╝██╔██╗ ██║
+██╔═██╗ ██╔══╝  ██╔══██╗██║╚██╗██║
+██║  ██╗███████╗██║  ██║██║ ╚████║
+╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
+                                  `);
   console.log('[api-gateway] 🚀  Listening on http://localhost:3000');
   for (const [p, t] of Object.entries(ROUTES)) {
     console.log(`  ${p} → ${t}`);

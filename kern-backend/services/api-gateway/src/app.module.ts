@@ -1,5 +1,6 @@
 import { Controller, Get, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { LoggerModule } from '@kern/shared';
 
 @Controller('health')
 class HealthController {
@@ -10,7 +11,7 @@ class HealthController {
 }
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true })],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), LoggerModule],
   controllers: [HealthController],
 })
 export class AppModule {}
