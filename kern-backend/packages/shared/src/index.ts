@@ -1,9 +1,8 @@
-// Shared types across all KERN microservices
-
+// ── Types & Interfaces ────────────────────────────────────────────────────────
 export interface JwtPayload {
-  sub: string;       // Supabase user UUID
+  sub: string; // Supabase user UUID
   email: string;
-  role?: string;     // 'admin' | 'member'
+  role?: string;
   iat?: number;
   exp?: number;
 }
@@ -20,15 +19,12 @@ export interface PaginatedResponse<T = unknown> {
   limit: number;
 }
 
-export enum MemberRole {
-  ADMIN = 'ADMIN',
-  EDITOR = 'EDITOR',
-  VIEWER = 'VIEWER',
-}
+// ── Enums ─────────────────────────────────────────────────────────────────────
+export * from './enums';
 
-export enum SubscriptionStatus {
-  TRIALING = 'TRIALING',
-  ACTIVE = 'ACTIVE',
-  PAST_DUE = 'PAST_DUE',
-  CANCELED = 'CANCELED',
-}
+// ── NestJS Common Utilities ───────────────────────────────────────────────────
+export { AllExceptionsFilter } from './filters/all-exceptions.filter';
+export { TransformInterceptor } from './interceptors/transform.interceptor';
+export { PinoLoggerService } from './logger/logger.service';
+export { HttpLoggerMiddleware } from './logger/http-logger.middleware';
+export { LoggerModule } from './logger/logger.module';
