@@ -7,7 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 //   - SubscriptionsModule  (create/update subscriptions via Prisma)
 //   - StripeWebhookModule  (handle Stripe events: payment success, cancellation)
 
-@Controller('/billing/health')
+@Controller('health')
 class HealthController {
   @Get()
   check() {

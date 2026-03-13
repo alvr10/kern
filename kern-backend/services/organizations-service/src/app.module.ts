@@ -6,7 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 //   - OrganizationsModule (CRUD, membership management via Prisma)
 //   - InvitationsModule (invite flow)
 
-@Controller('/organizations/health')
+@Controller('health')
 class HealthController {
   @Get()
   check() {

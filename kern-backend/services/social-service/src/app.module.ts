@@ -7,7 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 //   - SocialAccountsModule  (OAuth connection & token storage via Mongoose)
 //   - ScheduledPostsModule  (cron-based auto-publishing)
 
-@Controller('/social/health')
+@Controller('health')
 class HealthController {
   @Get()
   check() {

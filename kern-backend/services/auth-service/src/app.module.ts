@@ -6,7 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 //   - AuthModule (guards, strategies)
 //   - ProfileModule (CRUD via Prisma)
 
-@Controller('/auth/health')
+@Controller('health')
 class HealthController {
   @Get()
   check() {

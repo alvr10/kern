@@ -7,7 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 //   - NotificationsModule (in-app notifications via Mongoose)
 //   - EmailModule         (send emails via Resend SDK)
 
-@Controller('/notifications/health')
+@Controller('health')
 class HealthController {
   @Get()
   check() {

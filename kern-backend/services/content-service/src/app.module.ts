@@ -6,7 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 // Suggested modules:
 //   - ContentPiecesModule (Kanban/Calendar CRUD, status transitions via Mongoose)
 
-@Controller('/content/health')
+@Controller('health')
 class HealthController {
   @Get()
   check() {

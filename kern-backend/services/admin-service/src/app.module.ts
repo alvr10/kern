@@ -16,7 +16,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 // GET  /admin/analytics/tokens   → per-org token usage
 // GET  /admin/system/health      → aggregate health of all services
 
-@Controller('/admin/health')
+@Controller('health')
 class HealthController {
   @Get()
   check() {

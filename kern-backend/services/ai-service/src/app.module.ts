@@ -7,7 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 //   - GenerationsModule  (call OpenAI, stream responses, log to MongoDB)
 //   - TokenUsageModule   (track token consumption per org, emit events when limits hit)
 
-@Controller('/ai/health')
+@Controller('health')
 class HealthController {
   @Get()
   check() {

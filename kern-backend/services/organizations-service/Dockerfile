@@ -1,10 +1,14 @@
-FROM node:20-alpine
+FROM node:20-slim
+RUN apt-get update -y && apt-get install -y openssl
 WORKDIR /app
-COPY services/organizations-service/package*.json ./
-RUN npm ci
-COPY services/organizations-service/ .
-COPY prisma ./prisma
+COPY . .
+RUN npm install
 RUN npx prisma generate --schema=./prisma/schema.prisma
-RUN npm run build
+RUN npm run build -w @kern/shared
+RUN npm run build -w @kern/organizations-service
 EXPOSE 3002
-CMD ["node", "dist/main.js"]
+CMD ["node", "services/organizations-service/dist/main.js"]
+
+
+
+

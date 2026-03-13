@@ -5,7 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 // Suggested modules:
 //   - ProjectsModule (CRUD via Prisma — ties to Organization)
 
-@Controller('/projects/health')
+@Controller('health')
 class HealthController {
   @Get()
   check() {

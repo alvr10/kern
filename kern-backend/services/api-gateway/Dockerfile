@@ -1,8 +1,13 @@
-FROM node:20-alpine
+FROM node:20-slim
+RUN apt-get update -y && apt-get install -y openssl
 WORKDIR /app
-COPY services/api-gateway/package*.json ./
-RUN npm ci
-COPY services/api-gateway/ .
-RUN npm run build
+COPY . .
+RUN npm install
+RUN npm run build -w @kern/shared
+RUN npm run build -w @kern/api-gateway
 EXPOSE 3000
-CMD ["node", "dist/main.js"]
+CMD ["node", "services/api-gateway/dist/main.js"]
+
+
+
+
