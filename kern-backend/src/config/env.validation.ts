@@ -10,4 +10,6 @@ export const envValidationSchema = Joi.object({
   LOG_LEVEL: Joi.string()
     .valid("error", "warn", "info", "debug", "verbose")
     .default("info"),
+  DATABASE_URL: Joi.string().required(),
+  MONGODB_URI: Joi.string().required(),
 });

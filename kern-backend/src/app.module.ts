@@ -5,12 +5,13 @@ import { HttpLoggerMiddleware, LoggerModule } from "@common/logger";
 import { envValidationSchema } from "@config/env.validation";
 import { DatabaseModule } from "@database/database.module";
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
 import { EventEmitterModule } from "@nestjs/event-emitter";
 import { ScheduleModule } from "@nestjs/schedule";
 import { TerminusModule } from "@nestjs/terminus";
 import { ThrottlerModule } from "@nestjs/throttler";
+import { MongooseModule } from "@nestjs/mongoose";
 
 @Module({
   controllers: [HealthController],
@@ -41,6 +42,12 @@ import { ThrottlerModule } from "@nestjs/throttler";
 
     // Database
     DatabaseModule,
+    MongooseModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        uri: config.get<string>("MONGODB_URI"),
+      }),
+    }),
 
     // Feature Modules
 

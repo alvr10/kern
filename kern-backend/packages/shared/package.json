@@ -1,0 +1,12 @@
+{
+  "name": "@kern/shared",
+  "version": "1.0.0",
+  "description": "Shared types and utilities for KERN microservices",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

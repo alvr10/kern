@@ -1,22 +1,211 @@
 services:
-  # Application
-  app:
+  # ─── Infrastructure ───────────────────────────────────────────────────────────
+  mongodb:
+    image: mongo:7
+    container_name: kern-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-kern}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASS:-kernpass}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-kern}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - kern-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ─── API Gateway — only port exposed to the outside ──────────────────────────
+  api-gateway:
     build:
       context: .
-      dockerfile: Dockerfile
-      target: development
-    container_name: hopecore-app-development
+      dockerfile: services/api-gateway/Dockerfile
+    container_name: kern-api-gateway
+    restart: unless-stopped
     ports:
-      - "${PORT:-3000}:3000"
-    volumes:
-      - .:/app
-      - /app/node_modules
-    env_file:
-      - .env
+      - "${GATEWAY_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3000
     networks:
-      - hopecore-network
-    command: sh -c "rm -f tsconfig.tsbuildinfo && exec npm run start:dev"
+      - kern-network
+    depends_on:
+      - auth-service
+      - organizations-service
+      - projects-service
+      - content-service
+      - social-service
+      - notifications-service
+      - billing-service
+      - ai-service
+      - admin-service
+
+  # ─── Auth Service ─────────────────────────────────────────────────────────────
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    container_name: kern-auth-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3001
+      DATABASE_URL: ${DATABASE_URL}
+      DIRECT_URL: ${DIRECT_URL}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+    networks:
+      - kern-network
+
+  # ─── Organizations Service ────────────────────────────────────────────────────
+  organizations-service:
+    build:
+      context: .
+      dockerfile: services/organizations-service/Dockerfile
+    container_name: kern-organizations-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3002
+      DATABASE_URL: ${DATABASE_URL}
+      DIRECT_URL: ${DIRECT_URL}
+    networks:
+      - kern-network
+
+  # ─── Projects Service ─────────────────────────────────────────────────────────
+  projects-service:
+    build:
+      context: .
+      dockerfile: services/projects-service/Dockerfile
+    container_name: kern-projects-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3003
+      DATABASE_URL: ${DATABASE_URL}
+      DIRECT_URL: ${DIRECT_URL}
+    networks:
+      - kern-network
+
+  # ─── Content Service (Kanban / Calendar) ──────────────────────────────────────
+  content-service:
+    build:
+      context: .
+      dockerfile: services/content-service/Dockerfile
+    container_name: kern-content-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3004
+      MONGODB_URI: ${MONGODB_URI}
+    networks:
+      - kern-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  # ─── Social Service ───────────────────────────────────────────────────────────
+  social-service:
+    build:
+      context: .
+      dockerfile: services/social-service/Dockerfile
+    container_name: kern-social-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3005
+      MONGODB_URI: ${MONGODB_URI}
+    networks:
+      - kern-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  # ─── Notifications Service ────────────────────────────────────────────────────
+  notifications-service:
+    build:
+      context: .
+      dockerfile: services/notifications-service/Dockerfile
+    container_name: kern-notifications-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3006
+      MONGODB_URI: ${MONGODB_URI}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+    networks:
+      - kern-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  # ─── Billing Service ──────────────────────────────────────────────────────────
+  billing-service:
+    build:
+      context: .
+      dockerfile: services/billing-service/Dockerfile
+    container_name: kern-billing-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3007
+      DATABASE_URL: ${DATABASE_URL}
+      DIRECT_URL: ${DIRECT_URL}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+    networks:
+      - kern-network
+
+  # ─── AI Service ───────────────────────────────────────────────────────────────
+  ai-service:
+    build:
+      context: .
+      dockerfile: services/ai-service/Dockerfile
+    container_name: kern-ai-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3008
+      MONGODB_URI: ${MONGODB_URI}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    networks:
+      - kern-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  # ─── Admin Service (also exposed on host for admin UI) ────────────────────────
+  admin-service:
+    build:
+      context: .
+      dockerfile: services/admin-service/Dockerfile
+    container_name: kern-admin-service
+    restart: unless-stopped
+    ports:
+      - "${ADMIN_PORT:-3009}:3009"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3009
+      DATABASE_URL: ${DATABASE_URL}
+      DIRECT_URL: ${DIRECT_URL}
+      MONGODB_URI: ${MONGODB_URI}
+      ADMIN_SECRET: ${ADMIN_SECRET:-change-me-in-production}
+    networks:
+      - kern-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+volumes:
+  mongodb_data:
 
 networks:
-  hopecore-network:
+  kern-network:
     driver: bridge
