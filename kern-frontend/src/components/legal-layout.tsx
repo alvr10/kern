@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Menu } from './Menu';
+import { Menu } from './menu';
 
 interface LegalLayoutProps {
   children: React.ReactNode;

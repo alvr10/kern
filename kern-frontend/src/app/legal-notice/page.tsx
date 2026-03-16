@@ -1,5 +1,5 @@
 import React from 'react';
-import { LegalLayout } from '../../components/LegalLayout';
+import { LegalLayout } from '../../components/legal-layout';
 
 export default function LegalNotice(): React.JSX.Element {
   return (
