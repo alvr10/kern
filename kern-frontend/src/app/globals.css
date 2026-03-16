@@ -69,3 +69,45 @@ img, video {
   content: "";
   ... (commented out for production feel)
 } */
+
+/* View Transition API styles - Desktop */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.5s;
+}
+
+::view-transition-old(root) {
+  animation: 1.5s cubic-bezier(0.87, 0, 0.13, 1) both move-out;
+  z-index: 1;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation: 1.5s cubic-bezier(0.87, 0, 0.13, 1) both move-in;
+  z-index: 2;
+}
+
+/* Image wrapper for old content with dark overlay */
+::view-transition-image-pair(root) {
+  isolation: isolate;
+}
+
+@keyframes move-out {
+  from {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+  to {
+    transform: translateY(-35%);
+    filter: brightness(0.4);
+  }
+}
+
+@keyframes move-in {
+  from {
+    clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%);
+  }
+  to {
+    clip-path: polygon(0% 100%, 100% 100%, 100% 0%, 0% 0%);
+  }
+}

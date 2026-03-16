@@ -3,36 +3,27 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { supabase } from '../../../lib/supabase';
+import { useSignIn } from '@/lib/api/auth/hooks';
 import styles from '../auth.module.css';
 
 export default function SignInPage(): React.JSX.Element {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  
+  const { mutate: signIn, isPending: loading, error } = useSignIn();
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (signInError) throw signInError;
-
-      router.push('/');
-      router.refresh();
-    } catch (err: any) {
-      setError(err.message || 'Error al iniciar sesión');
-    } finally {
-      setLoading(false);
-    }
+    signIn(
+      { email, password },
+      {
+        onSuccess: () => {
+          router.push('/');
+          router.refresh();
+        },
+      }
+    );
   };
 
   return (
@@ -69,7 +60,7 @@ export default function SignInPage(): React.JSX.Element {
           />
         </div>
 
-        {error && <div className={styles.error}>{error}</div>}
+        {error && <div className={styles.error}>{error.message}</div>}
 
         <button 
           type="submit" 

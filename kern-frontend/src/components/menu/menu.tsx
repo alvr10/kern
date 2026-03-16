@@ -117,12 +117,12 @@ export function Menu(): React.JSX.Element {
         <Link href="/" className={styles.logo}>
           KERN
         </Link>
-        <div className={styles.links}>
+        <div className={`${styles.links} link`}>
           <HoverScrambleLink text="How it works" href="#how-it-works" />
           <HoverScrambleLink text="Pricing" href="#pricing" />
           <HoverScrambleLink text="Use Cases" href="#use-cases" />
         </div>
-        <div className={styles.authLinks}>
+        <div className={`${styles.authLinks} link`}>
           <Link href="/login" className={styles.loginButton}>Log In</Link>
           <Link href="/signup" className={styles.signupButton}>Sign Up</Link>
         </div>

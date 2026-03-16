@@ -2,40 +2,26 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { supabase } from '../../../lib/supabase';
+import { useSignUp } from '@/lib/api/auth/hooks';
 import styles from '../auth.module.css';
 
 export default function SignUpPage(): React.JSX.Element {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const { mutate: signUp, isPending: loading, error } = useSignUp();
+
+  const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    try {
-      const { error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+    signUp(
+      { email, password },
+      {
+        onSuccess: () => {
+          setSuccess(true);
         },
-      });
-
-      if (signUpError) throw signUpError;
-
-      setSuccess(true);
-    } catch (err: any) {
-      setError(err.message || 'Error al registrarse');
-    } finally {
-      setLoading(false);
-    }
+      }
+    );
   };
 
   if (success) {
@@ -88,7 +74,7 @@ export default function SignUpPage(): React.JSX.Element {
           />
         </div>
 
-        {error && <div className={styles.error}>{error}</div>}
+        {error && <div className={styles.error}>{error.message}</div>}
 
         <button 
           type="submit" 
