@@ -54,19 +54,9 @@ services:
       - "${GATEWAY_PORT:-3000}:3000"
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      PORT: 3000
+      GATEWAY_PORT: 3000
     networks:
       - kern-network
-    depends_on:
-      - auth-service
-      - organizations-service
-      - projects-service
-      - content-service
-      - social-service
-      - notifications-service
-      - billing-service
-      - ai-service
-      - admin-service
 
   # ─── Auth Service ─────────────────────────────────────────────────────────────
   auth-service:
@@ -81,6 +71,9 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: 3001
+      SERVICE_NAME: auth-service
+      SERVICE_HOST: auth-service
+      DISCOVERY_URL: http://api-gateway:3000/discovery
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_URL: ${DIRECT_URL}
       SUPABASE_URL: ${SUPABASE_URL}
@@ -105,6 +98,9 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: 3002
+      SERVICE_NAME: organizations-service
+      SERVICE_HOST: organizations-service
+      DISCOVERY_URL: http://api-gateway:3000/discovery
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_URL: ${DIRECT_URL}
     networks:
@@ -123,6 +119,9 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: 3003
+      SERVICE_NAME: projects-service
+      SERVICE_HOST: projects-service
+      DISCOVERY_URL: http://api-gateway:3000/discovery
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_URL: ${DIRECT_URL}
     networks:
@@ -141,6 +140,9 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: 3004
+      SERVICE_NAME: content-service
+      SERVICE_HOST: content-service
+      DISCOVERY_URL: http://api-gateway:3000/discovery
       MONGODB_URI: ${MONGODB_URI}
     networks:
       - kern-network
@@ -161,6 +163,9 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: 3005
+      SERVICE_NAME: social-service
+      SERVICE_HOST: social-service
+      DISCOVERY_URL: http://api-gateway:3000/discovery
       MONGODB_URI: ${MONGODB_URI}
     networks:
       - kern-network
@@ -181,6 +186,9 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: 3006
+      SERVICE_NAME: notifications-service
+      SERVICE_HOST: notifications-service
+      DISCOVERY_URL: http://api-gateway:3000/discovery
       MONGODB_URI: ${MONGODB_URI}
       RESEND_API_KEY: ${RESEND_API_KEY}
     networks:
@@ -204,6 +212,9 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: 3007
+      SERVICE_NAME: billing-service
+      SERVICE_HOST: billing-service
+      DISCOVERY_URL: http://api-gateway:3000/discovery
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_URL: ${DIRECT_URL}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
@@ -224,6 +235,9 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: 3008
+      SERVICE_NAME: ai-service
+      SERVICE_HOST: ai-service
+      DISCOVERY_URL: http://api-gateway:3000/discovery
       MONGODB_URI: ${MONGODB_URI}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
     networks:
@@ -246,7 +260,10 @@ services:
       - "${ADMIN_PORT:-3009}:3009"
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      PORT: 3009
+      ADMIN_PORT: 3009
+      SERVICE_NAME: admin-service
+      SERVICE_HOST: admin-service
+      DISCOVERY_URL: http://api-gateway:3000/discovery
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_URL: ${DIRECT_URL}
       MONGODB_URI: ${MONGODB_URI}

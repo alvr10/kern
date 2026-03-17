@@ -1,10 +1,11 @@
 import { Controller, Get, Post, Module, Inject } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport, ClientProxy } from '@nestjs/microservices';
+import { DiscoveryClientModule } from '@kern/shared';
 
 @Controller()
 class AppController {
-  constructor(@Inject('NOTIFICATIONS_SERVICE') private readonly rabbitClient: ClientProxy) {}
+  constructor(@Inject('NOTIFICATIONS_SERVICE') private readonly rabbitClient: ClientProxy) { }
 
   @Get('health')
   check() {
@@ -14,12 +15,12 @@ class AppController {
   @Post('register')
   mockRegister() {
     const mockUser = { id: 'usr_123', email: 'hello@kern.app', name: 'Alvaro' };
-    
+
     // Auth service does its own database logic here...
-    
+
     // Then shouting into the void for other services to react asynchronously
     this.rabbitClient.emit('user_created', mockUser);
-    
+
     return {
       message: 'User explicitly registered!',
       user: mockUser,
@@ -31,6 +32,7 @@ class AppController {
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    DiscoveryClientModule,
     ClientsModule.register([
       {
         name: 'NOTIFICATIONS_SERVICE',
@@ -47,4 +49,4 @@ class AppController {
   ],
   controllers: [AppController],
 })
-export class AppModule {}
+export class AppModule { }

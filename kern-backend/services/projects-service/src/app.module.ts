@@ -1,5 +1,6 @@
 import { Controller, Get, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { DiscoveryClientModule } from '@kern/shared';
 
 // TODO: Add projects logic here
 // Suggested modules:
@@ -14,7 +15,7 @@ class HealthController {
 }
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true })],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), DiscoveryClientModule],
   controllers: [HealthController],
 })
-export class AppModule {}
+export class AppModule { }

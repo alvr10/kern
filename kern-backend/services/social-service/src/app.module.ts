@@ -1,6 +1,7 @@
 import { Controller, Get, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { DiscoveryClientModule } from '@kern/shared';
 
 // TODO: Add social integrations here
 // Suggested modules:
@@ -19,7 +20,8 @@ class HealthController {
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGODB_URI ?? 'mongodb://localhost:27017/kern'),
+    DiscoveryClientModule,
   ],
   controllers: [HealthController],
 })
-export class AppModule {}
+export class AppModule { }

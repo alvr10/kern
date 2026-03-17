@@ -28,3 +28,7 @@ export { TransformInterceptor } from './interceptors/transform.interceptor';
 export { PinoLoggerService } from './logger/logger.service';
 export { HttpLoggerMiddleware } from './logger/http-logger.middleware';
 export { LoggerModule } from './logger/logger.module';
+
+// ── Service Discovery ──────────────────────────────────────────────────────────
+export { DiscoveryClientModule } from './discovery/discovery-client.module';
+export { ServiceManager } from './discovery/manager.service';

@@ -5,7 +5,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { logger: ['log', 'warn', 'error'] });
   app.enableCors();
-  const port = process.env.PORT ?? 3009;
+  const port = process.env.ADMIN_PORT ?? 3009;
   await app.listen(port);
   console.log(`[admin-service] 🚀  Ready on http://localhost:${port}`);
 }
