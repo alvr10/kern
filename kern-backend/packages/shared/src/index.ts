@@ -31,4 +31,4 @@ export { LoggerModule } from './logger/logger.module';
 
 // ── Service Discovery ──────────────────────────────────────────────────────────
 export { DiscoveryClientModule } from './discovery/discovery-client.module';
-export { ServiceManager } from './discovery/manager.service';
+export { ConsulService } from './discovery/consul.service';

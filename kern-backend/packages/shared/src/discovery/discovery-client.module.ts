@@ -1,9 +1,9 @@
 import { Module, Global } from '@nestjs/common';
-import { ServiceManager } from './manager.service';
+import { ConsulService } from './consul.service';
 
 @Global()
 @Module({
-  providers: [ServiceManager],
-  exports: [ServiceManager],
+  providers: [ConsulService],
+  exports: [ConsulService],
 })
-export class DiscoveryClientModule {}
+export class DiscoveryClientModule { }

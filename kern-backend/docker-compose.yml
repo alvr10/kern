@@ -1,9 +1,26 @@
 services:
   # ─── Infrastructure ───────────────────────────────────────────────────────────
+  consul:
+    image: consul:1.15.4
+    container_name: kern-consul
+    restart: unless-stopped
+    ports:
+      - "8500:8500" # UI + API
+    command: agent -dev -client=0.0.0.0 -ui
+    networks:
+      - kern-network
+    healthcheck:
+      test: ["CMD", "consul", "members"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   mongodb:
     image: mongo:7
     container_name: kern-mongodb
     restart: unless-stopped
+    # Port mapping kept for dev database access if needed,
+    # but in production, this would be internal only.
     ports:
       - "27017:27017"
     environment:
@@ -40,7 +57,7 @@ services:
       retries: 5
       start_period: 20s
 
-  # ─── API Gateway — only port exposed to the outside ──────────────────────────
+  # ─── API Gateway (Public Entry Point) ─────────────────────────────────────────
   api-gateway:
     build:
       context: .
@@ -55,6 +72,10 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       GATEWAY_PORT: 3000
+      CONSUL_URL: http://consul:8500
+    depends_on:
+      consul:
+        condition: service_healthy
     networks:
       - kern-network
 
@@ -65,15 +86,14 @@ services:
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: auth-service
-        PORT: 3001
+        PORT: 3000
     container_name: kern-auth-service
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      PORT: 3001
+      PORT: 3000
       SERVICE_NAME: auth-service
-      SERVICE_HOST: auth-service
-      DISCOVERY_URL: http://api-gateway:3000/discovery
+      CONSUL_URL: http://consul:8500
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_URL: ${DIRECT_URL}
       SUPABASE_URL: ${SUPABASE_URL}
@@ -82,6 +102,8 @@ services:
     networks:
       - kern-network
     depends_on:
+      consul:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
 
@@ -92,19 +114,21 @@ services:
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: organizations-service
-        PORT: 3002
+        PORT: 3000
     container_name: kern-organizations-service
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      PORT: 3002
+      PORT: 3000
       SERVICE_NAME: organizations-service
-      SERVICE_HOST: organizations-service
-      DISCOVERY_URL: http://api-gateway:3000/discovery
+      CONSUL_URL: http://consul:8500
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_URL: ${DIRECT_URL}
     networks:
       - kern-network
+    depends_on:
+      consul:
+        condition: service_healthy
 
   # ─── Projects Service ─────────────────────────────────────────────────────────
   projects-service:
@@ -113,19 +137,21 @@ services:
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: projects-service
-        PORT: 3003
+        PORT: 3000
     container_name: kern-projects-service
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      PORT: 3003
+      PORT: 3000
       SERVICE_NAME: projects-service
-      SERVICE_HOST: projects-service
-      DISCOVERY_URL: http://api-gateway:3000/discovery
+      CONSUL_URL: http://consul:8500
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_URL: ${DIRECT_URL}
     networks:
       - kern-network
+    depends_on:
+      consul:
+        condition: service_healthy
 
   # ─── Content Service (Kanban / Calendar) ──────────────────────────────────────
   content-service:
@@ -134,19 +160,20 @@ services:
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: content-service
-        PORT: 3004
+        PORT: 3000
     container_name: kern-content-service
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      PORT: 3004
+      PORT: 3000
       SERVICE_NAME: content-service
-      SERVICE_HOST: content-service
-      DISCOVERY_URL: http://api-gateway:3000/discovery
+      CONSUL_URL: http://consul:8500
       MONGODB_URI: ${MONGODB_URI}
     networks:
       - kern-network
     depends_on:
+      consul:
+        condition: service_healthy
       mongodb:
         condition: service_healthy
 
@@ -157,19 +184,20 @@ services:
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: social-service
-        PORT: 3005
+        PORT: 3000
     container_name: kern-social-service
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      PORT: 3005
+      PORT: 3000
       SERVICE_NAME: social-service
-      SERVICE_HOST: social-service
-      DISCOVERY_URL: http://api-gateway:3000/discovery
+      CONSUL_URL: http://consul:8500
       MONGODB_URI: ${MONGODB_URI}
     networks:
       - kern-network
     depends_on:
+      consul:
+        condition: service_healthy
       mongodb:
         condition: service_healthy
 
@@ -180,20 +208,21 @@ services:
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: notifications-service
-        PORT: 3006
+        PORT: 3000
     container_name: kern-notifications-service
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      PORT: 3006
+      PORT: 3000
       SERVICE_NAME: notifications-service
-      SERVICE_HOST: notifications-service
-      DISCOVERY_URL: http://api-gateway:3000/discovery
+      CONSUL_URL: http://consul:8500
       MONGODB_URI: ${MONGODB_URI}
       RESEND_API_KEY: ${RESEND_API_KEY}
     networks:
       - kern-network
     depends_on:
+      consul:
+        condition: service_healthy
       mongodb:
         condition: service_healthy
       rabbitmq:
@@ -206,21 +235,23 @@ services:
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: billing-service
-        PORT: 3007
+        PORT: 3000
     container_name: kern-billing-service
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      PORT: 3007
+      PORT: 3000
       SERVICE_NAME: billing-service
-      SERVICE_HOST: billing-service
-      DISCOVERY_URL: http://api-gateway:3000/discovery
+      CONSUL_URL: http://consul:8500
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_URL: ${DIRECT_URL}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
     networks:
       - kern-network
+    depends_on:
+      consul:
+        condition: service_healthy
 
   # ─── AI Service ───────────────────────────────────────────────────────────────
   ai-service:
@@ -229,41 +260,42 @@ services:
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: ai-service
-        PORT: 3008
+        PORT: 3000
     container_name: kern-ai-service
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      PORT: 3008
+      PORT: 3000
       SERVICE_NAME: ai-service
-      SERVICE_HOST: ai-service
-      DISCOVERY_URL: http://api-gateway:3000/discovery
+      CONSUL_URL: http://consul:8500
       MONGODB_URI: ${MONGODB_URI}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
     networks:
       - kern-network
     depends_on:
+      consul:
+        condition: service_healthy
       mongodb:
         condition: service_healthy
 
-  # ─── Admin Service (also exposed on host for admin UI) ────────────────────────
+  # ─── Admin Service ────────────────────────────────────────────────────────────
   admin-service:
     build:
       context: .
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: admin-service
-        PORT: 3009
+        PORT: 3000
     container_name: kern-admin-service
     restart: unless-stopped
+    # Kept port 3009 for Admin UI access, but service runs on 3000 internally.
     ports:
-      - "${ADMIN_PORT:-3009}:3009"
+      - "${ADMIN_PORT:-3009}:3000"
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      ADMIN_PORT: 3009
+      ADMIN_PORT: 3000
       SERVICE_NAME: admin-service
-      SERVICE_HOST: admin-service
-      DISCOVERY_URL: http://api-gateway:3000/discovery
+      CONSUL_URL: http://consul:8500
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_URL: ${DIRECT_URL}
       MONGODB_URI: ${MONGODB_URI}
@@ -271,6 +303,8 @@ services:
     networks:
       - kern-network
     depends_on:
+      consul:
+        condition: service_healthy
       mongodb:
         condition: service_healthy
 
