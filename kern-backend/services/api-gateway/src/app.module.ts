@@ -1,6 +1,6 @@
 import { Controller, Get, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { DiscoveryClientModule, LoggerModule } from '@kern/shared';
+import { DiscoveryClientModule, LoggerModule, MetricsModule } from '@kern/shared';
 import { ProxyModule } from './modules/proxy/proxy.module';
 
 @Controller('health')
@@ -12,7 +12,7 @@ class HealthController {
 }
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), LoggerModule, DiscoveryClientModule, ProxyModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), LoggerModule, DiscoveryClientModule, ProxyModule, MetricsModule],
   controllers: [HealthController],
 })
  export class AppModule { }

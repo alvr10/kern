@@ -1,6 +1,6 @@
 import { Controller, Get, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { DiscoveryClientModule } from '@kern/shared';
+import { DiscoveryClientModule, MetricsModule } from '@kern/shared';
 
 // TODO: Add organizations logic here
 // Suggested modules:
@@ -16,7 +16,7 @@ class HealthController {
 }
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), DiscoveryClientModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), DiscoveryClientModule, MetricsModule],
   controllers: [HealthController],
 })
 export class AppModule { }

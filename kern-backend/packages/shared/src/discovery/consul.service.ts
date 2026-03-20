@@ -36,6 +36,7 @@ export class ConsulService implements OnModuleInit, OnModuleDestroy {
     const registration = {
       id: this.serviceId,
       name: this.serviceName,
+      address: this.serviceName,
       port: this.servicePort,
       check: {
         name: `Health check for ${this.serviceName}`,
@@ -43,6 +44,9 @@ export class ConsulService implements OnModuleInit, OnModuleDestroy {
         interval: '10s',
         timeout: '5s',
         deregistercriticalserviceafter: '30s',
+      },
+      meta: {
+        metrics_path: '/metrics',
       },
     };
 

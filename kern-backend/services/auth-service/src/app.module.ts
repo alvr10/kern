@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Module, Inject } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport, ClientProxy } from '@nestjs/microservices';
-import { DiscoveryClientModule } from '@kern/shared';
+import { DiscoveryClientModule, MetricsModule } from '@kern/shared';
 
 @Controller()
 class AppController {
@@ -33,6 +33,7 @@ class AppController {
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DiscoveryClientModule,
+    MetricsModule,
     ClientsModule.register([
       {
         name: 'NOTIFICATIONS_SERVICE',

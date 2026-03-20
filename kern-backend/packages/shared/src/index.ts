@@ -32,3 +32,6 @@ export { LoggerModule } from './logger/logger.module';
 // ── Service Discovery ──────────────────────────────────────────────────────────
 export { DiscoveryClientModule } from './discovery/discovery-client.module';
 export { ConsulService } from './discovery/consul.service';
+
+// ── Metrics & Observability ───────────────────────────────────────────────────
+export { MetricsModule } from './metrics';

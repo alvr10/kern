@@ -10,8 +10,8 @@
   "scripts": {
     "up": "docker compose up --build",
     "up:d": "docker compose up --build -d",
-    "down": "docker compose down",
-    "down:v": "docker compose down -v",
+    "down": "docker compose down --remove-orphans",
+    "down:v": "docker compose down -v --remove-orphans",
     "logs": "docker compose logs -f",
     "ps": "docker compose ps",
     "restart": "docker compose restart"
