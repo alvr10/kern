@@ -1,0 +1,246 @@
+openapi: 3.0.0
+info:
+  title: KERN Billing Service
+  version: 1.0.0
+  description: Manages subscription plans, organization subscriptions, and Stripe webhook processing.
+
+tags:
+  - name: Plans
+  - name: Subscriptions
+  - name: Webhooks
+  - name: Health
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      operationId: billingHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /billing/plans:
+    get:
+      tags: [Plans]
+      summary: List all available subscription plans
+      operationId: listPlans
+      responses:
+        '200':
+          description: List of plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlanResponse'
+
+  /billing/plans/{id}:
+    get:
+      tags: [Plans]
+      summary: Get a plan by ID
+      operationId: getPlan
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Plan detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanResponse'
+        '404':
+          description: Not found
+
+  /billing/subscriptions/{organizationId}:
+    get:
+      tags: [Subscriptions]
+      summary: Get the current subscription for an organization
+      operationId: getSubscription
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Current subscription
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+        '404':
+          description: No active subscription found
+
+  /billing/subscriptions:
+    post:
+      tags: [Subscriptions]
+      summary: Create a Stripe Checkout session to start a subscription
+      operationId: createCheckoutSession
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCheckoutDto'
+      responses:
+        '201':
+          description: Checkout session created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  checkoutUrl:
+                    type: string
+                    description: Stripe hosted checkout URL to redirect the user to
+
+  /billing/subscriptions/{organizationId}/cancel:
+    post:
+      tags: [Subscriptions]
+      summary: Cancel the subscription at period end
+      operationId: cancelSubscription
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Subscription scheduled for cancellation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+
+  /billing/webhooks/stripe:
+    post:
+      tags: [Webhooks]
+      summary: Stripe webhook endpoint
+      operationId: stripeWebhook
+      description: Receives and processes Stripe events (payment success, cancellation, etc.)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Event processed
+        '400':
+          description: Invalid signature
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    PlanResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          example: Pro
+        slug:
+          type: string
+        monthlyTokenLimit:
+          type: integer
+        memberLimit:
+          type: integer
+        projectLimit:
+          type: integer
+        priceMonthlyUsd:
+          type: number
+          format: float
+        features:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+
+    SubscriptionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        organizationId:
+          type: string
+        planId:
+          type: string
+        status:
+          type: string
+          enum: [TRIALING, ACTIVE, PAST_DUE, CANCELED]
+        tokensUsed:
+          type: integer
+        tokensLimit:
+          type: integer
+        stripeCancelAtPeriodEnd:
+          type: boolean
+        stripeCurrentPeriodEnd:
+          type: string
+          format: date-time
+          nullable: true
+        trialEndsAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateCheckoutDto:
+      type: object
+      required: [organizationId, planId]
+      properties:
+        organizationId:
+          type: string
+        planId:
+          type: string
+        successUrl:
+          type: string
+          description: URL to redirect after successful payment
+        cancelUrl:
+          type: string
+          description: URL to redirect if user cancels checkout

@@ -3,7 +3,6 @@ import { ConsulService } from '@kern/shared';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const ROUTE_TO_SERVICE: Record<string, string> = {
-  '/auth': 'auth-service',
   '/organizations': 'organizations-service',
   '/projects': 'projects-service',
   '/content': 'content-service',
