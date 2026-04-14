@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { createProxyMiddleware } from 'http-proxy-middleware';
 import { PinoLoggerService, HttpLoggerMiddleware } from '@kern/shared';
 
 async function bootstrap() {

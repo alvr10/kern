@@ -1,13 +1,10 @@
 import { Controller, Get, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
 import { DiscoveryClientModule, MetricsModule } from '@kern/shared';
+import { DatabaseModule } from './infrastructure/database/database.module';
 
 // TODO: Add AI logic here
-// Suggested modules:
-//   - GenerationsModule  (call OpenAI, stream responses, log to MongoDB)
-//   - TokenUsageModule   (track token consumption per org, emit events when limits hit)
-
+// ...
 @Controller('health')
 class HealthController {
   @Get()
@@ -19,10 +16,10 @@ class HealthController {
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forRoot(process.env.MONGODB_URI ?? 'mongodb://localhost:27017/kern'),
+    DatabaseModule,
     DiscoveryClientModule,
     MetricsModule
   ],
   controllers: [HealthController],
 })
- export class AppModule { }
+export class AppModule { }

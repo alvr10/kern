@@ -1,7 +1,7 @@
 import { Controller, Get, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
 import { DiscoveryClientModule, MetricsModule } from '@kern/shared';
+import { DatabaseModule } from './infrastructure/database/database.module';
 
 // ─── Admin Routes (stub — implement each as its own module) ──────────────────
 // GET  /admin/health            → this controller
@@ -28,9 +28,7 @@ class HealthController {
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    // Connects to Supabase Postgres via Prisma (injected in feature modules)
-    // Connects to MongoDB for content + AI log aggregation
-    MongooseModule.forRoot(process.env.MONGODB_URI ?? 'mongodb://localhost:27017/kern'),
+    DatabaseModule,
     DiscoveryClientModule,
     MetricsModule
   ],

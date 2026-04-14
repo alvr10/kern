@@ -3,7 +3,7 @@ import { Document, Types } from 'mongoose';
 import { AI_ACTION_TYPE_VALUES, AiActionType, SOCIAL_PLATFORM_VALUES, SocialPlatform } from '@kern/shared';
 
 @Schema({ timestamps: { createdAt: true, updatedAt: false }, collection: 'ai_generations' })
-export class AiGeneration {
+export class AIGeneration {
   @Prop({ type: Types.ObjectId, ref: 'ContentPiece', index: true })
   contentPieceId?: Types.ObjectId;
 
@@ -41,7 +41,7 @@ export class AiGeneration {
   estimatedCostUsd?: number;
 }
 
-export type AiGenerationDocument = AiGeneration & Document;
-export const AiGenerationSchema = SchemaFactory.createForClass(AiGeneration);
+export type AIGenerationDocument = AIGeneration & Document;
+export const AIGenerationSchema = SchemaFactory.createForClass(AIGeneration);
 
-AiGenerationSchema.index({ organizationId: 1, createdAt: -1 });
+AIGenerationSchema.index({ organizationId: 1, createdAt: -1 });

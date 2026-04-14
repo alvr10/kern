@@ -2,6 +2,7 @@ import { Controller, Get, Post, Module, Inject } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport, ClientProxy } from '@nestjs/microservices';
 import { DiscoveryClientModule, MetricsModule } from '@kern/shared';
+import { DatabaseModule } from './infrastructure/database/database.module';
 
 @Controller()
 class AppController {
@@ -32,6 +33,7 @@ class AppController {
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    DatabaseModule,
     DiscoveryClientModule,
     MetricsModule,
     ClientsModule.register([

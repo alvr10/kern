@@ -1,12 +1,10 @@
 import { Controller, Get, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DiscoveryClientModule, MetricsModule } from '@kern/shared';
+import { DatabaseModule } from './infrastructure/database/database.module';
 
 // TODO: Add organizations logic here
-// Suggested modules:
-//   - OrganizationsModule (CRUD, membership management via Prisma)
-//   - InvitationsModule (invite flow)
-
+// ...
 @Controller('health')
 class HealthController {
   @Get()
@@ -16,7 +14,7 @@ class HealthController {
 }
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), DiscoveryClientModule, MetricsModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, DiscoveryClientModule, MetricsModule],
   controllers: [HealthController],
 })
 export class AppModule { }
