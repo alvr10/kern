@@ -1,24 +1,20 @@
-import { Controller, Get, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DiscoveryClientModule, MetricsModule } from '@kern/shared';
 import { DatabaseModule } from './infrastructure/database/database.module';
-
-// TODO: Add social integrations here
-// ...
-@Controller('health')
-class HealthController {
-  @Get()
-  check() {
-    return { status: 'ok', service: 'social-service', timestamp: new Date().toISOString() };
-  }
-}
+import { SocialModule } from './social.module';
+import { HealthController } from './presentation/controllers/health.controller';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ 
+      isGlobal: true,
+      envFilePath: '../../.env'
+    }),
     DatabaseModule,
     DiscoveryClientModule,
     MetricsModule,
+    SocialModule,
   ],
   controllers: [HealthController],
 })
