@@ -17,9 +17,16 @@
     "restart": "docker compose restart"
   },
   "dependencies": {
-    "@prisma/client": "^7.5.0"
+    "@prisma/adapter-pg": "^7.7.0",
+    "@prisma/client": "^7.5.0",
+    "@types/pg": "^8.20.0",
+    "dotenv": "^16.6.1",
+    "pg": "^8.20.0"
   },
   "devDependencies": {
-    "prisma": "^7.5.0"
+    "@types/node": "^20.0.0",
+    "prisma": "^7.5.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0"
   }
 }

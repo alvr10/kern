@@ -1,20 +1,19 @@
-import { Controller, Get, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DiscoveryClientModule, MetricsModule } from '@kern/shared';
 import { DatabaseModule } from './infrastructure/database/database.module';
-
-// TODO: Add organizations logic here
-// ...
-@Controller('health')
-class HealthController {
-  @Get()
-  check() {
-    return { status: 'ok', service: 'organizations-service', timestamp: new Date().toISOString() };
-  }
-}
+import { OrganizationsModule } from './organizations.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, DiscoveryClientModule, MetricsModule],
-  controllers: [HealthController],
+  imports: [
+    ConfigModule.forRoot({ 
+      isGlobal: true,
+      envFilePath: '../../.env'
+    }),
+    DatabaseModule,
+    DiscoveryClientModule,
+    MetricsModule,
+    OrganizationsModule,
+  ],
 })
-export class AppModule { }
+export class AppModule {}

@@ -47,11 +47,13 @@ src/
 ## 3. Technology Stack & Persistence
 
 ### TypeScript Standards
+
 - **Strict Mode**: Mandatory. No `any`, no `@ts-ignore`.
 - **Typing**: Use `interface` for contracts and `type` for unions/intersections.
 - **Returns**: Explicit return types for all public methods and functions.
 
 ### Databases
+
 - **Relational (Supabase/PostgreSQL)**: Use **Prisma**.
 - **NoSQL (Document)**: Use **Mongoose**.
 - **Rule**: Domain entities must remain database-agnostic. Use **Mappers** in the infrastructure layer to transform DB models into Domain entities.
@@ -92,9 +94,9 @@ src/
 
 ## 8. Agent Workflow
 
-1.  **Analyze**: Understand the impact on Domain vs Infrastructure.
-2.  **Define Protocol**: Start by defining DTOs, Commands, and Domain Interfaces.
-3.  **Implement Domain**: Write the core logic first.
-4.  **Implement Infra**: Connect to DB/External services.
-5.  **Expose**: Add the Controller/Consumer.
-6.  **Verify**: Ensure types are sound and naming is kebab-case.
+1. **Analyze**: Understand the impact on Domain vs Infrastructure.
+2. **Define Protocol**: Start by defining DTOs, Commands, and Domain Interfaces.
+3. **Implement Domain**: Write the core logic first.
+4. **Implement Infra**: Connect to DB/External services.
+5. **Expose**: Add the Controller/Consumer.
+6. **Verify**: Ensure types are sound and naming is kebab-case.
