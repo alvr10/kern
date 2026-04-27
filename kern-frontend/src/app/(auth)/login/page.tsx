@@ -19,7 +19,7 @@ export default function SignInPage(): React.JSX.Element {
       { email, password },
       {
         onSuccess: () => {
-          router.push('/');
+          router.push('/dashboard/organizations');
           router.refresh();
         },
       }

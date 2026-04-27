@@ -8,6 +8,7 @@ async function bootstrap() {
     logger: ['log', 'warn', 'error'],
   });
   app.enableCors();
+  app.setGlobalPrefix('/api/v1', { exclude: ['/health'] });
 
   // Connect to RabbitMQ via the shared Docker network
   app.connectMicroservice<MicroserviceOptions>({

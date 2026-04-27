@@ -9,6 +9,7 @@ async function bootstrap() {
   });
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
   app.enableCors();
+  app.setGlobalPrefix('/api/v1', { exclude: ['/health'] });
   const port = process.env.PORT ?? 3003;
   await app.listen(port);
   console.log(`[projects-service] 🚀  Ready on http://localhost:${port}`);

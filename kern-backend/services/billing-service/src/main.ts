@@ -7,6 +7,7 @@ async function bootstrap() {
     logger: ['log', 'warn', 'error'],
   });
   app.enableCors();
+  app.setGlobalPrefix('/api/v1', { exclude: ['/health'] });
   const port = process.env.PORT ?? 3007;
   await app.listen(port);
   console.log(`[billing-service] 🚀  Ready on http://localhost:${port}`);

@@ -317,7 +317,7 @@ services:
       SERVICE_NAME: ai-service
       CONSUL_URL: http://consul:8500
       MONGODB_URI: ${MONGODB_URI}
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
       # OpenTelemetry Auto-Instrumentation
       NODE_OPTIONS: "--require @opentelemetry/auto-instrumentations-node/register"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"

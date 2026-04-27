@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Headers } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateOrganizationDto } from '../../application/dtos/create-organization.dto';
 import { UpdateOrganizationDto } from '../../application/dtos/update-organization.dto';
@@ -16,15 +16,15 @@ export class OrganizationsController {
   ) {}
 
   @Get()
-  async list() {
-    // In a real app, profileId comes from Auth context (e.g. req.user.id)
-    const profileId = 'dummy-profile-id';
+  async list(@Headers() headers: Record<string, string>) {
+    const profileId = headers['x-user-id'];
     return this.queryBus.execute(new ListOrganizationsQuery(profileId));
   }
 
   @Post()
-  async create(@Body() dto: CreateOrganizationDto) {
-    const orgId = await this.commandBus.execute(new CreateOrganizationCommand(dto.name, dto.slug, dto.logoUrl));
+  async create(@Headers() headers: Record<string, string>, @Body() dto: CreateOrganizationDto) {
+    const profileId = headers['x-user-id'];
+    const orgId = await this.commandBus.execute(new CreateOrganizationCommand(dto.name, dto.slug, profileId, dto.logoUrl));
     return this.queryBus.execute(new GetOrganizationQuery(orgId));
   }
 
