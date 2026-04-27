@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Menu } from './menu/menu';
+import { Menu } from './menu';
 import { SmoothScroll } from './smooth-scroll';
 
 interface LegalLayoutProps {

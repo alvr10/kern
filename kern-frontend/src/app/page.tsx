@@ -5,9 +5,9 @@ import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { Menu } from '../components/menu/menu';
+import { Menu } from '../components/menu';
 import { SmoothScroll } from '../components/smooth-scroll';
-import TextBlockReveal from '../components/text-block-reveal/text-block-reveal';
+import TextBlockReveal from '../components/text-block-reveal';
 import styles from './page.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
