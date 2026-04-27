@@ -6,6 +6,7 @@ import { OrganizationsController } from './presentation/controllers/organization
 import { MembersController } from './presentation/controllers/members.controller';
 import { InvitationsController } from './presentation/controllers/invitations.controller';
 import { HealthController } from './presentation/controllers/health.controller';
+import { AdminController } from './presentation/controllers/admin.controller';
 
 // Command Handlers
 import { CreateOrganizationHandler } from './application/commands/create-organization.handler';
@@ -67,6 +68,7 @@ const Repositories = [
     MembersController,
     InvitationsController,
     HealthController,
+    AdminController,
   ],
   providers: [
     ...CommandHandlers,

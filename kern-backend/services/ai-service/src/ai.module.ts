@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GenerationsController } from './presentation/controllers/generations.controller';
 import { HealthController } from './presentation/controllers/health.controller';
+import { AdminController } from './presentation/controllers/admin.controller';
 
 import { GenerateContentHandler } from './application/commands/generate-content.handler';
 import { RewriteContentHandler } from './application/commands/rewrite-content.handler';
@@ -31,7 +32,7 @@ const Handlers = [
       { name: TokenUsage.name, schema: TokenUsageSchema },
     ]),
   ],
-  controllers: [GenerationsController, HealthController],
+  controllers: [GenerationsController, HealthController, AdminController],
   providers: [
     ...Handlers,
     GeminiClient,

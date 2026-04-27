@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { ContentController } from './presentation/controllers/content.controller';
 import { ReviewsController } from './presentation/controllers/reviews.controller';
 import { CommentsController } from './presentation/controllers/comments.controller';
+import { AdminController } from './infrastructure/database/controllers/admin.controller';
 
 import { CreateContentHandler } from './application/commands/create-content.handler';
 import { UpdateContentHandler } from './application/commands/update-content.handler';
@@ -36,7 +37,7 @@ const Handlers = [
 
 @Module({
   imports: [CqrsModule],
-  controllers: [ContentController, ReviewsController, CommentsController],
+  controllers: [ContentController, ReviewsController, CommentsController, AdminController],
   providers: [
     ...Handlers,
     {
