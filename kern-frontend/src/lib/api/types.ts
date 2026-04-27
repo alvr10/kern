@@ -61,7 +61,7 @@ export class ApiClientError extends Error {
   constructor(
     message: string,
     public statusCode: number | undefined,
-    public details?: unknown
+    public details?: unknown,
   ) {
     super(message);
     this.name = "ApiClientError";

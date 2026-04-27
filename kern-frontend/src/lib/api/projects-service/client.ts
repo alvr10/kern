@@ -14,7 +14,7 @@ export const projectsClient = {
    */
   listProjects: (
     organizationId: string,
-    archived: boolean = false
+    archived: boolean = false,
   ): Promise<ProjectResponse[]> => {
     return apiClient.get<ProjectResponse[]>("/projects", {
       params: { organizationId, archived },
@@ -38,7 +38,10 @@ export const projectsClient = {
   /**
    * Update a project
    */
-  updateProject: (id: string, data: UpdateProjectDto): Promise<ProjectResponse> => {
+  updateProject: (
+    id: string,
+    data: UpdateProjectDto,
+  ): Promise<ProjectResponse> => {
     return apiClient.patch<ProjectResponse>(`/projects/${id}`, data);
   },
 

@@ -34,4 +34,3 @@ export const refreshSession = async () => {
   if (error) throw error;
   return data.session;
 };
-

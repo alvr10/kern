@@ -14,7 +14,8 @@ import type {
  */
 export const contentKeys = {
   all: ["content"] as const,
-  lists: (projectId: string) => [...contentKeys.all, "list", projectId] as const,
+  lists: (projectId: string) =>
+    [...contentKeys.all, "list", projectId] as const,
   details: () => [...contentKeys.all, "detail"] as const,
   detail: (id: string) => [...contentKeys.details(), id] as const,
   kanban: (projectId: string) =>
@@ -69,7 +70,7 @@ export const useKanbanBoard = (projectId: string) => {
 export const useContentCalendar = (
   projectId: string,
   from: string,
-  to: string
+  to: string,
 ) => {
   return useQuery({
     queryKey: contentKeys.calendar(projectId, from, to),
@@ -88,7 +89,9 @@ export const useCreateContent = () => {
     mutationFn: (data: CreateContentDto) => contentClient.createContent(data),
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: contentKeys.lists(projectId) });
-      queryClient.invalidateQueries({ queryKey: contentKeys.kanban(projectId) });
+      queryClient.invalidateQueries({
+        queryKey: contentKeys.kanban(projectId),
+      });
     },
   });
 };
@@ -125,7 +128,9 @@ export const useDeleteContent = () => {
       contentClient.deleteContent(id),
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: contentKeys.lists(projectId) });
-      queryClient.invalidateQueries({ queryKey: contentKeys.kanban(projectId) });
+      queryClient.invalidateQueries({
+        queryKey: contentKeys.kanban(projectId),
+      });
     },
   });
 };

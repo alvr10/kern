@@ -47,7 +47,7 @@ export const useSignUp = () =>
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { 
+        options: {
           data: metadata,
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
@@ -95,4 +95,3 @@ export const useUpdatePassword = () =>
         throw { message: error.message, status: error.status } as AuthError;
     },
   });
-

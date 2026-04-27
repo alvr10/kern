@@ -29,7 +29,7 @@ export const billingClient = {
    */
   getSubscription: (organizationId: string): Promise<SubscriptionResponse> => {
     return apiClient.get<SubscriptionResponse>(
-      `/billing/subscriptions/${organizationId}`
+      `/billing/subscriptions/${organizationId}`,
     );
   },
 
@@ -37,11 +37,11 @@ export const billingClient = {
    * Create a Stripe Checkout session to start a subscription
    */
   createCheckoutSession: (
-    data: CreateCheckoutDto
+    data: CreateCheckoutDto,
   ): Promise<CheckoutSessionResponse> => {
     return apiClient.post<CheckoutSessionResponse>(
       "/billing/subscriptions",
-      data
+      data,
     );
   },
 
@@ -49,10 +49,10 @@ export const billingClient = {
    * Cancel the subscription at period end
    */
   cancelSubscription: (
-    organizationId: string
+    organizationId: string,
   ): Promise<SubscriptionResponse> => {
     return apiClient.post<SubscriptionResponse>(
-      `/billing/subscriptions/${organizationId}/cancel`
+      `/billing/subscriptions/${organizationId}/cancel`,
     );
   },
 };

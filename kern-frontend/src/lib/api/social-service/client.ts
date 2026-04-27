@@ -22,7 +22,7 @@ export const socialClient = {
    * Connect a new social media account
    */
   connectAccount: (
-    data: ConnectSocialAccountDto
+    data: ConnectSocialAccountDto,
   ): Promise<SocialAccountResponse> => {
     return apiClient.post<SocialAccountResponse>("/social/accounts", data);
   },
@@ -39,7 +39,7 @@ export const socialClient = {
    */
   publishNow: (contentPieceId: string): Promise<PublishResultResponse> => {
     return apiClient.post<PublishResultResponse>(
-      `/social/publish/${contentPieceId}`
+      `/social/publish/${contentPieceId}`,
     );
   },
 };

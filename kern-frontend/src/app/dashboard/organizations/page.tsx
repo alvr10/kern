@@ -2,10 +2,12 @@
 
 import React, { useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useOrganizations } from "@/lib/api/organizations-service/hooks";
 import { Plus, Building2, ArrowRight, Settings } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { Button } from "@/components/ui/button";
 import styles from "./page.module.css";
 
 /**
@@ -38,7 +40,7 @@ export default function OrganizationsPage(): React.JSX.Element {
         });
       }
     },
-    { scope: containerRef, dependencies: [organizations] }
+    { scope: containerRef, dependencies: [organizations] },
   );
 
   if (isLoading) {
@@ -53,7 +55,9 @@ export default function OrganizationsPage(): React.JSX.Element {
     return (
       <div className={styles.container}>
         <div className={styles.emptyState}>
-          <p>Error al cargar las organizaciones. Por favor, inténtalo de nuevo.</p>
+          <p>
+            Error al cargar las organizaciones. Por favor, inténtalo de nuevo.
+          </p>
         </div>
       </div>
     );
@@ -69,12 +73,12 @@ export default function OrganizationsPage(): React.JSX.Element {
           </p>
         </div>
         <div className={styles.actions}>
-          <button className={styles.createButton}>
-            <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <Link href="/dashboard/new">
+            <Button>
               <Plus size={18} />
               Nueva Organización
-            </span>
-          </button>
+            </Button>
+          </Link>
         </div>
       </header>
 
@@ -92,7 +96,13 @@ export default function OrganizationsPage(): React.JSX.Element {
               <div className={styles.cardHeader}>
                 <div className={styles.logo}>
                   {org.logoUrl ? (
-                    <img src={org.logoUrl} alt={org.name} />
+                    <Image
+                      src={org.logoUrl}
+                      alt={org.name}
+                      width={48}
+                      height={48}
+                      className={styles.logoImage}
+                    />
                   ) : (
                     <Building2 size={24} color="#666" />
                   )}
@@ -105,7 +115,9 @@ export default function OrganizationsPage(): React.JSX.Element {
 
               <div className={styles.cardFooter}>
                 <span className={styles.badge}>Pro Plan</span>
-                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                <div
+                  style={{ display: "flex", gap: "12px", alignItems: "center" }}
+                >
                   <Settings size={16} color="#444" />
                   <ArrowRight size={16} color="#444" />
                 </div>
@@ -117,7 +129,9 @@ export default function OrganizationsPage(): React.JSX.Element {
         <div className={styles.emptyState}>
           <Building2 size={48} />
           <p>No perteneces a ninguna organización todavía.</p>
-          <button className={styles.createButton}>Crea tu primera organización</button>
+          <Link href="/dashboard/new">
+            <Button size="lg">Crea tu primera organización</Button>
+          </Link>
         </div>
       )}
     </div>

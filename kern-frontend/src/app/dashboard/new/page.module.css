@@ -1,0 +1,102 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--foreground);
+  padding: 80px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 400; /* Tenor Sans */
+  font-family: var(--font-title);
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  color: var(--muted-foreground);
+  font-size: 16px;
+  line-height: 1.5;
+  font-family: var(--font-body);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  padding: 32px;
+  border-radius: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  font-family: var(--font-body);
+}
+
+.input {
+  background-color: var(--input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  color: var(--foreground);
+  font-size: 14px;
+  transition: border-color 0.2s;
+  outline: none;
+  font-family: var(--font-body);
+}
+
+.input:focus {
+  border-color: var(--ring);
+}
+
+.slugPreview {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-top: 4px;
+  font-family: var(--font-body);
+}
+
+.slugPreview span {
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.error {
+  color: var(--destructive);
+  font-size: 12px;
+  margin-top: 4px;
+  font-family: var(--font-body);
+}

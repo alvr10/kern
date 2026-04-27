@@ -24,7 +24,7 @@ export const organizationsClient = {
    * Create a new organization
    */
   createOrganization: (
-    data: CreateOrganizationDto
+    data: CreateOrganizationDto,
   ): Promise<OrganizationResponse> => {
     return apiClient.post<OrganizationResponse>("/organizations", data);
   },
@@ -41,7 +41,7 @@ export const organizationsClient = {
    */
   updateOrganization: (
     id: string,
-    data: UpdateOrganizationDto
+    data: UpdateOrganizationDto,
   ): Promise<OrganizationResponse> => {
     return apiClient.patch<OrganizationResponse>(`/organizations/${id}`, data);
   },
@@ -66,11 +66,11 @@ export const organizationsClient = {
   updateMemberRole: (
     id: string,
     memberId: string,
-    role: MemberRole
+    role: MemberRole,
   ): Promise<MembershipResponse> => {
     return apiClient.patch<MembershipResponse>(
       `/organizations/${id}/members/${memberId}`,
-      { role }
+      { role },
     );
   },
 
@@ -86,11 +86,11 @@ export const organizationsClient = {
    */
   inviteUser: (
     id: string,
-    data: InviteUserDto
+    data: InviteUserDto,
   ): Promise<InvitationResponse> => {
     return apiClient.post<InvitationResponse>(
       `/organizations/${id}/invitations`,
-      data
+      data,
     );
   },
 

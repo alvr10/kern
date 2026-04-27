@@ -21,7 +21,7 @@ export const adminKeys = {
  */
 export const useAdminUsers = (
   secret: string,
-  params?: { page?: number; limit?: number; search?: string }
+  params?: { page?: number; limit?: number; search?: string },
 ) => {
   return useQuery({
     queryKey: [...adminKeys.users(secret), params],
@@ -58,7 +58,9 @@ export const useAdminBanUser = () => {
       banned: boolean;
     }) => adminClient.banUser(secret, id, banned),
     onSuccess: (_, { secret, id }) => {
-      queryClient.invalidateQueries({ queryKey: adminKeys.userDetail(secret, id) });
+      queryClient.invalidateQueries({
+        queryKey: adminKeys.userDetail(secret, id),
+      });
       queryClient.invalidateQueries({ queryKey: adminKeys.users(secret) });
     },
   });
@@ -69,7 +71,7 @@ export const useAdminBanUser = () => {
  */
 export const useAdminOrganizations = (
   secret: string,
-  params?: { page?: number; limit?: number }
+  params?: { page?: number; limit?: number },
 ) => {
   return useQuery({
     queryKey: [...adminKeys.organizations(secret), params],
@@ -88,7 +90,9 @@ export const useAdminDeleteOrganization = () => {
     mutationFn: ({ secret, id }: { secret: string; id: string }) =>
       adminClient.deleteOrganization(secret, id),
     onSuccess: (_, { secret }) => {
-      queryClient.invalidateQueries({ queryKey: adminKeys.organizations(secret) });
+      queryClient.invalidateQueries({
+        queryKey: adminKeys.organizations(secret),
+      });
     },
   });
 };
@@ -109,7 +113,7 @@ export const useAdminOverview = (secret: string) => {
  */
 export const useAdminTokenUsage = (
   secret: string,
-  params?: { page?: number; limit?: number }
+  params?: { page?: number; limit?: number },
 ) => {
   return useQuery({
     queryKey: [...adminKeys.tokenUsage(secret), params],

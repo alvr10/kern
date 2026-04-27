@@ -1,13 +1,18 @@
 "use client";
+
 import React, { useRef } from "react";
 import gsap from "gsap";
 import { SplitText } from "gsap/SplitText";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import styles from "./text-block-reveal.module.css";
 
-gsap.registerPlugin(SplitText, ScrollTrigger);
+// Safe plugin registration
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(SplitText, ScrollTrigger);
+}
 
-interface TextBlockRevealProps {
+export interface TextBlockRevealProps {
   children: React.ReactNode;
   animateOnScroll?: boolean;
   delay?: number;
@@ -16,11 +21,15 @@ interface TextBlockRevealProps {
   duration?: number;
 }
 
+/**
+ * TextBlockReveal component that reveals text with a block animation.
+ * Requires GSAP SplitText plugin.
+ */
 export default function TextBlockReveal({
   children,
   animateOnScroll = true,
   delay = 0,
-  blockColor = "#000",
+  blockColor = "var(--foreground, #000)",
   stagger = 0.15,
   duration = 0.75,
 }: TextBlockRevealProps): React.JSX.Element {
@@ -31,8 +40,14 @@ export default function TextBlockReveal({
 
   useGSAP(
     () => {
-      if (!containerRef.current) return;
+      if (!containerRef.current || !SplitText) return;
 
+      // Cleanup of previous splits
+      splitRefs.current.forEach((split) => {
+        if (split && typeof split.revert === "function") {
+          split.revert();
+        }
+      });
       splitRefs.current = [];
       linesRef.current = [];
       blocksRef.current = [];
@@ -45,10 +60,14 @@ export default function TextBlockReveal({
       }
 
       elements.forEach((element) => {
-        if (element.style.position !== "absolute" && element.style.position !== "fixed") {
+        if (
+          element.style.position !== "absolute" &&
+          element.style.position !== "fixed"
+        ) {
           element.style.position = "relative";
         }
 
+        // Use SplitText.create as in the original snippet for maximum compatibility
         const split = SplitText.create(element, {
           type: "lines",
         });
@@ -58,13 +77,17 @@ export default function TextBlockReveal({
         (split.lines as HTMLElement[]).forEach((line) => {
           const content = line.innerHTML;
           line.innerHTML = `
-            <div class="block-line-inner" style="position: relative; display: block; width: 100%; overflow: hidden;">
-              <div class="block-line-text" style="opacity: 0;">${content}</div>
-              <div class="block-revealer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; background-color: ${blockColor}; transform: scaleX(0); transform-origin: left center; pointer-events: none;"></div>
+            <div class="${styles.blockLineInner}">
+              <div class="${styles.blockLineText}">${content}</div>
+              <div class="${styles.blockRevealer}" style="background-color: ${blockColor};"></div>
             </div>`;
 
-          const text = line.querySelector(".block-line-text") as HTMLElement;
-          const block = line.querySelector(".block-revealer") as HTMLElement;
+          const text = line.querySelector(
+            `.${styles.blockLineText}`,
+          ) as HTMLElement;
+          const block = line.querySelector(
+            `.${styles.blockRevealer}`,
+          ) as HTMLElement;
 
           if (text && block) {
             linesRef.current.push(text);
@@ -73,10 +96,14 @@ export default function TextBlockReveal({
         });
       });
 
-      const createBlockRevealAnimation = (block: HTMLElement, text: HTMLElement, index: number): gsap.core.Timeline => {
-        const tl = gsap.timeline({ 
+      const createBlockRevealAnimation = (
+        block: HTMLElement,
+        text: HTMLElement,
+        index: number,
+      ): gsap.core.Timeline => {
+        const tl = gsap.timeline({
           delay: delay + index * stagger,
-          defaults: { ease: "power4.inOut", duration: duration }
+          defaults: { ease: "power4.inOut", duration: duration },
         });
 
         tl.to(block, { scaleX: 1 })
@@ -87,13 +114,13 @@ export default function TextBlockReveal({
         return tl;
       };
 
-      if (animateOnScroll) {
+      if (animateOnScroll && blocksRef.current.length > 0) {
         const masterTl = gsap.timeline({ paused: true });
-        
+
         blocksRef.current.forEach((block, index) => {
           masterTl.add(
             createBlockRevealAnimation(block, linesRef.current[index], index),
-            0 // All start at masterTl's floor, but have internal delays
+            0,
           );
         });
 
@@ -109,16 +136,11 @@ export default function TextBlockReveal({
         });
       }
 
+      // Cleanup function for useGSAP
       return () => {
-        splitRefs.current.forEach((split) => split?.revert());
-
-        const wrappers = containerRef.current?.querySelectorAll(
-          ".block-line-wrapper"
-        );
-        wrappers?.forEach((wrapper) => {
-          if (wrapper.parentNode && wrapper.firstChild) {
-            wrapper.parentNode.insertBefore(wrapper.firstChild, wrapper);
-            wrapper.remove();
+        splitRefs.current.forEach((split) => {
+          if (split && typeof split.revert === "function") {
+            split.revert();
           }
         });
       };
@@ -126,15 +148,27 @@ export default function TextBlockReveal({
     {
       scope: containerRef,
       dependencies: [animateOnScroll, delay, blockColor, stagger, duration],
-    }
+    },
   );
 
   if (React.Children.count(children) === 1 && React.isValidElement(children)) {
-    return React.cloneElement(children as React.ReactElement<any>, { ref: containerRef });
+    return React.cloneElement(
+      children as React.ReactElement<{
+        ref: React.RefObject<HTMLDivElement | null>;
+      }>,
+      // eslint-disable-next-line react-hooks/refs
+      {
+        ref: containerRef,
+      },
+    );
   }
 
   return (
-    <div ref={containerRef} data-copy-wrapper="true">
+    <div
+      ref={containerRef}
+      data-copy-wrapper="true"
+      className={styles.container}
+    >
       {children}
     </div>
   );

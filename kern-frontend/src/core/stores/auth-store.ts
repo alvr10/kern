@@ -27,8 +27,8 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage",
-    }
-  )
+    },
+  ),
 );
 
 /**
@@ -36,21 +36,22 @@ export const useAuthStore = create<AuthState>()(
  * Syncs Supabase session state with the Zustand store
  */
 if (typeof window !== "undefined") {
-  supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
-    const { setAuth, setLoading, logout } = useAuthStore.getState();
+  supabase.auth.onAuthStateChange(
+    (event: AuthChangeEvent, session: Session | null) => {
+      const { setAuth, setLoading, logout } = useAuthStore.getState();
 
-    console.log("[Auth] Event:", event, session?.user?.id);
+      console.log("[Auth] Event:", event, session?.user?.id);
 
-    if (session) {
-      setAuth(session.access_token, session.user);
-    } else {
-      if (event === "SIGNED_OUT") {
-        logout();
+      if (session) {
+        setAuth(session.access_token, session.user);
       } else {
-        setAuth(null, null);
+        if (event === "SIGNED_OUT") {
+          logout();
+        } else {
+          setAuth(null, null);
+        }
       }
-    }
-    setLoading(false);
-  });
+      setLoading(false);
+    },
+  );
 }
-

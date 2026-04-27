@@ -15,7 +15,10 @@ export const projectKeys = {
 /**
  * useProjects
  */
-export const useProjects = (organizationId: string, archived: boolean = false) => {
+export const useProjects = (
+  organizationId: string,
+  archived: boolean = false,
+) => {
   return useQuery({
     queryKey: [...projectKeys.lists(organizationId), { archived }],
     queryFn: () => projectsClient.listProjects(organizationId, archived),
@@ -75,8 +78,13 @@ export const useArchiveProject = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, organizationId }: { id: string; organizationId: string }) =>
-      projectsClient.archiveProject(id),
+    mutationFn: ({
+      id,
+      organizationId,
+    }: {
+      id: string;
+      organizationId: string;
+    }) => projectsClient.archiveProject(id),
     onSuccess: (_, { organizationId, id }) => {
       queryClient.invalidateQueries({ queryKey: projectKeys.detail(id) });
       queryClient.invalidateQueries({

@@ -79,7 +79,9 @@ export default function DashboardLayout({
               <Link
                 href="/dashboard/organizations"
                 className={`${styles.tab} ${
-                  pathname === "/dashboard/organizations" ? styles.activeTab : ""
+                  pathname === "/dashboard/organizations"
+                    ? styles.activeTab
+                    : ""
                 }`}
               >
                 Organizaciones

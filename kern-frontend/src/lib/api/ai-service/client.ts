@@ -46,7 +46,7 @@ export const aiClient = {
    */
   listGenerations: (
     organizationId: string,
-    params?: { page?: number; limit?: number }
+    params?: { page?: number; limit?: number },
   ): Promise<PaginatedGenerationsResponse> => {
     return apiClient.get<PaginatedGenerationsResponse>("/ai/generations", {
       params: { ...params, organizationId },
@@ -58,7 +58,7 @@ export const aiClient = {
    */
   getTokenUsage: (organizationId: string): Promise<TokenUsageResponse> => {
     return apiClient.get<TokenUsageResponse>(
-      `/ai/token-usage/${organizationId}`
+      `/ai/token-usage/${organizationId}`,
     );
   },
 };

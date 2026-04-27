@@ -18,7 +18,7 @@ const getAuthToken = (): string | null => {
  * Build headers with auth token
  */
 const buildHeaders = (
-  customHeaders?: Record<string, string>
+  customHeaders?: Record<string, string>,
 ): Record<string, string> => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -39,7 +39,7 @@ const buildHeaders = (
  * Builds query string from params object
  */
 const buildQueryString = (
-  params?: Record<string, string | number | boolean | undefined>
+  params?: Record<string, string | number | boolean | undefined>,
 ): string => {
   if (!params) return "";
 
@@ -61,7 +61,7 @@ async function request<T>(
   method: HttpMethod,
   endpoint: string,
   body?: unknown,
-  config?: RequestConfig
+  config?: RequestConfig,
 ): Promise<T> {
   const url = getEndpointUrl(endpoint) + buildQueryString(config?.params);
 
@@ -110,7 +110,7 @@ async function request<T>(
       throw new ApiClientError(
         message,
         errorObj?.statusCode || response.status,
-        data
+        data,
       );
     }
 
@@ -160,7 +160,7 @@ export const apiClient = {
   post: <T>(
     endpoint: string,
     body?: unknown,
-    config?: RequestConfig
+    config?: RequestConfig,
   ): Promise<T> => {
     return request<T>("POST", endpoint, body, config);
   },
@@ -171,7 +171,7 @@ export const apiClient = {
   put: <T>(
     endpoint: string,
     body?: unknown,
-    config?: RequestConfig
+    config?: RequestConfig,
   ): Promise<T> => {
     return request<T>("PUT", endpoint, body, config);
   },
@@ -189,7 +189,7 @@ export const apiClient = {
   patch: <T>(
     endpoint: string,
     body?: unknown,
-    config?: RequestConfig
+    config?: RequestConfig,
   ): Promise<T> => {
     return request<T>("PATCH", endpoint, body, config);
   },

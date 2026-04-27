@@ -51,7 +51,7 @@ export const contentClient = {
   getCalendar: (
     projectId: string,
     from: string,
-    to: string
+    to: string,
   ): Promise<ContentPieceResponse[]> => {
     return apiClient.get<ContentPieceResponse[]>("/content/calendar", {
       params: { projectId, from, to },
@@ -70,7 +70,7 @@ export const contentClient = {
    */
   updateContent: (
     id: string,
-    data: UpdateContentDto
+    data: UpdateContentDto,
   ): Promise<ContentPieceResponse> => {
     return apiClient.patch<ContentPieceResponse>(`/content/${id}`, data);
   },
@@ -87,7 +87,7 @@ export const contentClient = {
    */
   updateStatus: (
     id: string,
-    status: ContentStatus
+    status: ContentStatus,
   ): Promise<ContentPieceResponse> => {
     return apiClient.patch<ContentPieceResponse>(`/content/${id}/status`, {
       status,
@@ -99,7 +99,7 @@ export const contentClient = {
    */
   submitReview: (
     id: string,
-    data: CreateReviewDto
+    data: CreateReviewDto,
   ): Promise<ContentPieceResponse> => {
     return apiClient.post<ContentPieceResponse>(`/content/${id}/reviews`, data);
   },
@@ -116,7 +116,7 @@ export const contentClient = {
    */
   addComment: (
     id: string,
-    data: CreateCommentDto
+    data: CreateCommentDto,
   ): Promise<CommentResponse> => {
     return apiClient.post<CommentResponse>(`/content/${id}/comments`, data);
   },

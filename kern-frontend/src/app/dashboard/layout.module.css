@@ -1,18 +1,19 @@
 .layout {
   min-height: 100vh;
-  background-color: #000;
+  background-color: var(--background);
+  color: var(--foreground);
   display: flex;
   flex-direction: column;
 }
 
 .navbar {
   height: 64px;
-  border-bottom: 1px solid #1a1a1a;
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  background-color: #000;
+  background-color: var(--background);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -28,14 +29,15 @@
   font-weight: 700;
   font-size: 20px;
   letter-spacing: -0.05em;
-  color: #fff;
+  color: var(--foreground);
   text-decoration: none;
+  font-family: var(--font-title);
 }
 
 .divider {
   width: 1px;
   height: 24px;
-  background-color: #333;
+  background-color: var(--border);
   transform: rotate(20deg);
 }
 
@@ -45,16 +47,17 @@
   gap: 8px;
   padding: 6px 12px;
   border-radius: 6px;
-  border: 1px solid #333;
+  border: 1px solid var(--border);
   font-size: 14px;
-  color: #888;
+  color: var(--muted-foreground);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  font-family: var(--font-body);
 }
 
 .orgSwitcher:hover {
-  background-color: #111;
-  color: #fff;
+  background-color: var(--accent);
+  color: var(--foreground);
 }
 
 .navbarRight {
@@ -68,47 +71,49 @@
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  background-color: #111;
-  border: 1px solid #222;
+  background-color: var(--input);
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 13px;
-  color: #666;
+  color: var(--muted-foreground);
   width: 240px;
+  font-family: var(--font-body);
 }
 
 .iconButton {
   background: none;
   border: none;
-  color: #888;
+  color: var(--muted-foreground);
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
-  transition: color 0.2s, background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .iconButton:hover {
-  color: #fff;
-  background-color: #111;
+  color: var(--foreground);
+  background-color: var(--accent);
 }
 
 .avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: #333;
-  color: #fff;
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
+  font-family: var(--font-body);
 }
 
 .subnav {
   height: 48px;
-  border-bottom: 1px solid #1a1a1a;
-  background-color: #000;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--background);
   padding: 0 24px;
   display: flex;
   align-items: flex-end;
@@ -121,23 +126,28 @@
 }
 
 .tab {
-  color: #888;
+  color: var(--muted-foreground);
   text-decoration: none;
   font-size: 14px;
   padding-bottom: 12px;
   border-bottom: 2px solid transparent;
   transition: color 0.2s;
+  font-family: var(--font-body);
 }
 
 .tab:hover {
-  color: #fff;
+  color: var(--foreground);
 }
 
 .activeTab {
-  color: #fff;
-  border-bottom-color: #fff;
+  color: var(--foreground);
+  border-bottom-color: var(--primary);
 }
 
 .main {
   flex: 1;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
 }

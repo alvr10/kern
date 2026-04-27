@@ -12,7 +12,8 @@ import type {
  */
 export const aiKeys = {
   all: ["ai"] as const,
-  generations: (orgId: string) => [...aiKeys.all, "generations", orgId] as const,
+  generations: (orgId: string) =>
+    [...aiKeys.all, "generations", orgId] as const,
   tokenUsage: (orgId: string) => [...aiKeys.all, "token-usage", orgId] as const,
 };
 
@@ -97,7 +98,7 @@ export const useAdaptContent = () => {
  */
 export const useAIGenerations = (
   organizationId: string,
-  params?: { page?: number; limit?: number }
+  params?: { page?: number; limit?: number },
 ) => {
   return useQuery({
     queryKey: [...aiKeys.generations(organizationId), params],

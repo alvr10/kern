@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { useSignUp } from '@/lib/api/auth/hooks';
-import styles from '../auth.module.css';
+import React, { useState } from "react";
+import Link from "next/link";
+import { useSignUp } from "@/lib/api/auth/hooks";
+import styles from "../auth.module.css";
 
 export default function SignUpPage(): React.JSX.Element {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [success, setSuccess] = useState(false);
 
   const { mutate: signUp, isPending: loading, error } = useSignUp();
@@ -20,7 +20,7 @@ export default function SignUpPage(): React.JSX.Element {
         onSuccess: () => {
           setSuccess(true);
         },
-      }
+      },
     );
   };
 
@@ -29,10 +29,18 @@ export default function SignUpPage(): React.JSX.Element {
       <>
         <h1 className={styles.title}>Revisa tu correo</h1>
         <p className={styles.subtitle}>
-          Hemos enviado un enlace de confirmación a <strong>{email}</strong>. 
+          Hemos enviado un enlace de confirmación a <strong>{email}</strong>.
           Por favor, confirma tu cuenta para continuar.
         </p>
-        <Link href="/login" className={styles.submitBtn} style={{ textAlign: 'center', display: 'block', textDecoration: 'none' }}>
+        <Link
+          href="/login"
+          className={styles.submitBtn}
+          style={{
+            textAlign: "center",
+            display: "block",
+            textDecoration: "none",
+          }}
+        >
           Volver al Inicio de Sesión
         </Link>
       </>
@@ -42,11 +50,15 @@ export default function SignUpPage(): React.JSX.Element {
   return (
     <>
       <h1 className={styles.title}>Crea tu cuenta</h1>
-      <p className={styles.subtitle}>Empieza a organizar tu contenido con una estructura profesional.</p>
+      <p className={styles.subtitle}>
+        Empieza a organizar tu contenido con una estructura profesional.
+      </p>
 
       <form className={styles.form} onSubmit={handleSignUp}>
         <div className={styles.inputGroup}>
-          <label htmlFor="email" className={styles.label}>Correo electrónico</label>
+          <label htmlFor="email" className={styles.label}>
+            Correo electrónico
+          </label>
           <input
             id="email"
             type="email"
@@ -60,7 +72,9 @@ export default function SignUpPage(): React.JSX.Element {
         </div>
 
         <div className={styles.inputGroup}>
-          <label htmlFor="password" className={styles.label}>Contraseña</label>
+          <label htmlFor="password" className={styles.label}>
+            Contraseña
+          </label>
           <input
             id="password"
             type="password"
@@ -76,18 +90,16 @@ export default function SignUpPage(): React.JSX.Element {
 
         {error && <div className={styles.error}>{error.message}</div>}
 
-        <button 
-          type="submit" 
-          className={styles.submitBtn} 
-          disabled={loading}
-        >
-          {loading ? 'Creando cuenta...' : 'Registrarse'}
+        <button type="submit" className={styles.submitBtn} disabled={loading}>
+          {loading ? "Creando cuenta..." : "Registrarse"}
         </button>
       </form>
 
       <p className={styles.footer}>
-        ¿Ya tienes una cuenta?{' '}
-        <Link href="/login" className={styles.link}>Inicia sesión</Link>
+        ¿Ya tienes una cuenta?{" "}
+        <Link href="/login" className={styles.link}>
+          Inicia sesión
+        </Link>
       </p>
     </>
   );
