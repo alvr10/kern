@@ -17,8 +17,16 @@ class HealthController {
   }
 }
 
+import { BillingModule } from './billing.module';
+
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, DiscoveryClientModule, MetricsModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '../../.env' }),
+    DatabaseModule,
+    DiscoveryClientModule,
+    MetricsModule,
+    BillingModule,
+  ],
   controllers: [HealthController],
 })
 export class AppModule { }
