@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ContentPiece, ContentPieceDocument } from '../database/schemas/content-piece.schema';
+import { ContentPiece, ContentPieceDocument } from '../schemas/content-piece.schema';
 
 @Controller('admin')
 export class AdminController {

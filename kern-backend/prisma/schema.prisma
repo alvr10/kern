@@ -8,7 +8,6 @@
 // Setup:
 //   1. Paste the trigger SQL at the bottom into Supabase SQL editor
 //   2. Set DATABASE_URL (pooler port 6543) and
-//      DIRECT_URL (direct port 5432) in .env
 // ============================================================
 
 generator client {
