@@ -13,12 +13,12 @@ export class ConsulService implements OnModuleInit, OnModuleDestroy {
   constructor(private readonly config: ConfigService) {
     const consulUrlStr = this.config.get<string>('CONSUL_URL', 'http://consul:8500');
     const consulUrl = new URL(consulUrlStr);
-    
+
     this.consul = new Consul({
       host: consulUrl.hostname,
       port: Number(consulUrl.port || '8500'),
     });
-    
+
     this.serviceName = this.config.get<string>('SERVICE_NAME', 'unknown');
     this.servicePort = Number(this.config.get<number>('PORT', 3000));
     this.serviceId = `${this.serviceName}-${process.pid}`;

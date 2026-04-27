@@ -1,11 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import {
-  CONTENT_STATUS_VALUES,
-  ContentStatus,
-  SOCIAL_PLATFORM_VALUES,
-  SocialPlatform,
-} from '@kern/shared';
+import { CONTENT_STATUS_VALUES, ContentStatus, SOCIAL_PLATFORM_VALUES, SocialPlatform } from '@kern/shared';
 
 @Schema({ timestamps: true })
 export class Comment {
@@ -57,10 +52,20 @@ export class ContentPiece {
   @Prop({ required: true })
   body: string;
 
-  @Prop({ type: String, enum: CONTENT_STATUS_VALUES, default: 'DRAFT', index: true })
+  @Prop({
+    type: String,
+    enum: CONTENT_STATUS_VALUES,
+    default: 'DRAFT',
+    index: true,
+  })
   status: ContentStatus;
 
-  @Prop({ type: String, enum: SOCIAL_PLATFORM_VALUES, required: true, index: true })
+  @Prop({
+    type: String,
+    enum: SOCIAL_PLATFORM_VALUES,
+    required: true,
+    index: true,
+  })
   platform: SocialPlatform;
 
   @Prop({ type: [String], default: [] })

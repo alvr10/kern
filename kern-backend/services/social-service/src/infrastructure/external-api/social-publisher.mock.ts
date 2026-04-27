@@ -12,8 +12,8 @@ export interface PublishResult {
 export class SocialPublisherMock {
   async publish(
     platform: SocialPlatform,
-    content: { title: string; body: string; mediaUrls?: string[] },
-    accessToken: string,
+    _content: { title: string; body: string; mediaUrls?: string[] },
+    _accessToken: string,
   ): Promise<PublishResult> {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -46,7 +46,7 @@ export class SocialPublisherMock {
     };
   }
 
-  async getProfile(platform: SocialPlatform, accessToken: string): Promise<any> {
+  async getProfile(platform: SocialPlatform, _accessToken: string): Promise<any> {
     return {
       handle: `@kern_mock_${platform.toLowerCase()}`,
       name: `KERN Mock ${platform}`,

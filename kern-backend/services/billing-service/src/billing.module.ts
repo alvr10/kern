@@ -12,11 +12,7 @@ import { SUBSCRIPTION_REPOSITORY } from './domain/repositories/subscription.repo
 import { SubscriptionPrismaRepository } from './infrastructure/database/repositories/subscription-prisma.repository';
 import { PrismaService } from './infrastructure/database/prisma.service';
 
-const Handlers = [
-  CreateCheckoutSessionHandler,
-  HandleStripeWebhookHandler,
-  GetSubscriptionHandler,
-];
+const Handlers = [CreateCheckoutSessionHandler, HandleStripeWebhookHandler, GetSubscriptionHandler];
 
 @Module({
   imports: [CqrsModule],

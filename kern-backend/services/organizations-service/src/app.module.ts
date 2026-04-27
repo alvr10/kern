@@ -6,9 +6,9 @@ import { OrganizationsModule } from './organizations.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ 
+    ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '../../.env'
+      envFilePath: '../../.env',
     }),
     DatabaseModule,
     DiscoveryClientModule,

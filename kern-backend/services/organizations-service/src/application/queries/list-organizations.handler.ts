@@ -13,8 +13,6 @@ export class ListOrganizationsHandler implements IQueryHandler<ListOrganizations
       include: { organization: true },
     });
 
-    return memberships
-      .filter(m => m.organization.deletedAt === null)
-      .map(m => m.organization);
+    return memberships.filter(m => m.organization.deletedAt === null).map(m => m.organization);
   }
 }

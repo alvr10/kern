@@ -10,7 +10,7 @@ export class CreateOrganizationHandler implements ICommandHandler<CreateOrganiza
   constructor(
     @Inject(ORGANIZATION_REPOSITORY)
     private readonly orgRepository: OrganizationRepository,
-  ) { }
+  ) {}
 
   async execute(command: CreateOrganizationCommand): Promise<string> {
     const existingOrg = await this.orgRepository.findBySlug(command.slug);

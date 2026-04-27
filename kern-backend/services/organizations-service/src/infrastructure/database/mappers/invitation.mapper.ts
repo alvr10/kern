@@ -1,4 +1,8 @@
-import { Invitation as PrismaInvitation, InvitationStatus as PrismaInvitationStatus, MemberRole as PrismaMemberRole } from '@prisma/client';
+import {
+  Invitation as PrismaInvitation,
+  InvitationStatus as PrismaInvitationStatus,
+  MemberRole as PrismaMemberRole,
+} from '@prisma/client';
 import { Invitation } from '../../../domain/entities/invitation.entity';
 import { InvitationStatus } from '../../../domain/value-objects/invitation-status.vo';
 import { MemberRole } from '../../../domain/value-objects/member-role.vo';

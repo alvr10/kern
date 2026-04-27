@@ -28,16 +28,15 @@ export class CommentMongoRepository implements CommentRepository {
 
   async save(comment: Comment): Promise<void> {
     const data = CommentMapper.toPersistence(comment);
-    await this.contentModel.findByIdAndUpdate(comment.contentPieceId, {
-      $push: { comments: data },
-    }).exec();
+    await this.contentModel
+      .findByIdAndUpdate(comment.contentPieceId, {
+        $push: { comments: data },
+      })
+      .exec();
   }
 
   async update(comment: Comment): Promise<void> {
     const data = CommentMapper.toPersistence(comment);
-    await this.contentModel.updateOne(
-      { 'comments._id': data._id },
-      { $set: { 'comments.$': data } },
-    ).exec();
+    await this.contentModel.updateOne({ 'comments._id': data._id }, { $set: { 'comments.$': data } }).exec();
   }
 }

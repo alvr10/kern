@@ -18,11 +18,7 @@ import { AIGeneration, AIGenerationSchema } from './infrastructure/database/sche
 import { TokenUsage, TokenUsageSchema } from './infrastructure/database/schemas/token-usage.schema';
 import { GeminiClient } from './infrastructure/external-api/gemini.client';
 
-const Handlers = [
-  GenerateContentHandler,
-  RewriteContentHandler,
-  GetTokenUsageHandler,
-];
+const Handlers = [GenerateContentHandler, RewriteContentHandler, GetTokenUsageHandler];
 
 @Module({
   imports: [

@@ -13,24 +13,11 @@ import { ContentClient } from './infrastructure/external-api/content.client';
 import { AIClient } from './infrastructure/external-api/ai.client';
 import { AdminSecretGuard } from './infrastructure/guards/admin-secret.guard';
 
-const Handlers = [
-  GetPlatformOverviewHandler,
-];
+const Handlers = [GetPlatformOverviewHandler];
 
 @Module({
   imports: [CqrsModule, HttpModule],
-  controllers: [
-    AdminAnalyticsController, 
-    AdminUsersController, 
-    AdminOrgsController, 
-    HealthController
-  ],
-  providers: [
-    ...Handlers,
-    OrganizationsClient,
-    ContentClient,
-    AIClient,
-    AdminSecretGuard,
-  ],
+  controllers: [AdminAnalyticsController, AdminUsersController, AdminOrgsController, HealthController],
+  providers: [...Handlers, OrganizationsClient, ContentClient, AIClient, AdminSecretGuard],
 })
 export class AdminModule {}

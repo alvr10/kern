@@ -35,9 +35,7 @@ export class ProjectsController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateProjectDto) {
-    await this.commandBus.execute(
-      new UpdateProjectCommand(id, dto.name, dto.description, dto.color),
-    );
+    await this.commandBus.execute(new UpdateProjectCommand(id, dto.name, dto.description, dto.color));
     return this.queryBus.execute(new GetProjectQuery(id));
   }
 

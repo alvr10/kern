@@ -33,9 +33,9 @@ export class InviteUserHandler implements ICommandHandler<InviteUserCommand> {
     );
 
     await this.invitationRepository.save(invitation);
-    
+
     // Here we would dispatch a Domain Event to trigger email sending
-    
+
     return id;
   }
 }

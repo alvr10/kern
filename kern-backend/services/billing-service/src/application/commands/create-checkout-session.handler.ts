@@ -22,7 +22,7 @@ export class CreateCheckoutSessionHandler implements ICommandHandler<CreateCheck
     }
 
     const subscription = await this.subscriptionRepository.findByOrganizationId(command.organizationId);
-    
+
     const session = await this.stripeClient.createCheckoutSession({
       customerId: subscription?.stripeCustomerId || undefined,
       organizationId: command.organizationId,

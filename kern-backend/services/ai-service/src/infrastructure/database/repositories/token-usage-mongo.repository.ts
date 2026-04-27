@@ -20,10 +20,11 @@ export class TokenUsageMongoRepository implements TokenUsageRepository {
 
   async save(usage: TokenUsage): Promise<void> {
     const data = TokenUsageMapper.toPersistence(usage);
-    await this.usageModel.findOneAndUpdate(
-      { organizationId: usage.organizationId },
-      data,
-      { upsert: true, new: true }
-    ).exec();
+    await this.usageModel
+      .findOneAndUpdate({ organizationId: usage.organizationId }, data, {
+        upsert: true,
+        new: true,
+      })
+      .exec();
   }
 }

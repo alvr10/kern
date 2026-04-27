@@ -12,7 +12,7 @@ export abstract class BaseInternalClient {
       const { data } = await firstValueFrom(this.httpService.get(`${this.baseUrl}${path}`, { params }));
       return data;
     } catch (error) {
-      throw new Error(`Failed to call ${this.baseUrl}${path}: ${error.message}`);
+      throw new Error(`Failed to call ${this.baseUrl}${path}: ${error.message}`, { cause: error });
     }
   }
 
@@ -21,7 +21,7 @@ export abstract class BaseInternalClient {
       const { data } = await firstValueFrom(this.httpService.post(`${this.baseUrl}${path}`, body));
       return data;
     } catch (error) {
-      throw new Error(`Failed to call ${this.baseUrl}${path}: ${error.message}`);
+      throw new Error(`Failed to call ${this.baseUrl}${path}: ${error.message}`, { cause: error });
     }
   }
 
@@ -30,7 +30,7 @@ export abstract class BaseInternalClient {
       const { data } = await firstValueFrom(this.httpService.patch(`${this.baseUrl}${path}`, body));
       return data;
     } catch (error) {
-      throw new Error(`Failed to call ${this.baseUrl}${path}: ${error.message}`);
+      throw new Error(`Failed to call ${this.baseUrl}${path}: ${error.message}`, { cause: error });
     }
   }
 
@@ -39,7 +39,7 @@ export abstract class BaseInternalClient {
       const { data } = await firstValueFrom(this.httpService.delete(`${this.baseUrl}${path}`));
       return data;
     } catch (error) {
-      throw new Error(`Failed to call ${this.baseUrl}${path}: ${error.message}`);
+      throw new Error(`Failed to call ${this.baseUrl}${path}: ${error.message}`, { cause: error });
     }
   }
 }

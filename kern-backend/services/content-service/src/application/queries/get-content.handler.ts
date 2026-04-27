@@ -2,7 +2,10 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetContentQuery } from './get-content.query';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ContentPiece as MongoContentPiece, ContentPieceDocument } from '../../infrastructure/database/schemas/content-piece.schema';
+import {
+  ContentPiece as MongoContentPiece,
+  ContentPieceDocument,
+} from '../../infrastructure/database/schemas/content-piece.schema';
 
 @QueryHandler(GetContentQuery)
 export class GetContentHandler implements IQueryHandler<GetContentQuery> {

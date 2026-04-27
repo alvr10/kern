@@ -11,11 +11,7 @@ import { SocialAccountMongoRepository } from './infrastructure/database/reposito
 import { SocialPublisherMock } from './infrastructure/external-api/social-publisher.mock';
 import { ContentServiceClient } from './infrastructure/external-api/content-service.client';
 
-const Handlers = [
-  ConnectSocialAccountHandler,
-  PublishNowHandler,
-  ListSocialAccountsHandler,
-];
+const Handlers = [ConnectSocialAccountHandler, PublishNowHandler, ListSocialAccountsHandler];
 
 @Module({
   imports: [CqrsModule, HttpModule],

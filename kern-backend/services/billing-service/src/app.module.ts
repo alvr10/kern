@@ -13,7 +13,11 @@ import { DatabaseModule } from './infrastructure/database/database.module';
 class HealthController {
   @Get()
   check() {
-    return { status: 'ok', service: 'billing-service', timestamp: new Date().toISOString() };
+    return {
+      status: 'ok',
+      service: 'billing-service',
+      timestamp: new Date().toISOString(),
+    };
   }
 }
 
@@ -29,4 +33,4 @@ import { BillingModule } from './billing.module';
   ],
   controllers: [HealthController],
 })
-export class AppModule { }
+export class AppModule {}

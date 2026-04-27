@@ -12,7 +12,7 @@ export class UpdateMemberRoleHandler implements ICommandHandler<UpdateMemberRole
 
   async execute(command: UpdateMemberRoleCommand): Promise<void> {
     const membership = await this.membershipRepository.findById(command.memberId);
-    
+
     if (!membership || membership.organizationId !== command.organizationId) {
       throw new Error('Membership not found in this organization');
     }

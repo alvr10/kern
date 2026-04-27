@@ -8,12 +8,20 @@ export class SubscriptionsController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
-  ) { }
+  ) {}
 
   @Post()
-  async createCheckout(@Body() dto: { organizationId: string; planId: string; successUrl: string; cancelUrl: string }) {
+  async createCheckout(
+    @Body()
+    dto: {
+      organizationId: string;
+      planId: string;
+      successUrl: string;
+      cancelUrl: string;
+    },
+  ) {
     return this.commandBus.execute(
-      new CreateCheckoutSessionCommand(dto.organizationId, dto.planId, dto.successUrl, dto.cancelUrl)
+      new CreateCheckoutSessionCommand(dto.organizationId, dto.planId, dto.successUrl, dto.cancelUrl),
     );
   }
 

@@ -16,10 +16,7 @@ export class CommentsController {
   }
 
   @Post()
-  async addComment(
-    @Param('id') contentPieceId: string,
-    @Body() dto: { body: string; parentId?: string },
-  ) {
+  async addComment(@Param('id') contentPieceId: string, @Body() dto: { body: string; parentId?: string }) {
     const authorId = 'dummy-author-id';
     const commentId = await this.commandBus.execute(
       new AddCommentCommand(contentPieceId, authorId, dto.body, dto.parentId),

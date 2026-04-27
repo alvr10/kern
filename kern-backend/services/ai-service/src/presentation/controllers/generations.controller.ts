@@ -30,12 +30,7 @@ export class GenerationsController {
   @Post('rewrite')
   async rewrite(@Body() dto: RewriteContentDto) {
     return this.commandBus.execute(
-      new RewriteContentCommand(
-        dto.organizationId,
-        dto.contentPieceId,
-        dto.originalText,
-        dto.instructions,
-      ),
+      new RewriteContentCommand(dto.organizationId, dto.contentPieceId, dto.originalText, dto.instructions),
     );
   }
 

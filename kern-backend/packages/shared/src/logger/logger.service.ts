@@ -31,11 +31,25 @@ export class PinoLoggerService implements NestLoggerService {
     });
   }
 
-  log(message: any, context?: string) { this.logger.info({ context }, message); }
-  error(message: any, trace?: string, context?: string) { this.logger.error({ context, trace }, message); }
-  warn(message: any, context?: string) { this.logger.warn({ context }, message); }
-  debug(message: any, context?: string) { this.logger.debug({ context }, message); }
-  verbose(message: any, context?: string) { this.logger.trace({ context }, message); }
-  getLogger(): Logger { return this.logger; }
-  child(bindings: Record<string, any>): Logger { return this.logger.child(bindings); }
+  log(message: any, context?: string) {
+    this.logger.info({ context }, message);
+  }
+  error(message: any, trace?: string, context?: string) {
+    this.logger.error({ context, trace }, message);
+  }
+  warn(message: any, context?: string) {
+    this.logger.warn({ context }, message);
+  }
+  debug(message: any, context?: string) {
+    this.logger.debug({ context }, message);
+  }
+  verbose(message: any, context?: string) {
+    this.logger.trace({ context }, message);
+  }
+  getLogger(): Logger {
+    return this.logger;
+  }
+  child(bindings: Record<string, any>): Logger {
+    return this.logger.child(bindings);
+  }
 }

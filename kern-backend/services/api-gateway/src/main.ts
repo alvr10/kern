@@ -18,7 +18,9 @@ const SERVICES = [
 ];
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { logger: ['log', 'warn', 'error'] });
+  const app = await NestFactory.create(AppModule, {
+    logger: ['log', 'warn', 'error'],
+  });
   app.enableCors();
 
   const express = app.getHttpAdapter().getInstance();
@@ -31,7 +33,7 @@ async function bootstrap() {
   express.use(jwtAuthMiddleware);
 
   // Serve each service's openapi.yaml as a static file
-  SERVICES.forEach((service) => {
+  SERVICES.forEach(service => {
     const yamlPath = resolve(__dirname, '..', '..', '..', 'services', service, 'openapi.yaml');
     express.get(`/api/docs/yaml/${service}`, (_req: any, res: any) => {
       res.sendFile(yamlPath);
@@ -41,7 +43,7 @@ async function bootstrap() {
   // Mount Swagger UI with multi-spec dropdown (no compiled document needed)
   const swaggerOptions: swaggerUi.SwaggerUiOptions = {
     swaggerOptions: {
-      urls: SERVICES.map((service) => ({
+      urls: SERVICES.map(service => ({
         url: `/api/docs/yaml/${service}`,
         name: service.replace('-service', '').toUpperCase(),
       })),

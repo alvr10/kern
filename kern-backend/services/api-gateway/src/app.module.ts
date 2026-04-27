@@ -7,7 +7,11 @@ import { ProxyModule } from './modules/proxy/proxy.module';
 class HealthController {
   @Get()
   check() {
-    return { status: 'ok', service: 'api-gateway', timestamp: new Date().toISOString() };
+    return {
+      status: 'ok',
+      service: 'api-gateway',
+      timestamp: new Date().toISOString(),
+    };
   }
 }
 
@@ -15,4 +19,4 @@ class HealthController {
   imports: [ConfigModule.forRoot({ isGlobal: true }), LoggerModule, DiscoveryClientModule, ProxyModule, MetricsModule],
   controllers: [HealthController],
 })
- export class AppModule { }
+export class AppModule {}

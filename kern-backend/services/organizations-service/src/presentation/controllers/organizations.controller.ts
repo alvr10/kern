@@ -18,15 +18,13 @@ export class OrganizationsController {
   @Get()
   async list() {
     // In a real app, profileId comes from Auth context (e.g. req.user.id)
-    const profileId = 'dummy-profile-id'; 
+    const profileId = 'dummy-profile-id';
     return this.queryBus.execute(new ListOrganizationsQuery(profileId));
   }
 
   @Post()
   async create(@Body() dto: CreateOrganizationDto) {
-    const orgId = await this.commandBus.execute(
-      new CreateOrganizationCommand(dto.name, dto.slug, dto.logoUrl),
-    );
+    const orgId = await this.commandBus.execute(new CreateOrganizationCommand(dto.name, dto.slug, dto.logoUrl));
     return this.queryBus.execute(new GetOrganizationQuery(orgId));
   }
 
@@ -37,9 +35,7 @@ export class OrganizationsController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateOrganizationDto) {
-    await this.commandBus.execute(
-      new UpdateOrganizationCommand(id, dto.name, dto.logoUrl, dto.brandVoice),
-    );
+    await this.commandBus.execute(new UpdateOrganizationCommand(id, dto.name, dto.logoUrl, dto.brandVoice));
     return this.queryBus.execute(new GetOrganizationQuery(id));
   }
 

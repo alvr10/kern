@@ -11,14 +11,9 @@ export class ReviewsController {
   ) {}
 
   @Post()
-  async submitReview(
-    @Param('id') contentPieceId: string,
-    @Body() dto: { approved: boolean; comment?: string },
-  ) {
+  async submitReview(@Param('id') contentPieceId: string, @Body() dto: { approved: boolean; comment?: string }) {
     const reviewerId = 'dummy-reviewer-id';
-    await this.commandBus.execute(
-      new SubmitReviewCommand(contentPieceId, reviewerId, dto.approved, dto.comment),
-    );
+    await this.commandBus.execute(new SubmitReviewCommand(contentPieceId, reviewerId, dto.approved, dto.comment));
     return this.queryBus.execute(new GetContentQuery(contentPieceId));
   }
 }

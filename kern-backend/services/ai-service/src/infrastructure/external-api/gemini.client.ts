@@ -27,7 +27,7 @@ export class GeminiClient implements OnModuleInit {
 
       const response = await result.response;
       const text = response.text();
-      
+
       // Rough estimation of tokens if not provided by API
       // Gemini API provides usageMetadata in the response
       const tokensUsed = response.usageMetadata?.totalTokenCount || text.split(' ').length * 1.5;
@@ -38,7 +38,7 @@ export class GeminiClient implements OnModuleInit {
       };
     } catch (error) {
       console.error('Gemini API Error:', error);
-      throw new Error(`AI generation failed: ${error.message}`);
+      throw new Error(`AI generation failed: ${error.message}`, { cause: error });
     }
   }
 }

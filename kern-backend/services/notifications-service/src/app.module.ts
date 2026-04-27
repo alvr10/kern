@@ -12,7 +12,11 @@ class AppController {
 
   @Get('health')
   check() {
-    return { status: 'ok', service: 'notifications-service', timestamp: new Date().toISOString() };
+    return {
+      status: 'ok',
+      service: 'notifications-service',
+      timestamp: new Date().toISOString(),
+    };
   }
 
   @EventPattern('user_created')
@@ -22,12 +26,7 @@ class AppController {
 }
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    DatabaseModule,
-    DiscoveryClientModule,
-    MetricsModule
-  ],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, DiscoveryClientModule, MetricsModule],
   controllers: [AppController],
 })
-export class AppModule { }
+export class AppModule {}

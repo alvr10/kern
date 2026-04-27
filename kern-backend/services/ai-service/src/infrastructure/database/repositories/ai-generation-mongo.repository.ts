@@ -18,7 +18,11 @@ export class AIGenerationMongoRepository implements AIGenerationRepository {
     return doc ? AIGenerationMapper.toDomain(doc) : null;
   }
 
-  async findByOrganizationId(organizationId: string, page: number, limit: number): Promise<{ data: AIGeneration[]; total: number }> {
+  async findByOrganizationId(
+    organizationId: string,
+    page: number,
+    limit: number,
+  ): Promise<{ data: AIGeneration[]; total: number }> {
     const skip = (page - 1) * limit;
     const [docs, total] = await Promise.all([
       this.generationModel.find({ organizationId }).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),

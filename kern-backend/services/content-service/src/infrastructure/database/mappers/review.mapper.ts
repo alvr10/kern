@@ -15,7 +15,7 @@ export class ReviewMapper {
 
   static toPersistence(domainReview: Review): MongoReview {
     return {
-      _id: (domainReview.id as any), // Mongoose will handle string to ObjectId conversion if needed
+      _id: domainReview.id as any, // Mongoose will handle string to ObjectId conversion if needed
       reviewerId: domainReview.reviewerId,
       approved: domainReview.approved,
       comment: domainReview.comment || undefined,

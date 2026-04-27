@@ -4,7 +4,9 @@ import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { logger: ['log', 'warn', 'error'] });
+  const app = await NestFactory.create(AppModule, {
+    logger: ['log', 'warn', 'error'],
+  });
   app.enableCors();
 
   // Connect to RabbitMQ via the shared Docker network
@@ -14,7 +16,7 @@ async function bootstrap() {
       urls: [process.env.RABBITMQ_URL || 'amqp://kern:kernpass@rabbitmq:5672'],
       queue: 'notifications_queue',
       queueOptions: {
-        durable: false
+        durable: false,
       },
     },
   });

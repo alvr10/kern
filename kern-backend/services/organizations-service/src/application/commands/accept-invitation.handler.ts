@@ -17,7 +17,7 @@ export class AcceptInvitationHandler implements ICommandHandler<AcceptInvitation
 
   async execute(command: AcceptInvitationCommand): Promise<void> {
     const invitation = await this.invitationRepository.findByToken(command.token);
-    
+
     if (!invitation) {
       throw new Error('Invitation not found');
     }

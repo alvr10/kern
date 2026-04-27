@@ -3,16 +3,14 @@ import { Request, Response, NextFunction } from 'express';
 
 // Public routes that bypass JWT verification
 const PUBLIC_ROUTES: Array<{ method: string; prefix: string }> = [
-  { method: 'GET',  prefix: '/health' },
-  { method: 'GET',  prefix: '/api/docs' },
-  { method: 'GET',  prefix: '/billing/plans' },    // Public plan list
+  { method: 'GET', prefix: '/health' },
+  { method: 'GET', prefix: '/api/docs' },
+  { method: 'GET', prefix: '/billing/plans' }, // Public plan list
   { method: 'POST', prefix: '/billing/webhooks' }, // Stripe webhooks use their own sig
 ];
 
 function isPublicRoute(method: string, path: string): boolean {
-  return PUBLIC_ROUTES.some(
-    (r) => r.method === method && path.startsWith(r.prefix),
-  );
+  return PUBLIC_ROUTES.some(r => r.method === method && path.startsWith(r.prefix));
 }
 
 let supabase: SupabaseClient | null = null;
@@ -27,11 +25,7 @@ function getSupabaseClient(): SupabaseClient {
   return supabase;
 }
 
-export async function jwtAuthMiddleware(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
+export async function jwtAuthMiddleware(req: Request, res: Response, next: NextFunction): Promise<void> {
   if (isPublicRoute(req.method, req.path)) {
     next();
     return;
@@ -53,7 +47,7 @@ export async function jwtAuthMiddleware(
   }
 
   // Inject verified identity as headers for downstream services to consume
-  req.headers['x-user-id']    = data.user.id;
+  req.headers['x-user-id'] = data.user.id;
   req.headers['x-user-email'] = data.user.email ?? '';
 
   next();

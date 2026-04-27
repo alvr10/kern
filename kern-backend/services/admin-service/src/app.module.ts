@@ -7,9 +7,9 @@ import { HealthController } from './presentation/controllers/health.controller';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ 
+    ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '../../.env'
+      envFilePath: '../../.env',
     }),
     DatabaseModule,
     DiscoveryClientModule,
@@ -18,4 +18,4 @@ import { HealthController } from './presentation/controllers/health.controller';
   ],
   controllers: [HealthController],
 })
-export class AppModule { }
+export class AppModule {}

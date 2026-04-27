@@ -17,12 +17,12 @@ const ROUTE_TO_SERVICE: Record<string, string> = {
 export class ProxyModule implements NestModule {
   private readonly serviceIndices: Map<string, number> = new Map();
 
-  constructor(private readonly consulService: ConsulService) { }
+  constructor(private readonly consulService: ConsulService) {}
 
   configure(consumer: MiddlewareConsumer) {
     for (const [prefix, serviceName] of Object.entries(ROUTE_TO_SERVICE)) {
-      consumer.apply(
-        async (req, res, next) => {
+      consumer
+        .apply(async (req, res, next) => {
           // Resolve target from registry at request time
           const instances = await this.consulService.resolve(serviceName);
           if (!instances || !instances.length) {
@@ -47,8 +47,8 @@ export class ProxyModule implements NestModule {
               },
             },
           })(req, res, next);
-        }
-      ).forRoutes(prefix);
+        })
+        .forRoutes(prefix);
     }
   }
 }

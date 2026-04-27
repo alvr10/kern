@@ -6,4 +6,4 @@ import { ConsulService } from './consul.service';
   providers: [ConsulService],
   exports: [ConsulService],
 })
-export class DiscoveryClientModule { }
+export class DiscoveryClientModule {}

@@ -2,7 +2,10 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { AI_ACTION_TYPE_VALUES, AiActionType, SOCIAL_PLATFORM_VALUES, SocialPlatform } from '@kern/shared';
 
-@Schema({ timestamps: { createdAt: true, updatedAt: false }, collection: 'ai_generations' })
+@Schema({
+  timestamps: { createdAt: true, updatedAt: false },
+  collection: 'ai_generations',
+})
 export class AIGeneration {
   @Prop({ type: Types.ObjectId, ref: 'ContentPiece', index: true })
   contentPieceId?: Types.ObjectId;

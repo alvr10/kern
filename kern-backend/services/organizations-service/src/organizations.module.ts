@@ -40,11 +40,7 @@ const CommandHandlers = [
   RemoveMemberHandler,
 ];
 
-const QueryHandlers = [
-  ListOrganizationsHandler,
-  GetOrganizationHandler,
-  ListMembersHandler,
-];
+const QueryHandlers = [ListOrganizationsHandler, GetOrganizationHandler, ListMembersHandler];
 
 const Repositories = [
   {
@@ -63,17 +59,7 @@ const Repositories = [
 
 @Module({
   imports: [CqrsModule],
-  controllers: [
-    OrganizationsController,
-    MembersController,
-    InvitationsController,
-    HealthController,
-    AdminController,
-  ],
-  providers: [
-    ...CommandHandlers,
-    ...QueryHandlers,
-    ...Repositories,
-  ],
+  controllers: [OrganizationsController, MembersController, InvitationsController, HealthController, AdminController],
+  providers: [...CommandHandlers, ...QueryHandlers, ...Repositories],
 })
 export class OrganizationsModule {}

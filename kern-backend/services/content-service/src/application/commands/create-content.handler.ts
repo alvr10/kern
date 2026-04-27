@@ -15,7 +15,7 @@ export class CreateContentHandler implements ICommandHandler<CreateContentComman
 
   async execute(command: CreateContentCommand): Promise<string> {
     const id = uuidv4();
-    
+
     const contentPiece = new ContentPiece(
       id,
       command.projectId,

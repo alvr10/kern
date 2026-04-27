@@ -33,8 +33,10 @@ export class ContentMongoRepository implements ContentRepository {
 
   async addReview(review: Review): Promise<void> {
     const data = ReviewMapper.toPersistence(review);
-    await this.contentModel.findByIdAndUpdate(review.contentPieceId, {
-      $push: { reviews: data },
-    }).exec();
+    await this.contentModel
+      .findByIdAndUpdate(review.contentPieceId, {
+        $push: { reviews: data },
+      })
+      .exec();
   }
 }

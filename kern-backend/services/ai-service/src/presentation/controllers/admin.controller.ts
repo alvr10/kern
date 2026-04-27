@@ -8,7 +8,7 @@ export class AdminController {
   constructor(
     @InjectModel(TokenUsage.name)
     private readonly usageModel: Model<TokenUsage>,
-  ) { }
+  ) {}
 
   @Get('stats')
   async getStats() {

@@ -31,11 +31,12 @@ export class SocialAccountMongoRepository implements SocialAccountRepository {
 
   async save(account: SocialAccount): Promise<void> {
     const data = SocialAccountMapper.toPersistence(account);
-    if (account.id && account.id.length === 24) { // Basic check for ObjectID string
-       await this.accountModel.findByIdAndUpdate(account.id, data, { upsert: true }).exec();
+    if (account.id && account.id.length === 24) {
+      // Basic check for ObjectID string
+      await this.accountModel.findByIdAndUpdate(account.id, data, { upsert: true }).exec();
     } else {
-       const created = new this.accountModel(data);
-       await created.save();
+      const created = new this.accountModel(data);
+      await created.save();
     }
   }
 

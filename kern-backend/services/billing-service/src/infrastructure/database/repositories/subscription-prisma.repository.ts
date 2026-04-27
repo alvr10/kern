@@ -9,12 +9,16 @@ export class SubscriptionPrismaRepository implements SubscriptionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findByOrganizationId(organizationId: string): Promise<Subscription | null> {
-    const sub = await this.prisma.subscription.findUnique({ where: { organizationId } });
+    const sub = await this.prisma.subscription.findUnique({
+      where: { organizationId },
+    });
     return sub ? SubscriptionMapper.toDomain(sub) : null;
   }
 
   async findByStripeSubscriptionId(stripeSubscriptionId: string): Promise<Subscription | null> {
-    const sub = await this.prisma.subscription.findUnique({ where: { stripeSubscriptionId } });
+    const sub = await this.prisma.subscription.findUnique({
+      where: { stripeSubscriptionId },
+    });
     return sub ? SubscriptionMapper.toDomain(sub) : null;
   }
 

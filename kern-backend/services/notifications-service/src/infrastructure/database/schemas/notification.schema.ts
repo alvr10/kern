@@ -2,7 +2,10 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { NOTIFICATION_TYPE_VALUES, NotificationType } from '@kern/shared';
 
-@Schema({ timestamps: { createdAt: true, updatedAt: false }, collection: 'notifications' })
+@Schema({
+  timestamps: { createdAt: true, updatedAt: false },
+  collection: 'notifications',
+})
 export class Notification {
   @Prop({ required: true, index: true })
   profileId: string;

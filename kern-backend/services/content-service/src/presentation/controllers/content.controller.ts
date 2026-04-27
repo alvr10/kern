@@ -54,11 +54,7 @@ export class ContentController {
   }
 
   @Get('calendar')
-  async getCalendar(
-    @Query('projectId') projectId: string,
-    @Query('from') from: string,
-    @Query('to') to: string,
-  ) {
+  async getCalendar(@Query('projectId') projectId: string, @Query('from') from: string, @Query('to') to: string) {
     return this.queryBus.execute(new GetCalendarQuery(projectId, new Date(from), new Date(to)));
   }
 

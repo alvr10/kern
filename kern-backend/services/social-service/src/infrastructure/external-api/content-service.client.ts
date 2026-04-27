@@ -17,12 +17,10 @@ export class ContentServiceClient {
 
   async getContentPiece(id: string): Promise<any> {
     try {
-      const { data } = await firstValueFrom(
-        this.httpService.get(`${this.baseUrl}/content/${id}`)
-      );
+      const { data } = await firstValueFrom(this.httpService.get(`${this.baseUrl}/content/${id}`));
       return data;
     } catch (error) {
-      throw new Error(`Failed to fetch content piece ${id}: ${error.message}`);
+      throw new Error(`Failed to fetch content piece ${id}: ${error.message}`, { cause: error });
     }
   }
 }

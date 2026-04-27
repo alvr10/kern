@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { SUBSCRIPTION_REPOSITORY, SubscriptionRepository } from '../../domain/repositories/subscription.repository';
 import { PLAN_REPOSITORY, PlanRepository } from '../../domain/repositories/plan.repository';
 import { Inject, BadRequestException } from '@nestjs/common';
-import { Subscription, SubscriptionStatus } from '../../domain/entities/subscription.entity';
+import { SubscriptionStatus } from '../../domain/entities/subscription.entity';
 
 @CommandHandler(HandleStripeWebhookCommand)
 export class HandleStripeWebhookHandler implements ICommandHandler<HandleStripeWebhookCommand> {
@@ -48,8 +48,8 @@ export class HandleStripeWebhookHandler implements ICommandHandler<HandleStripeW
 
     // In a real app, we'd fetch the subscription from Stripe to get the period end and plan
     // For simplicity, we'll assume we have the organizationId and can update it.
-    let subscription = await this.subscriptionRepository.findByOrganizationId(organizationId);
-    
+    const subscription = await this.subscriptionRepository.findByOrganizationId(organizationId);
+
     if (subscription) {
       subscription.activate(stripeSubscriptionId, stripeCustomerId, new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
       await this.subscriptionRepository.save(subscription);

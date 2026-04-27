@@ -23,20 +23,13 @@ export class MembersController {
     @Param('memberId') memberId: string,
     @Body() dto: UpdateMemberRoleDto,
   ) {
-    await this.commandBus.execute(
-      new UpdateMemberRoleCommand(organizationId, memberId, dto.role),
-    );
+    await this.commandBus.execute(new UpdateMemberRoleCommand(organizationId, memberId, dto.role));
     // return the updated list or member
     return { success: true };
   }
 
   @Delete(':memberId')
-  async remove(
-    @Param('id') organizationId: string,
-    @Param('memberId') memberId: string,
-  ) {
-    await this.commandBus.execute(
-      new RemoveMemberCommand(organizationId, memberId),
-    );
+  async remove(@Param('id') organizationId: string, @Param('memberId') memberId: string) {
+    await this.commandBus.execute(new RemoveMemberCommand(organizationId, memberId));
   }
 }
