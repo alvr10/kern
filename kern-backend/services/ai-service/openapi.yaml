@@ -1,0 +1,317 @@
+openapi: 3.0.0
+info:
+  title: KERN AI Service
+  version: 1.0.0
+  description: AI-powered content generation, rewriting, and enhancement. Tracks token usage per organization.
+
+tags:
+  - name: Generations
+  - name: Token Usage
+  - name: Health
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      operationId: aiHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /ai/generate:
+    post:
+      tags: [Generations]
+      summary: Generate a social media post with AI
+      operationId: generateContent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateContentDto'
+      responses:
+        '201':
+          description: Content generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIGenerationResponse'
+        '402':
+          description: Token limit reached for this organization
+        '503':
+          description: AI provider unavailable
+
+  /ai/rewrite:
+    post:
+      tags: [Generations]
+      summary: Rewrite an existing content piece
+      operationId: rewriteContent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RewriteContentDto'
+      responses:
+        '201':
+          description: Content rewritten
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIGenerationResponse'
+        '402':
+          description: Token limit reached
+
+  /ai/improve:
+    post:
+      tags: [Generations]
+      summary: Improve an existing draft (grammar, tone, engagement)
+      operationId: improveContent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImproveContentDto'
+      responses:
+        '201':
+          description: Content improved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIGenerationResponse'
+        '402':
+          description: Token limit reached
+
+  /ai/adapt:
+    post:
+      tags: [Generations]
+      summary: Adapt content for a different social platform
+      operationId: adaptContent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdaptContentDto'
+      responses:
+        '201':
+          description: Content adapted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIGenerationResponse'
+        '402':
+          description: Token limit reached
+
+  /ai/generations:
+    get:
+      tags: [Generations]
+      summary: List past AI generations for an organization
+      operationId: listGenerations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: organizationId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of AI generations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedGenerationsResponse'
+
+  /ai/token-usage/{organizationId}:
+    get:
+      tags: [Token Usage]
+      summary: Get token usage summary for an organization
+      operationId: getTokenUsage
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Token usage summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenUsageResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    SocialPlatform:
+      type: string
+      enum: [TWITTER, LINKEDIN, INSTAGRAM, FACEBOOK, TIKTOK]
+
+    AIActionType:
+      type: string
+      enum: [GENERATE, REWRITE, ADAPT, IMPROVE]
+
+    GenerateContentDto:
+      type: object
+      required: [organizationId, platform, topic]
+      properties:
+        organizationId:
+          type: string
+        contentPieceId:
+          type: string
+          nullable: true
+          description: Link to an existing content piece if applicable
+        platform:
+          $ref: '#/components/schemas/SocialPlatform'
+        topic:
+          type: string
+          description: Brief description or keywords for the post
+        tone:
+          type: string
+          description: Desired tone (e.g. professional, casual, humorous)
+          nullable: true
+        maxLength:
+          type: integer
+          nullable: true
+
+    RewriteContentDto:
+      type: object
+      required: [organizationId, contentPieceId, originalText]
+      properties:
+        organizationId:
+          type: string
+        contentPieceId:
+          type: string
+        originalText:
+          type: string
+        instructions:
+          type: string
+          nullable: true
+
+    ImproveContentDto:
+      type: object
+      required: [organizationId, contentPieceId, originalText]
+      properties:
+        organizationId:
+          type: string
+        contentPieceId:
+          type: string
+        originalText:
+          type: string
+
+    AdaptContentDto:
+      type: object
+      required: [organizationId, contentPieceId, originalText, targetPlatform]
+      properties:
+        organizationId:
+          type: string
+        contentPieceId:
+          type: string
+        originalText:
+          type: string
+        targetPlatform:
+          $ref: '#/components/schemas/SocialPlatform'
+
+    AIGenerationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        organizationId:
+          type: string
+        contentPieceId:
+          type: string
+          nullable: true
+        actionType:
+          $ref: '#/components/schemas/AIActionType'
+        platform:
+          $ref: '#/components/schemas/SocialPlatform'
+        prompt:
+          type: string
+        generatedText:
+          type: string
+        tokensUsed:
+          type: integer
+        estimatedCostUsd:
+          type: number
+          format: float
+        createdAt:
+          type: string
+          format: date-time
+
+    PaginatedGenerationsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AIGenerationResponse'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    TokenUsageResponse:
+      type: object
+      properties:
+        organizationId:
+          type: string
+        tokensUsed:
+          type: integer
+        tokensLimit:
+          type: integer
+        percentUsed:
+          type: number
+          format: float
+        resetAt:
+          type: string
+          format: date-time
+          nullable: true

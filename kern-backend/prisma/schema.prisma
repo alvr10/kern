@@ -1,8 +1,238 @@
+// ============================================================
+// Kern — PostgreSQL Schema (Supabase)
+// Handles: Auth, Users, Orgs, Billing, Access Control
+//
+// MongoDB handles: Content, Comments, Reviews, AI logs,
+//                  Notifications (see mongoose-schemas.ts)
+//
+// Setup:
+//   1. Paste the trigger SQL at the bottom into Supabase SQL editor
+//   2. Set DATABASE_URL (pooler port 6543) and
+// ============================================================
+
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["partialIndexes"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
 }
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum MemberRole {
+  ADMIN   // Manage org, members, billing
+  EDITOR  // Create/edit content, use AI
+  VIEWER  // Review and approve only
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+// ============================================================
+// PROFILES
+// Mirrors auth.users — auto-created by the trigger below.
+// `id` = Supabase Auth UUID. Never insert manually.
+// ============================================================
+
+model Profile {
+  id        String  @id       // Supabase Auth UUID — set by trigger
+  email     String  @unique
+  name      String
+  avatarUrl String?
+  timezone  String  @default("UTC")
+
+  notifyTokenAlerts Boolean @default(true)
+  notifyApprovals   Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations (all within PostgreSQL)
+  memberships     Membership[]
+  sentInvitations Invitation[] @relation("InvitedBy")
+
+  // Note: contentPieces, aiGenerations, notifications live in MongoDB.
+  // Reference this profile by its `id` (UUID string) from those collections.
+
+  @@map("profiles")
+}
+
+// ============================================================
+// PLANS & SUBSCRIPTIONS
+// ============================================================
+
+model Plan {
+  id                   String  @id @default(cuid())
+  name                 String  @unique   // "Free" | "Starter" | "Pro"
+  slug                 String  @unique
+  monthlyTokenLimit    Int
+  memberLimit          Int
+  projectLimit         Int
+  priceMonthlyUsd      Decimal @db.Decimal(10, 2)
+  stripePriceIdMonthly String?
+  stripePriceIdYearly  String?
+  features             Json    @default("[]")
+  isActive             Boolean @default(true)
+
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id             String             @id @default(cuid())
+  organizationId String             @unique
+  planId         String
+  status         SubscriptionStatus @default(TRIALING)
+
+  // Stripe fields — updated via webhook
+  stripeCustomerId        String?   @unique
+  stripeSubscriptionId    String?   @unique
+  stripeCurrentPeriodEnd  DateTime?
+  stripeCancelAtPeriodEnd Boolean   @default(false)
+
+  // Token tracking — reset on each billing period via Stripe webhook
+  tokensUsed         Int     @default(0)
+  tokensLimit        Int     // snapshot of plan limit at subscription time
+  tokensAlertSent80  Boolean @default(false)
+  tokensAlertSent100 Boolean @default(false)
+
+  trialEndsAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan         Plan         @relation(fields: [planId], references: [id])
+
+  @@index([planId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+// ============================================================
+// ORGANIZATIONS, MEMBERSHIP & INVITATIONS
+// ============================================================
+
+model Organization {
+  id         String    @id @default(cuid())
+  name       String
+  slug       String    @unique
+  logoUrl    String?
+  // { tone, style, keywords: string[], avoidWords: string[] }
+  brandVoice Json?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime? // soft delete
+
+  subscription Subscription?
+  memberships  Membership[]
+  projects     Project[]
+  invitations  Invitation[]
+
+  // Note: notifications for this org live in MongoDB (organizationId field).
+
+  @@index([slug])
+  @@map("organizations")
+}
+
+model Membership {
+  id             String     @id @default(cuid())
+  profileId      String
+  organizationId String
+  role           MemberRole @default(EDITOR)
+  joinedAt       DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  profile      Profile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, organizationId])
+  @@index([organizationId])
+  @@index([role])
+  @@map("memberships")
+}
+
+model Invitation {
+  id             String           @id @default(cuid())
+  organizationId String
+  invitedById    String
+  email          String
+  role           MemberRole       @default(EDITOR)
+  token          String           @unique @default(cuid())
+  status         InvitationStatus @default(PENDING)
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime         @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy    Profile      @relation("InvitedBy", fields: [invitedById], references: [id])
+
+  @@index([organizationId])
+  @@index([email])
+  @@index([token])
+  @@map("invitations")
+}
+
+// ============================================================
+// PROJECTS
+// Anchor for content — lives here so org/project membership
+// rules can be enforced relationally.
+// ============================================================
+
+model Project {
+  id             String    @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  color          String?   // hex colour for UI
+  isArchived     Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // Note: ContentPiece documents in MongoDB reference this project by `id`.
+
+  @@index([organizationId])
+  @@index([isArchived])
+  @@map("projects")
+}
+
+// ============================================================
+// SUPABASE TRIGGER — paste into the Supabase SQL editor once
+// ============================================================
+//
+// create or replace function public.handle_new_user()
+// returns trigger
+// language plpgsql
+// security definer set search_path = public
+// as $$
+// begin
+//   insert into public.profiles (id, email, name, avatar_url)
+//   values (
+//     new.id,
+//     new.email,
+//     coalesce(new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
+//     new.raw_user_meta_data->>'avatar_url'
+//   );
+//   return new;
+// end;
+// $$;
+//
+// create or replace trigger on_auth_user_created
+//   after insert on auth.users
+//   for each row execute procedure public.handle_new_user();
