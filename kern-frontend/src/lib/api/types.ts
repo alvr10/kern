@@ -4,6 +4,17 @@
  */
 
 /**
+ * Supported social platforms
+ */
+export enum SocialPlatform {
+  TWITTER = "TWITTER",
+  LINKEDIN = "LINKEDIN",
+  INSTAGRAM = "INSTAGRAM",
+  FACEBOOK = "FACEBOOK",
+  TIKTOK = "TIKTOK",
+}
+
+/**
  * Standard API error response
  */
 export interface ApiError {
