@@ -3,7 +3,7 @@ import { SocialPlatform } from '../../domain/value-objects/social-platform.vo';
 
 export class ListContentQuery {
   constructor(
-    public readonly projectId: string,
+    public readonly organizationId: string,
     public readonly status?: ContentStatus,
     public readonly platform?: SocialPlatform,
     public readonly page: number = 1,

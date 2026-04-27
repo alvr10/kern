@@ -4,10 +4,6 @@ import { SocialPlatform } from '../../domain/value-objects/social-platform.vo';
 export class CreateContentDto {
   @IsString()
   @IsNotEmpty()
-  projectId: string;
-
-  @IsString()
-  @IsNotEmpty()
   organizationId: string;
 
   @IsString()

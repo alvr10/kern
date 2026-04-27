@@ -280,8 +280,6 @@ components:
                 type: string
               memberCount:
                 type: integer
-              projectCount:
-                type: integer
               subscriptionStatus:
                 type: string
               createdAt:

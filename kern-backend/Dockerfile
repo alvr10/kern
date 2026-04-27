@@ -57,7 +57,6 @@ COPY --from=builder /app/services/${SERVICE_NAME}/dist ./services/${SERVICE_NAME
 
 # Copy all service openapi.yaml specs (only used by api-gateway at runtime)
 COPY --from=builder /app/services/organizations-service/openapi.yaml ./services/organizations-service/openapi.yaml
-COPY --from=builder /app/services/projects-service/openapi.yaml ./services/projects-service/openapi.yaml
 COPY --from=builder /app/services/content-service/openapi.yaml ./services/content-service/openapi.yaml
 COPY --from=builder /app/services/ai-service/openapi.yaml ./services/ai-service/openapi.yaml
 COPY --from=builder /app/services/notifications-service/openapi.yaml ./services/notifications-service/openapi.yaml

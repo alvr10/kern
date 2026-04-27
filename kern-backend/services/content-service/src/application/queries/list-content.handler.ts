@@ -15,7 +15,7 @@ export class ListContentHandler implements IQueryHandler<ListContentQuery> {
   ) {}
 
   async execute(query: ListContentQuery): Promise<any> {
-    const filter: any = { projectId: query.projectId, deletedAt: null };
+    const filter: any = { organizationId: query.organizationId, deletedAt: null };
     if (query.status) filter.status = query.status;
     if (query.platform) filter.platform = query.platform;
 

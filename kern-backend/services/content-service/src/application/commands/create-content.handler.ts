@@ -18,7 +18,6 @@ export class CreateContentHandler implements ICommandHandler<CreateContentComman
 
     const contentPiece = new ContentPiece(
       id,
-      command.projectId,
       command.organizationId,
       command.authorId,
       command.title,

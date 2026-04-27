@@ -1,3 +1,3 @@
 export class GetKanbanQuery {
-  constructor(public readonly projectId: string) {}
+  constructor(public readonly organizationId: string) {}
 }

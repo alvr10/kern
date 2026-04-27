@@ -1,6 +1,6 @@
 export class GetCalendarQuery {
   constructor(
-    public readonly projectId: string,
+    public readonly organizationId: string,
     public readonly from: Date,
     public readonly to: Date,
   ) {}

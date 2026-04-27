@@ -18,7 +18,7 @@ export class GetKanbanHandler implements IQueryHandler<GetKanbanQuery> {
   async execute(query: GetKanbanQuery): Promise<any> {
     const pieces = await this.contentModel
       .find({
-        projectId: query.projectId,
+        organizationId: query.organizationId,
         deletedAt: null,
       })
       .sort({ kanbanPosition: 1 })

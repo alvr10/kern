@@ -5,7 +5,6 @@ import { Review } from './review.entity';
 export class ContentPiece {
   constructor(
     public readonly id: string,
-    public readonly projectId: string,
     public readonly organizationId: string,
     public readonly authorId: string,
     public title: string,

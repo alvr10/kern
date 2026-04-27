@@ -185,7 +185,7 @@ components:
           type: integer
         memberLimit:
           type: integer
-        projectLimit:
+        organizationLimit:
           type: integer
         priceMonthlyUsd:
           type: number

@@ -17,7 +17,7 @@ export class GetCalendarHandler implements IQueryHandler<GetCalendarQuery> {
   async execute(query: GetCalendarQuery): Promise<any[]> {
     return this.contentModel
       .find({
-        projectId: query.projectId,
+        organizationId: query.organizationId,
         scheduledAt: {
           $gte: query.from,
           $lte: query.to,

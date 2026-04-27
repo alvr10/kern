@@ -81,7 +81,7 @@ model Plan {
   slug                 String  @unique
   monthlyTokenLimit    Int
   memberLimit          Int
-  projectLimit         Int
+  organizationLimit    Int
   priceMonthlyUsd      Decimal @db.Decimal(10, 2)
   stripePriceIdMonthly String?
   stripePriceIdYearly  String?
@@ -140,7 +140,6 @@ model Organization {
 
   subscription Subscription?
   memberships  Membership[]
-  projects     Project[]
   invitations  Invitation[]
 
   // Note: notifications for this org live in MongoDB (organizationId field).
@@ -185,31 +184,6 @@ model Invitation {
   @@index([email])
   @@index([token])
   @@map("invitations")
-}
-
-// ============================================================
-// PROJECTS
-// Anchor for content — lives here so org/project membership
-// rules can be enforced relationally.
-// ============================================================
-
-model Project {
-  id             String    @id @default(cuid())
-  organizationId String
-  name           String
-  description    String?
-  color          String?   // hex colour for UI
-  isArchived     Boolean   @default(false)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  // Note: ContentPiece documents in MongoDB reference this project by `id`.
-
-  @@index([organizationId])
-  @@index([isArchived])
-  @@map("projects")
 }
 
 // ============================================================

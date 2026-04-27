@@ -23,7 +23,6 @@ export class ContentController {
     const authorId = 'dummy-author-id';
     const id = await this.commandBus.execute(
       new CreateContentCommand(
-        dto.projectId,
         dto.organizationId,
         authorId,
         dto.title,
@@ -39,23 +38,27 @@ export class ContentController {
 
   @Get()
   async list(
-    @Query('projectId') projectId: string,
+    @Query('organizationId') organizationId: string,
     @Query('status') status?: ContentStatus,
     @Query('platform') platform?: SocialPlatform,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ) {
-    return this.queryBus.execute(new ListContentQuery(projectId, status, platform, page, limit));
+    return this.queryBus.execute(new ListContentQuery(organizationId, status, platform, page, limit));
   }
 
   @Get('kanban')
-  async getKanban(@Query('projectId') projectId: string) {
-    return this.queryBus.execute(new GetKanbanQuery(projectId));
+  async getKanban(@Query('organizationId') organizationId: string) {
+    return this.queryBus.execute(new GetKanbanQuery(organizationId));
   }
 
   @Get('calendar')
-  async getCalendar(@Query('projectId') projectId: string, @Query('from') from: string, @Query('to') to: string) {
-    return this.queryBus.execute(new GetCalendarQuery(projectId, new Date(from), new Date(to)));
+  async getCalendar(
+    @Query('organizationId') organizationId: string,
+    @Query('from') from: string,
+    @Query('to') to: string,
+  ) {
+    return this.queryBus.execute(new GetCalendarQuery(organizationId, new Date(from), new Date(to)));
   }
 
   @Get(':id')

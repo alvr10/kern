@@ -5,7 +5,7 @@ export class Plan {
     public readonly slug: string,
     public readonly monthlyTokenLimit: number,
     public readonly memberLimit: number,
-    public readonly projectLimit: number,
+    public readonly organizationLimit: number,
     public readonly priceMonthlyUsd: number,
     public readonly features: string[],
     public readonly isActive: boolean,

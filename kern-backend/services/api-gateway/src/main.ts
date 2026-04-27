@@ -9,7 +9,6 @@ import { jwtAuthMiddleware } from './middleware/jwt-auth.middleware';
 
 const SERVICES = [
   'organizations-service',
-  'projects-service',
   'content-service',
   'ai-service',
   'notifications-service',
@@ -62,7 +61,6 @@ async function bootstrap() {
 
   const ROUTE_TO_SERVICE: Record<string, string> = {
     '/api/v1/organizations': 'organizations-service',
-    '/api/v1/projects': 'projects-service',
     '/api/v1/content': 'content-service',
     '/api/v1/social': 'social-service',
     '/api/v1/notifications': 'notifications-service',
@@ -72,7 +70,7 @@ async function bootstrap() {
   };
 
   express.use(async (req: any, res: any, next: any) => {
-    const prefix = Object.keys(ROUTE_TO_SERVICE).find((p) => req.path.startsWith(p));
+    const prefix = Object.keys(ROUTE_TO_SERVICE).find(p => req.path.startsWith(p));
     if (!prefix) return next();
 
     const serviceName = ROUTE_TO_SERVICE[prefix];

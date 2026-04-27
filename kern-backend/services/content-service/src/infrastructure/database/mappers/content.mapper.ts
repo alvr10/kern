@@ -8,7 +8,6 @@ export class ContentMapper {
   static toDomain(mongoPiece: ContentPieceDocument): ContentPiece {
     return new ContentPiece(
       mongoPiece._id.toString(),
-      mongoPiece.projectId,
       mongoPiece.organizationId,
       mongoPiece.authorId,
       mongoPiece.title,
@@ -29,7 +28,6 @@ export class ContentMapper {
 
   static toPersistence(domainPiece: ContentPiece): Partial<MongoContentPiece> {
     return {
-      projectId: domainPiece.projectId,
       organizationId: domainPiece.organizationId,
       authorId: domainPiece.authorId,
       title: domainPiece.title,

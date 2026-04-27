@@ -1,7 +1,7 @@
 .container {
-  min-height: calc(100vh - 112px); /* Navbar + Subnav height */
-  background-color: #000;
-  color: #fff;
+  height: 100%;
+  background-color: var(--background);
+  color: var(--foreground);
   display: flex;
   flex-direction: column;
 }
@@ -10,8 +10,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px 40px;
-  border-bottom: 1px solid #1a1a1a;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+  flex-shrink: 0;
 }
 
 .titleSection {
@@ -24,10 +26,11 @@
   font-size: 24px;
   font-weight: 600;
   letter-spacing: -0.02em;
+  font-family: var(--font-title);
 }
 
 .subtitle {
-  color: #888;
+  color: var(--muted-foreground);
   font-size: 14px;
 }
 
@@ -36,53 +39,77 @@
   gap: 12px;
 }
 
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5), 0 0 10px rgba(236, 72, 153, 0.3), 0 0 15px rgba(245, 158, 11, 0.2);
+  }
+  33% {
+    box-shadow: 0 0 15px rgba(236, 72, 153, 0.6), 0 0 20px rgba(245, 158, 11, 0.4), 0 0 25px rgba(59, 130, 246, 0.3);
+  }
+  66% {
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.6), 0 0 20px rgba(59, 130, 246, 0.4), 0 0 25px rgba(236, 72, 153, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5), 0 0 10px rgba(236, 72, 153, 0.3), 0 0 15px rgba(245, 158, 11, 0.2);
+  }
+}
+
 .generateButton {
-  background-color: #111;
-  color: #fff;
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
   padding: 8px 16px;
   border-radius: 6px;
   font-weight: 500;
   font-size: 13px;
-  border: 1px solid #333;
+  border: 1px solid var(--border);
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  animation: glow 3s infinite ease-in-out;
 }
 
 .generateButton:hover {
-  background-color: #1a1a1a;
+  background-color: var(--accent);
+  transform: translateY(-1px);
 }
 
 .createButton {
-  background-color: #fff;
-  color: #000;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
   padding: 8px 16px;
   border-radius: 6px;
   font-weight: 500;
   font-size: 13px;
   border: none;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.createButton:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 .board {
   flex: 1;
-  padding: 24px 40px;
   display: flex;
   gap: 24px;
   overflow-x: auto;
-  align-items: flex-start;
+  align-items: stretch; /* Make columns fill height */
+  padding-bottom: 24px;
+  min-height: 0; /* Allow flex child to shrink/scroll */
 }
 
 .column {
   flex: 0 0 300px;
-  background-color: #0a0a0a;
-  border: 1px solid #1a1a1a;
+  background-color: var(--card);
+  border: 1px solid var(--border);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
-  max-height: 100%;
+  height: 100%; /* Reach to bottom */
 }
 
 .columnHeader {
@@ -90,7 +117,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #1a1a1a;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
 .columnTitle {
@@ -103,8 +131,8 @@
 
 .count {
   font-size: 12px;
-  color: #666;
-  background-color: #1a1a1a;
+  color: var(--muted-foreground);
+  background-color: var(--secondary);
   padding: 2px 8px;
   border-radius: 10px;
 }
@@ -117,15 +145,16 @@
 .iconButton {
   background: none;
   border: none;
-  color: #666;
+  color: var(--muted-foreground);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
-  transition: color 0.2s;
+  transition: all 0.2s;
 }
 
 .iconButton:hover {
-  color: #fff;
+  color: var(--foreground);
+  background-color: var(--accent);
 }
 
 .cardList {
@@ -134,27 +163,36 @@
   flex-direction: column;
   gap: 12px;
   overflow-y: auto;
+  flex: 1; /* Allow content list to scroll while column header/footer stay fixed */
 }
 
 .card {
-  background-color: #111;
-  border: 1px solid #222;
-  border-radius: 8px;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 10px;
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   cursor: grab;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.cardActive {
+  opacity: 0.5;
+  cursor: grabbing;
 }
 
 .card:hover {
-  border-color: #444;
+  border-color: var(--ring);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .cardBody {
   font-size: 14px;
-  color: #ccc;
+  color: var(--foreground);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -172,31 +210,34 @@
   font-size: 11px;
   padding: 2px 6px;
   border-radius: 4px;
-  background-color: #1a1a1a;
-  color: #888;
-  border: 1px solid #333;
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+  border: 1px solid var(--border);
   text-transform: uppercase;
+  font-weight: 500;
 }
 
 .newCardButton {
-  margin: 0 16px 16px;
+  margin: 16px;
   padding: 8px;
   background-color: transparent;
-  border: 1px dashed #333;
+  border: 1px dashed var(--border);
   border-radius: 8px;
-  color: #666;
+  color: var(--muted-foreground);
   font-size: 13px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: border-color 0.2s, color 0.2s;
+  transition: all 0.2s;
+  flex-shrink: 0;
 }
 
 .newCardButton:hover {
-  border-color: #555;
-  color: #fff;
+  border-color: var(--ring);
+  color: var(--foreground);
+  background-color: var(--accent);
 }
 
 .loadingContainer {
@@ -209,10 +250,95 @@
 .spinner {
   width: 32px;
   height: 32px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-left-color: #fff;
+  border: 2px solid var(--secondary);
+  border-left-color: var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modalContent {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
+  padding: 32px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modalTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  font-family: var(--font-title);
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+.input, .textarea, .select {
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--foreground);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus, .textarea:focus, .select:focus {
+  border-color: var(--ring);
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.cancelButton {
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.cancelButton:hover {
+  background-color: var(--secondary);
+  color: var(--foreground);
 }
 
 @keyframes spin {

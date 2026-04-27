@@ -125,39 +125,6 @@ services:
       alloy:
         condition: service_started
 
-  # ─── Projects Service ─────────────────────────────────────────────────────────
-  projects-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        SERVICE_NAME: projects-service
-        PORT: 3000
-    container_name: kern-projects-service
-    restart: unless-stopped
-    environment:
-      NODE_ENV: ${NODE_ENV:-development}
-      PORT: 3000
-      SERVICE_NAME: projects-service
-      CONSUL_URL: http://consul:8500
-      DATABASE_URL: ${DATABASE_URL}
-      # OpenTelemetry Auto-Instrumentation
-      NODE_OPTIONS: "--require @opentelemetry/auto-instrumentations-node/register"
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
-      OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
-      OTEL_TRACES_SAMPLER_ARG: "0.1"
-      OTEL_BSP_MAX_QUEUE_SIZE: "4096"
-      OTEL_BSP_EXPORT_TIMEOUT: "10000"
-      OTEL_SERVICE_NAME: "projects-service"
-      OTEL_RESOURCE_ATTRIBUTES: "service.namespace=kern,deployment.environment=${NODE_ENV}"
-    networks:
-      - kern-network
-    depends_on:
-      consul:
-        condition: service_healthy
-      alloy:
-        condition: service_started
-
   # ─── Content Service (Kanban / Calendar) ──────────────────────────────────────
   content-service:
     build:

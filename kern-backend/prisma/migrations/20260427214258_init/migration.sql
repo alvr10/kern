@@ -29,7 +29,7 @@ CREATE TABLE "plans" (
     "slug" TEXT NOT NULL,
     "monthlyTokenLimit" INTEGER NOT NULL,
     "memberLimit" INTEGER NOT NULL,
-    "projectLimit" INTEGER NOT NULL,
+    "organizationLimit" INTEGER NOT NULL,
     "priceMonthlyUsd" DECIMAL(10,2) NOT NULL,
     "stripePriceIdMonthly" TEXT,
     "stripePriceIdYearly" TEXT,
@@ -102,20 +102,6 @@ CREATE TABLE "invitations" (
     CONSTRAINT "invitations_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "projects" (
-    "id" TEXT NOT NULL,
-    "organizationId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "description" TEXT,
-    "color" TEXT,
-    "isArchived" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "projects_pkey" PRIMARY KEY ("id")
-);
-
 -- CreateIndex
 CREATE UNIQUE INDEX "profiles_email_key" ON "profiles"("email");
 
@@ -167,12 +153,6 @@ CREATE INDEX "invitations_email_idx" ON "invitations"("email");
 -- CreateIndex
 CREATE INDEX "invitations_token_idx" ON "invitations"("token");
 
--- CreateIndex
-CREATE INDEX "projects_organizationId_idx" ON "projects"("organizationId");
-
--- CreateIndex
-CREATE INDEX "projects_isArchived_idx" ON "projects"("isArchived");
-
 -- AddForeignKey
 ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -190,6 +170,3 @@ ALTER TABLE "invitations" ADD CONSTRAINT "invitations_organizationId_fkey" FOREI
 
 -- AddForeignKey
 ALTER TABLE "invitations" ADD CONSTRAINT "invitations_invitedById_fkey" FOREIGN KEY ("invitedById") REFERENCES "profiles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "projects" ADD CONSTRAINT "projects_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;

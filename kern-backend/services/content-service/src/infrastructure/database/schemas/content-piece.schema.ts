@@ -38,9 +38,6 @@ export const ContentReviewSchema = SchemaFactory.createForClass(ContentReview);
 @Schema({ timestamps: true, collection: 'content_pieces' })
 export class ContentPiece {
   @Prop({ required: true, index: true })
-  projectId: string;
-
-  @Prop({ required: true, index: true })
   organizationId: string;
 
   @Prop({ required: true, index: true })
@@ -98,4 +95,4 @@ export const ContentPieceSchema = SchemaFactory.createForClass(ContentPiece);
 
 ContentPieceSchema.index({ organizationId: 1, status: 1 });
 ContentPieceSchema.index({ organizationId: 1, scheduledAt: 1 });
-ContentPieceSchema.index({ projectId: 1, kanbanPosition: 1 });
+ContentPieceSchema.index({ organizationId: 1, kanbanPosition: 1 });

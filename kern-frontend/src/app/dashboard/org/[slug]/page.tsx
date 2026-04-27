@@ -1,6 +1,11 @@
 import { redirect } from "next/navigation";
 
-export default function OrgPage({ params }: { params: { slug: string } }) {
+export default async function OrgPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
   // Redirect to the create/kanban view by default
-  redirect(`/dashboard/org/${params.slug}/create`);
+  redirect(`/dashboard/org/${slug}/create`);
 }

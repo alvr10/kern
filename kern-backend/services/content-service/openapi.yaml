@@ -34,7 +34,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - name: projectId
+        - name: organizationId
           in: query
           required: true
           schema:
@@ -93,7 +93,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - name: projectId
+        - name: organizationId
           in: query
           required: true
           schema:
@@ -114,7 +114,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - name: projectId
+        - name: organizationId
           in: query
           required: true
           schema:
@@ -323,10 +323,8 @@ components:
 
     CreateContentDto:
       type: object
-      required: [projectId, organizationId, title, body, platform]
+      required: [organizationId, title, body, platform]
       properties:
-        projectId:
-          type: string
         organizationId:
           type: string
         title:
@@ -376,8 +374,6 @@ components:
       type: object
       properties:
         id:
-          type: string
-        projectId:
           type: string
         organizationId:
           type: string

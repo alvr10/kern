@@ -3,7 +3,6 @@ import { SocialPlatform } from '../../domain/value-objects/social-platform.vo';
 
 export class CreateContentCommand implements ICommand {
   constructor(
-    public readonly projectId: string,
     public readonly organizationId: string,
     public readonly authorId: string,
     public readonly title: string,

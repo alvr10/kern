@@ -28,7 +28,6 @@ This project follows strict engineering standards defined in `AGENTS.md`:
 | :---------------------- | :------- | :------------------ | :------------------------------------------ |
 | `api-gateway`           | **3000** | —                   | Public Entry Point, Proxying, Rate Limiting |
 | `organizations-service` | 3002     | PostgreSQL (Prisma) | Teams, Roles, and Workspace Management      |
-| `projects-service`      | 3003     | PostgreSQL (Prisma) | Project-scoped logical isolation            |
 | `content-service`       | 3004     | MongoDB (Mongoose)  | Content Pieces, Kanban, and Calendar        |
 | `social-service`        | 3005     | MongoDB (Mongoose)  | Account connection & Automated Publishing   |
 | `ai-service`            | 3006     | MongoDB (Mongoose)  | Gemini 1.5 Flash Integration & Token Quotas |
@@ -42,7 +41,7 @@ This project follows strict engineering standards defined in `AGENTS.md`:
 
 - **Languages**: TypeScript (Strict Mode).
 - **Persistence**:
-  - **PostgreSQL**: Relational data (Orgs, Projects, Billing) via **Prisma**.
+  - **PostgreSQL**: Relational data (Organizations, Billing) via **Prisma**.
   - **MongoDB**: Document data (Content, Social, AI Logs) via **Mongoose**.
   - **Redis**: Caching and distributed locking.
 - **Messaging**: RabbitMQ.

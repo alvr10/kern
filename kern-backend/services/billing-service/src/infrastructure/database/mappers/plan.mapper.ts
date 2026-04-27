@@ -9,7 +9,7 @@ export class PlanMapper {
       prisma.slug,
       prisma.monthlyTokenLimit,
       prisma.memberLimit,
-      prisma.projectLimit,
+      prisma.organizationLimit,
       Number(prisma.priceMonthlyUsd),
       prisma.features as string[],
       prisma.isActive,
