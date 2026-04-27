@@ -4,7 +4,7 @@ import React, { useRef } from 'react';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import styles from './Menu.module.css';
+import styles from './menu.module.css';
 
 const scrambleText = (elements: Element[], duration = 0.2) => {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
@@ -76,7 +76,7 @@ export function Menu(): React.JSX.Element {
 
     // Cache the original style so we can measure auto width
     navBar.style.width = 'max-content';
-    const compactWidth = navBar.getBoundingClientRect().width;
+    const compactWidth = (navBar.getBoundingClientRect().width) + 50;
     navBar.style.width = '90vw';
 
     let isCompact = false;
@@ -117,12 +117,12 @@ export function Menu(): React.JSX.Element {
         <Link href="/" className={styles.logo}>
           KERN
         </Link>
-        <div className={styles.links}>
+        <div className={`${styles.links} link`}>
           <HoverScrambleLink text="How it works" href="#how-it-works" />
           <HoverScrambleLink text="Pricing" href="#pricing" />
           <HoverScrambleLink text="Use Cases" href="#use-cases" />
         </div>
-        <div className={styles.authLinks}>
+        <div className={`${styles.authLinks} link`}>
           <Link href="/login" className={styles.loginButton}>Log In</Link>
           <Link href="/signup" className={styles.signupButton}>Sign Up</Link>
         </div>

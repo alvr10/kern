@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { Menu } from './Menu';
+import { Menu } from './menu/menu';
+import { SmoothScroll } from './smooth-scroll';
 
 interface LegalLayoutProps {
   children: React.ReactNode;
@@ -16,7 +17,7 @@ export function LegalLayout({ children, activePath }: LegalLayoutProps): React.J
   ];
 
   return (
-    <>
+    <SmoothScroll>
       <Menu />
       <main style={{ minHeight: '100vh', backgroundColor: 'var(--background)', color: 'var(--foreground)' }} className="py-32 px-6 md:px-12 lg:px-24 flex justify-center">
         <div className="w-full max-w-5xl flex flex-col md:flex-row gap-12">
@@ -59,6 +60,6 @@ export function LegalLayout({ children, activePath }: LegalLayoutProps): React.J
         </div>
       </div>
     </main>
-    </>
+    </SmoothScroll>
   );
 }
