@@ -5,7 +5,6 @@ import styles from "./layout.module.css";
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
 import { useTheme } from "next-themes";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Building2,
   Bell,
@@ -18,7 +17,6 @@ import {
   AtSign,
   Plus,
   Settings,
-  PanelLeftClose,
   Sun,
   Moon,
   LayoutGrid,
@@ -321,9 +319,6 @@ export default function DashboardLayout({
                   </span>
                   <span className={styles.planName}>Plan Gratuito</span>
                 </div>
-                <button className={styles.collapseButton}>
-                  <PanelLeftClose size={16} />
-                </button>
               </div>
             </div>
 
@@ -358,6 +353,31 @@ export default function DashboardLayout({
                         <Sparkles size={14} style={{ marginRight: 8 }} />
                         Mejorar Plan
                       </button>
+                    </div>
+
+                    <div className={styles.popupDivider} />
+
+                    <div className={styles.popupNav}>
+                      <div
+                        className={styles.popupItem}
+                        onClick={() =>
+                          setTheme(theme === "dark" ? "light" : "dark")
+                        }
+                      >
+                        {mounted &&
+                          (theme === "dark" ? (
+                            <Sun size={16} />
+                          ) : (
+                            <Moon size={16} />
+                          ))}
+                        <span>
+                          Modo {theme === "dark" ? "Claro" : "Oscuro"}
+                        </span>
+                      </div>
+                      <div className={styles.popupItem}>
+                        <Bell size={16} />
+                        <span>Notificaciones</span>
+                      </div>
                     </div>
 
                     <div className={styles.popupDivider} />
@@ -539,46 +559,7 @@ export default function DashboardLayout({
         )}
       </aside>
 
-      {/* Top Navbar (Slimmer, for search/notif) */}
       <div className={styles.contentWrapper}>
-        <header className={styles.topHeader}>
-          <div className={styles.headerLeft}>
-            {/* Breadcrumbs or search could go here */}
-          </div>
-          <div className={styles.headerRight}>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={styles.iconButton}
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              aria-label="Toggle theme"
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                {mounted && (
-                  <motion.div
-                    key={theme}
-                    initial={{ y: 10, opacity: 0, rotate: -90 }}
-                    animate={{ y: 0, opacity: 1, rotate: 0 }}
-                    exit={{ y: -10, opacity: 0, rotate: 90 }}
-                    transition={{ duration: 0.2, ease: "easeInOut" }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.button>
-            <button className={styles.iconButton}>
-              <Bell size={20} />
-            </button>
-            <div className={styles.headerAvatar}>A</div>
-          </div>
-        </header>
-
         <main className={styles.main}>{children}</main>
       </div>
     </div>

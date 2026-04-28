@@ -6,7 +6,7 @@
 }
 
 .sidebar {
-  width: 280px;
+  width: 250px;
   background-color: var(--card); /* Themed background */
   border-right: 1px solid var(--border);
   display: flex;
@@ -317,26 +317,17 @@
   overflow-y: auto;
 }
 
-.topHeader {
-  height: 56px;
-  padding: 0 32px;
+.footerActions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background-color: var(--background);
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  justify-content: space-around;
+  padding: 12px 8px;
+  border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
 }
 
-.headerRight {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.iconButton {
+.sidebarIconButton {
   background: none;
   border: none;
   color: var(--muted-foreground);
@@ -349,28 +340,17 @@
   justify-content: center;
 }
 
-.iconButton:hover {
-  background-color: var(--accent);
-  color: var(--foreground);
-}
-
-.headerAvatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+.sidebarIconButton:hover {
   background-color: var(--secondary);
-  color: var(--secondary-foreground);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
+  color: var(--foreground);
 }
 
 .main {
   flex: 1;
   padding: 24px;
   width: 100%;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 /* Organization Popup Menu */
