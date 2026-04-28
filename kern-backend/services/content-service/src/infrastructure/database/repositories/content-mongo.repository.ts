@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { ContentPiece as MongoContentPiece, ContentPieceDocument } from '../schemas/content-piece.schema';
 import { ContentPiece } from '../../../domain/entities/content-piece.entity';
 import { Review } from '../../../domain/entities/review.entity';
@@ -16,7 +16,13 @@ export class ContentMongoRepository implements ContentRepository {
   ) {}
 
   async findById(id: string): Promise<ContentPiece | null> {
-    const doc = await this.contentModel.findById(id).exec();
+    let doc = await this.contentModel.findById(id).exec();
+
+    // Fallback for older documents stored as ObjectId
+    if (!doc && Types.ObjectId.isValid(id)) {
+      doc = await this.contentModel.findById(new Types.ObjectId(id)).exec();
+    }
+
     return doc ? ContentMapper.toDomain(doc) : null;
   }
 
@@ -28,15 +34,33 @@ export class ContentMongoRepository implements ContentRepository {
 
   async update(contentPiece: ContentPiece): Promise<void> {
     const data = ContentMapper.toPersistence(contentPiece);
-    await this.contentModel.findByIdAndUpdate(contentPiece.id, data).exec();
+    const id = contentPiece.id;
+
+    const result = await this.contentModel.findByIdAndUpdate(id, data).exec();
+
+    // Fallback for older documents stored as ObjectId
+    if (!result && Types.ObjectId.isValid(id)) {
+      await this.contentModel.findByIdAndUpdate(new Types.ObjectId(id), data).exec();
+    }
   }
 
   async addReview(review: Review): Promise<void> {
     const data = ReviewMapper.toPersistence(review);
-    await this.contentModel
-      .findByIdAndUpdate(review.contentPieceId, {
+    const id = review.contentPieceId;
+
+    const result = await this.contentModel
+      .findByIdAndUpdate(id, {
         $push: { reviews: data },
       })
       .exec();
+
+    // Fallback for older documents stored as ObjectId
+    if (!result && Types.ObjectId.isValid(id)) {
+      await this.contentModel
+        .findByIdAndUpdate(new Types.ObjectId(id), {
+          $push: { reviews: data },
+        })
+        .exec();
+    }
   }
 }

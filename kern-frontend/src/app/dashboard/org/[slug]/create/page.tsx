@@ -1,27 +1,15 @@
 "use client";
 
-import React, { useRef, useState, useMemo } from "react";
+import React, { useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { useOrganizations } from "@/lib/api/organizations-service/hooks";
-import { useProjects } from "@/lib/api/projects-service/hooks";
 import {
   useKanbanBoard,
-  useCreateContent,
   useUpdateContentStatus,
 } from "@/lib/api/content-service/hooks";
-import {
-  Plus,
-  Sparkles,
-  MoreHorizontal,
-  PlusCircle,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  X,
-} from "lucide-react";
+import { Sparkles, Plus } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   DndContext,
   closestCorners,
@@ -30,252 +18,18 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  DragStartEvent,
   DragOverEvent,
   DragOverlay,
-  defaultDropAnimationSideEffects,
 } from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-  useSortable,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import styles from "./page.module.css";
 import {
   ContentPieceResponse,
   ContentStatus,
 } from "@/lib/api/content-service/types";
-import { SocialPlatform } from "@/lib/api/types";
-
-/**
- * Sortable Item (Kanban Card)
- */
-function SortableCard({ item }: { item: ContentPieceResponse }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: item.id,
-    data: {
-      type: "card",
-      item,
-    },
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className={cn(styles.card, isDragging && styles.cardActive)}
-    >
-      <div className={styles.cardBody}>{item.body}</div>
-      <div className={styles.cardFooter}>
-        <span className={styles.platformBadge}>{item.platform}</span>
-        {item.status === "APPROVED" && (
-          <CheckCircle2 size={14} color="#10b981" />
-        )}
-        {item.status === "DRAFT" && <Clock size={14} color="#666" />}
-        {item.status === "IN_REVIEW" && (
-          <AlertCircle size={14} color="#f59e0b" />
-        )}
-      </div>
-    </div>
-  );
-}
-
-/**
- * Kanban Column Section
- */
-function KanbanColumn({
-  id,
-  title,
-  status,
-  items,
-  count,
-  onAddIdea,
-}: {
-  id: string;
-  title: string;
-  status: ContentStatus;
-  items: ContentPieceResponse[];
-  count: number;
-  onAddIdea: (status: ContentStatus) => void;
-}) {
-  const { setNodeRef } = useSortable({
-    id,
-    data: {
-      type: "column",
-      status,
-    },
-  });
-
-  return (
-    <div ref={setNodeRef} className={styles.column}>
-      <div className={styles.columnHeader}>
-        <div className={styles.columnTitle}>
-          {title}
-          <span className={styles.count}>{count}</span>
-        </div>
-        <div className={styles.columnActions}>
-          <button
-            className={styles.iconButton}
-            onClick={() => onAddIdea(status)}
-          >
-            <Plus size={16} />
-          </button>
-          <button className={styles.iconButton}>
-            <MoreHorizontal size={16} />
-          </button>
-        </div>
-      </div>
-      <div className={styles.cardList}>
-        <SortableContext
-          items={items.map((i) => i.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          {items.map((item) => (
-            <SortableCard key={item.id} item={item} />
-          ))}
-        </SortableContext>
-      </div>
-      <button
-        className={styles.newCardButton}
-        onClick={() => onAddIdea(status)}
-      >
-        <PlusCircle size={16} />
-        Nuevo Idea
-      </button>
-    </div>
-  );
-}
-
-/**
- * Create Idea Modal
- */
-function CreateIdeaModal({
-  isOpen,
-  onClose,
-  initialStatus,
-  projectId,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  initialStatus: ContentStatus;
-  projectId: string;
-}) {
-  const [body, setBody] = useState("");
-  const [platform, setPlatform] = useState<SocialPlatform>(
-    SocialPlatform.INSTAGRAM,
-  );
-  const createContent = useCreateContent();
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    createContent.mutate(
-      {
-        projectId,
-        body,
-        platform,
-        status: initialStatus,
-        scheduledFor: new Date().toISOString(), // Default to now
-      },
-      {
-        onSuccess: () => {
-          setBody("");
-          onClose();
-        },
-      },
-    );
-  };
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className={styles.modalOverlay}>
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className={styles.modalContent}
-          >
-            <div
-              className={styles.modalHeader}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "20px",
-              }}
-            >
-              <h2 className={styles.modalTitle}>Nueva Idea</h2>
-              <button onClick={onClose} className={styles.iconButton}>
-                <X size={20} />
-              </button>
-            </div>
-            <form onSubmit={handleSubmit}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Contenido de la idea</label>
-                <textarea
-                  className={styles.textarea}
-                  value={body}
-                  onChange={(e) => setBody(e.target.value)}
-                  placeholder="¿En qué estás pensando?"
-                  required
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Plataforma</label>
-                <select
-                  className={styles.select}
-                  value={platform}
-                  onChange={(e) =>
-                    setPlatform(e.target.value as SocialPlatform)
-                  }
-                >
-                  <option value={SocialPlatform.INSTAGRAM}>Instagram</option>
-                  <option value={SocialPlatform.LINKEDIN}>LinkedIn</option>
-                  <option value={"THREADS"}>Threads</option>
-                  <option value={SocialPlatform.TIKTOK}>TikTok</option>
-                </select>
-              </div>
-              <div className={styles.modalActions}>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className={styles.cancelButton}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className={styles.createButton}
-                  disabled={createContent.isPending}
-                >
-                  {createContent.isPending ? "Creando..." : "Crear Idea"}
-                </button>
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
-  );
-}
-
-import { cn } from "@/lib/utils";
+import { KanbanColumn } from "./_components/kanban-column";
+import { CreateIdeaModal } from "./_components/create-idea-modal";
 
 /**
  * Create Content (Kanban) Page
@@ -294,15 +48,9 @@ export default function CreateContentPage(): React.JSX.Element {
   const { data: organizations } = useOrganizations();
   const currentOrg = organizations?.find((org) => org.slug === slug);
 
-  // 2. Get projects for this organization
-  const { data: projects, isLoading: projectsLoading } = useProjects(
-    currentOrg?.id || "",
-  );
-
-  // 3. Get kanban board for the first project
-  const defaultProject = projects?.[0];
+  // 2. Get kanban board for the organization
   const { data: kanbanData, isLoading: kanbanLoading } = useKanbanBoard(
-    defaultProject?.id || "",
+    currentOrg?.id || "",
   );
 
   const updateStatus = useUpdateContentStatus();
@@ -315,8 +63,23 @@ export default function CreateContentPage(): React.JSX.Element {
     }),
   );
 
+  // State for drag
+  const [activeItem, setActiveItem] = useState<ContentPieceResponse | null>(
+    null,
+  );
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const item = event.active.data.current?.item as ContentPieceResponse;
+    if (item) setActiveItem(item);
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    // optional: optimistic UI reorder here if you want instant visual feedback
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    setActiveItem(null);
     if (!over) return;
 
     const activeItem = active.data.current?.item as ContentPieceResponse;
@@ -333,7 +96,10 @@ export default function CreateContentPage(): React.JSX.Element {
     }
 
     if (targetStatus && activeItem && activeItem.status !== targetStatus) {
-      updateStatus.mutate({ id: activeItem.id, status: targetStatus });
+      updateStatus.mutate({
+        id: activeItem.id || activeItem._id!,
+        status: targetStatus,
+      });
     }
   };
 
@@ -359,7 +125,7 @@ export default function CreateContentPage(): React.JSX.Element {
     setIsModalOpen(true);
   };
 
-  if (projectsLoading || kanbanLoading) {
+  if (kanbanLoading) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.spinner} />
@@ -394,6 +160,8 @@ export default function CreateContentPage(): React.JSX.Element {
       <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
         <div className={styles.board}>
@@ -463,13 +231,36 @@ export default function CreateContentPage(): React.JSX.Element {
             </div>
           </div>
         </div>
+
+        {/* Floating card that follows the mouse */}
+        <DragOverlay dropAnimation={{ duration: 200, easing: "ease" }}>
+          {activeItem ? (
+            <div
+              className={styles.card}
+              style={{
+                boxShadow: "0 16px 40px rgba(0,0,0,0.25)",
+                transform: "rotate(2deg) scale(1.03)",
+                opacity: 0.95,
+                cursor: "grabbing",
+                pointerEvents: "none",
+              }}
+            >
+              <div className={styles.cardBody}>{activeItem.body}</div>
+              <div className={styles.cardFooter}>
+                <span className={styles.platformBadge}>
+                  {activeItem.platform}
+                </span>
+              </div>
+            </div>
+          ) : null}
+        </DragOverlay>
       </DndContext>
 
       <CreateIdeaModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         initialStatus={selectedStatus}
-        projectId={defaultProject?.id || ""}
+        organizationId={currentOrg?.id || ""}
       />
     </div>
   );

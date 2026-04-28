@@ -4,8 +4,8 @@
 -- All tables live in the public schema.
 -- auth.uid() refers to the currently authenticated Supabase user.
 --
--- NOTE: Prisma fields without @map keep camelCase column names
--- in Postgres, so multi-word columns are double-quoted below.
+-- NOTE: Prisma fields are mapped to snake_case in the database.
+-- All multi-word columns are now snake_case.
 -- ============================================================
 
 -- Helper function: returns true if the calling user is a member
@@ -22,8 +22,8 @@ as $$
   select exists (
     select 1
     from public.memberships m
-    where m."organizationId" = org_id
-      and m."profileId"      = auth.uid()::text
+    where m.organization_id = org_id
+      and m.profile_id      = auth.uid()::text
       and m.role             = any(allowed_roles)
   );
 $$;
@@ -41,9 +41,9 @@ create policy "profiles: self or shared org member can select"
     or exists (
       select 1
       from public.memberships m1
-      join public.memberships m2 on m2."organizationId" = m1."organizationId"
-      where m1."profileId" = auth.uid()::text
-        and m2."profileId" = profiles.id
+      join public.memberships m2 on m2.organization_id = m1.organization_id
+      where m1.profile_id = auth.uid()::text
+        and m2.profile_id = profiles.id
     )
   );
 
@@ -76,7 +76,7 @@ alter table public.subscriptions enable row level security;
 create policy "subscriptions: org admin can select"
   on public.subscriptions for select
   using (
-    public.is_org_member("organizationId", array['ADMIN'::"MemberRole"])
+    public.is_org_member(organization_id, array['ADMIN'::"MemberRole"])
   );
 
 -- ============================================================
@@ -117,7 +117,7 @@ create policy "memberships: org members can select"
   on public.memberships for select
   using (
     public.is_org_member(
-      "organizationId",
+      organization_id,
       array['ADMIN'::"MemberRole", 'EDITOR'::"MemberRole", 'VIEWER'::"MemberRole"]
     )
   );
@@ -125,19 +125,19 @@ create policy "memberships: org members can select"
 create policy "memberships: admin can insert"
   on public.memberships for insert
   with check (
-    public.is_org_member("organizationId", array['ADMIN'::"MemberRole"])
+    public.is_org_member(organization_id, array['ADMIN'::"MemberRole"])
   );
 
 create policy "memberships: admin can update"
   on public.memberships for update
-  using  (public.is_org_member("organizationId", array['ADMIN'::"MemberRole"]))
-  with check (public.is_org_member("organizationId", array['ADMIN'::"MemberRole"]));
+  using  (public.is_org_member(organization_id, array['ADMIN'::"MemberRole"]))
+  with check (public.is_org_member(organization_id, array['ADMIN'::"MemberRole"]));
 
 create policy "memberships: admin or self can delete"
   on public.memberships for delete
   using (
-    public.is_org_member("organizationId", array['ADMIN'::"MemberRole"])
-    or "profileId" = auth.uid()::text
+    public.is_org_member(organization_id, array['ADMIN'::"MemberRole"])
+    or profile_id = auth.uid()::text
   );
 
 -- ============================================================
@@ -149,23 +149,22 @@ alter table public.invitations enable row level security;
 create policy "invitations: admin or invitee can select"
   on public.invitations for select
   using (
-    public.is_org_member("organizationId", array['ADMIN'::"MemberRole"])
+    public.is_org_member(organization_id, array['ADMIN'::"MemberRole"])
     or email = (select email from public.profiles where id = auth.uid()::text)
   );
 
 create policy "invitations: admin can insert"
   on public.invitations for insert
   with check (
-    public.is_org_member("organizationId", array['ADMIN'::"MemberRole"])
-    and "invitedById" = auth.uid()::text
+    public.is_org_member(organization_id, array['ADMIN'::"MemberRole"])
+    and invited_by_id = auth.uid()::text
   );
 
 create policy "invitations: admin can update"
   on public.invitations for update
-  using  (public.is_org_member("organizationId", array['ADMIN'::"MemberRole"]))
-  with check (public.is_org_member("organizationId", array['ADMIN'::"MemberRole"]));
+  using  (public.is_org_member(organization_id, array['ADMIN'::"MemberRole"]))
+  with check (public.is_org_member(organization_id, array['ADMIN'::"MemberRole"]));
 
 create policy "invitations: admin can delete"
   on public.invitations for delete
-  using (public.is_org_member("organizationId", array['ADMIN'::"MemberRole"]));
-
+  using (public.is_org_member(organization_id, array['ADMIN'::"MemberRole"]));

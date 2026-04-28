@@ -20,7 +20,7 @@ export const contentClient = {
    * List content pieces
    */
   listContent: (params: {
-    projectId: string;
+    organizationId: string;
     status?: ContentStatus;
     platform?: SocialPlatform;
     page?: number;
@@ -39,9 +39,9 @@ export const contentClient = {
   /**
    * Get content pieces grouped by status for Kanban view
    */
-  getKanban: (projectId: string): Promise<KanbanResponse> => {
+  getKanban: (organizationId: string): Promise<KanbanResponse> => {
     return apiClient.get<KanbanResponse>("/content/kanban", {
-      params: { projectId },
+      params: { organizationId },
     });
   },
 
@@ -49,12 +49,12 @@ export const contentClient = {
    * Get scheduled content pieces for a date range
    */
   getCalendar: (
-    projectId: string,
+    organizationId: string,
     from: string,
     to: string,
   ): Promise<ContentPieceResponse[]> => {
     return apiClient.get<ContentPieceResponse[]>("/content/calendar", {
-      params: { projectId, from, to },
+      params: { organizationId, from, to },
     });
   },
 

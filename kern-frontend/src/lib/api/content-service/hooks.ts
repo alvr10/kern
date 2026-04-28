@@ -14,14 +14,14 @@ import type {
  */
 export const contentKeys = {
   all: ["content"] as const,
-  lists: (projectId: string) =>
-    [...contentKeys.all, "list", projectId] as const,
+  lists: (organizationId: string) =>
+    [...contentKeys.all, "list", organizationId] as const,
   details: () => [...contentKeys.all, "detail"] as const,
   detail: (id: string) => [...contentKeys.details(), id] as const,
-  kanban: (projectId: string) =>
-    [...contentKeys.all, "kanban", projectId] as const,
-  calendar: (projectId: string, from: string, to: string) =>
-    [...contentKeys.all, "calendar", projectId, from, to] as const,
+  kanban: (organizationId: string) =>
+    [...contentKeys.all, "kanban", organizationId] as const,
+  calendar: (organizationId: string, from: string, to: string) =>
+    [...contentKeys.all, "calendar", organizationId, from, to] as const,
   comments: (id: string) => [...contentKeys.detail(id), "comments"] as const,
 };
 
@@ -29,16 +29,16 @@ export const contentKeys = {
  * useContentList
  */
 export const useContentList = (params: {
-  projectId: string;
+  organizationId: string;
   status?: ContentStatus;
   platform?: SocialPlatform;
   page?: number;
   limit?: number;
 }) => {
   return useQuery({
-    queryKey: [...contentKeys.lists(params.projectId), params],
+    queryKey: [...contentKeys.lists(params.organizationId), params],
     queryFn: () => contentClient.listContent(params),
-    enabled: !!params.projectId,
+    enabled: !!params.organizationId,
   });
 };
 
@@ -56,11 +56,11 @@ export const useContent = (id: string) => {
 /**
  * useKanbanBoard
  */
-export const useKanbanBoard = (projectId: string) => {
+export const useKanbanBoard = (organizationId: string) => {
   return useQuery({
-    queryKey: contentKeys.kanban(projectId),
-    queryFn: () => contentClient.getKanban(projectId),
-    enabled: !!projectId,
+    queryKey: contentKeys.kanban(organizationId),
+    queryFn: () => contentClient.getKanban(organizationId),
+    enabled: !!organizationId,
   });
 };
 
@@ -68,14 +68,14 @@ export const useKanbanBoard = (projectId: string) => {
  * useContentCalendar
  */
 export const useContentCalendar = (
-  projectId: string,
+  organizationId: string,
   from: string,
   to: string,
 ) => {
   return useQuery({
-    queryKey: contentKeys.calendar(projectId, from, to),
-    queryFn: () => contentClient.getCalendar(projectId, from, to),
-    enabled: !!projectId && !!from && !!to,
+    queryKey: contentKeys.calendar(organizationId, from, to),
+    queryFn: () => contentClient.getCalendar(organizationId, from, to),
+    enabled: !!organizationId && !!from && !!to,
   });
 };
 
@@ -87,10 +87,12 @@ export const useCreateContent = () => {
 
   return useMutation({
     mutationFn: (data: CreateContentDto) => contentClient.createContent(data),
-    onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({ queryKey: contentKeys.lists(projectId) });
+    onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: contentKeys.kanban(projectId),
+        queryKey: contentKeys.lists(data.organizationId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: contentKeys.kanban(data.organizationId),
       });
     },
   });
@@ -105,13 +107,16 @@ export const useUpdateContent = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateContentDto }) =>
       contentClient.updateContent(id, data),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: contentKeys.detail(data.id) });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({
-        queryKey: contentKeys.lists(data.projectId),
+        queryKey: contentKeys.detail(data.id || data._id),
       });
       queryClient.invalidateQueries({
-        queryKey: contentKeys.kanban(data.projectId),
+        queryKey: contentKeys.lists(data.organizationId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: contentKeys.kanban(data.organizationId),
       });
     },
   });
@@ -124,12 +129,14 @@ export const useDeleteContent = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, projectId }: { id: string; projectId: string }) =>
+    mutationFn: ({ id }: { id: string; organizationId: string }) =>
       contentClient.deleteContent(id),
-    onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({ queryKey: contentKeys.lists(projectId) });
+    onSuccess: (_, { organizationId }) => {
       queryClient.invalidateQueries({
-        queryKey: contentKeys.kanban(projectId),
+        queryKey: contentKeys.lists(organizationId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: contentKeys.kanban(organizationId),
       });
     },
   });
@@ -144,13 +151,16 @@ export const useUpdateContentStatus = () => {
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: ContentStatus }) =>
       contentClient.updateStatus(id, status),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: contentKeys.detail(data.id) });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({
-        queryKey: contentKeys.lists(data.projectId),
+        queryKey: contentKeys.detail(data.id || data._id),
       });
       queryClient.invalidateQueries({
-        queryKey: contentKeys.kanban(data.projectId),
+        queryKey: contentKeys.lists(data.organizationId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: contentKeys.kanban(data.organizationId),
       });
     },
   });
@@ -165,8 +175,11 @@ export const useSubmitReview = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: CreateReviewDto }) =>
       contentClient.submitReview(id, data),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: contentKeys.detail(data.id) });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({
+        queryKey: contentKeys.detail(data.id || data._id),
+      });
     },
   });
 };

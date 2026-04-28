@@ -52,14 +52,14 @@ model Profile {
   id        String  @id       // Supabase Auth UUID — set by trigger
   email     String  @unique
   name      String
-  avatarUrl String?
-  timezone  String  @default("UTC")
+  avatarUrl         String?  @map("avatar_url")
+  timezone          String   @default("UTC")
 
-  notifyTokenAlerts Boolean @default(true)
-  notifyApprovals   Boolean @default(true)
+  notifyTokenAlerts Boolean  @default(true) @map("notify_token_alerts")
+  notifyApprovals   Boolean  @default(true) @map("notify_approvals")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
 
   // Relations (all within PostgreSQL)
   memberships     Membership[]
@@ -76,17 +76,17 @@ model Profile {
 // ============================================================
 
 model Plan {
-  id                   String  @id @default(cuid())
-  name                 String  @unique   // "Free" | "Starter" | "Pro"
-  slug                 String  @unique
-  monthlyTokenLimit    Int
-  memberLimit          Int
-  organizationLimit    Int
-  priceMonthlyUsd      Decimal @db.Decimal(10, 2)
-  stripePriceIdMonthly String?
-  stripePriceIdYearly  String?
-  features             Json    @default("[]")
-  isActive             Boolean @default(true)
+  id                   String   @id @default(cuid())
+  name                 String   @unique   // "Free" | "Starter" | "Pro"
+  slug                 String   @unique
+  monthlyTokenLimit    Int      @map("monthly_token_limit")
+  memberLimit          Int      @map("member_limit")
+  organizationLimit    Int      @map("organization_limit")
+  priceMonthlyUsd      Decimal  @db.Decimal(10, 2) @map("price_monthly_usd")
+  stripePriceIdMonthly String?  @map("stripe_price_id_monthly")
+  stripePriceIdYearly  String?  @map("stripe_price_id_yearly")
+  features             Json     @default("[]")
+  isActive             Boolean  @default(true) @map("is_active")
 
   subscriptions Subscription[]
 
@@ -95,25 +95,25 @@ model Plan {
 
 model Subscription {
   id             String             @id @default(cuid())
-  organizationId String             @unique
-  planId         String
+  organizationId String             @unique @map("organization_id")
+  planId         String             @map("plan_id")
   status         SubscriptionStatus @default(TRIALING)
 
   // Stripe fields — updated via webhook
-  stripeCustomerId        String?   @unique
-  stripeSubscriptionId    String?   @unique
-  stripeCurrentPeriodEnd  DateTime?
-  stripeCancelAtPeriodEnd Boolean   @default(false)
+  stripeCustomerId        String?   @unique @map("stripe_customer_id")
+  stripeSubscriptionId    String?   @unique @map("stripe_subscription_id")
+  stripeCurrentPeriodEnd  DateTime? @map("stripe_current_period_end")
+  stripeCancelAtPeriodEnd Boolean   @default(false) @map("stripe_cancel_at_period_end")
 
   // Token tracking — reset on each billing period via Stripe webhook
-  tokensUsed         Int     @default(0)
-  tokensLimit        Int     // snapshot of plan limit at subscription time
-  tokensAlertSent80  Boolean @default(false)
-  tokensAlertSent100 Boolean @default(false)
+  tokensUsed         Int     @default(0) @map("tokens_used")
+  tokensLimit        Int     @map("tokens_limit") // snapshot of plan limit at subscription time
+  tokensAlertSent80  Boolean @default(false) @map("tokens_alert_sent_80")
+  tokensAlertSent100 Boolean @default(false) @map("tokens_alert_sent_100")
 
-  trialEndsAt DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  trialEndsAt DateTime? @map("trial_ends_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt      @map("updated_at")
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   plan         Plan         @relation(fields: [planId], references: [id])
@@ -131,12 +131,12 @@ model Organization {
   id         String    @id @default(cuid())
   name       String
   slug       String    @unique
-  logoUrl    String?
+  logoUrl    String?   @map("logo_url")
   // { tone, style, keywords: string[], avoidWords: string[] }
-  brandVoice Json?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  deletedAt  DateTime? // soft delete
+  brandVoice Json?     @map("brand_voice")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt      @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at") // soft delete
 
   subscription Subscription?
   memberships  Membership[]
@@ -150,11 +150,11 @@ model Organization {
 
 model Membership {
   id             String     @id @default(cuid())
-  profileId      String
-  organizationId String
+  profileId      String     @map("profile_id")
+  organizationId String     @map("organization_id")
   role           MemberRole @default(EDITOR)
-  joinedAt       DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  joinedAt       DateTime   @default(now()) @map("joined_at")
+  updatedAt      DateTime   @updatedAt      @map("updated_at")
 
   profile      Profile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -167,15 +167,15 @@ model Membership {
 
 model Invitation {
   id             String           @id @default(cuid())
-  organizationId String
-  invitedById    String
+  organizationId String           @map("organization_id")
+  invitedById    String           @map("invited_by_id")
   email          String
   role           MemberRole       @default(EDITOR)
   token          String           @unique @default(cuid())
   status         InvitationStatus @default(PENDING)
-  expiresAt      DateTime
-  acceptedAt     DateTime?
-  createdAt      DateTime         @default(now())
+  expiresAt      DateTime         @map("expires_at")
+  acceptedAt     DateTime?        @map("accepted_at")
+  createdAt      DateTime         @default(now()) @map("created_at")
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   invitedBy    Profile      @relation("InvitedBy", fields: [invitedById], references: [id])
@@ -185,28 +185,3 @@ model Invitation {
   @@index([token])
   @@map("invitations")
 }
-
-// ============================================================
-// SUPABASE TRIGGER — paste into the Supabase SQL editor once
-// ============================================================
-//
-// create or replace function public.handle_new_user()
-// returns trigger
-// language plpgsql
-// security definer set search_path = public
-// as $$
-// begin
-//   insert into public.profiles (id, email, name, avatar_url)
-//   values (
-//     new.id,
-//     new.email,
-//     coalesce(new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
-//     new.raw_user_meta_data->>'avatar_url'
-//   );
-//   return new;
-// end;
-// $$;
-//
-// create or replace trigger on_auth_user_created
-//   after insert on auth.users
-//   for each row execute procedure public.handle_new_user();

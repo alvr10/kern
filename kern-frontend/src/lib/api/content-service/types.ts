@@ -15,7 +15,6 @@ export enum ContentStatus {
  * Data transfer object for creating content
  */
 export interface CreateContentDto {
-  projectId: string;
   organizationId: string;
   title: string;
   body: string;
@@ -65,7 +64,7 @@ export interface CommentResponse {
  */
 export interface ContentPieceResponse {
   id: string;
-  projectId: string;
+  _id?: string;
   organizationId: string;
   authorId: string;
   title: string;

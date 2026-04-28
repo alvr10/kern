@@ -28,6 +28,7 @@ export class ContentMapper {
 
   static toPersistence(domainPiece: ContentPiece): Partial<MongoContentPiece> {
     return {
+      _id: domainPiece.id,
       organizationId: domainPiece.organizationId,
       authorId: domainPiece.authorId,
       title: domainPiece.title,

@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 import { CONTENT_STATUS_VALUES, ContentStatus, SOCIAL_PLATFORM_VALUES, SocialPlatform } from '@kern/shared';
 
 @Schema({ timestamps: true })
 export class Comment {
-  _id: Types.ObjectId;
+  @Prop({ type: String })
+  _id: string;
 
   @Prop({ required: true })
   authorId: string; // profiles.id (Supabase UUID)
@@ -12,8 +13,8 @@ export class Comment {
   @Prop({ required: true })
   body: string;
 
-  @Prop({ type: Types.ObjectId })
-  parentId?: Types.ObjectId;
+  @Prop({ type: String })
+  parentId?: string;
 
   @Prop()
   resolvedAt?: Date;
@@ -22,7 +23,8 @@ export const CommentSchema = SchemaFactory.createForClass(Comment);
 
 @Schema({ timestamps: { createdAt: true, updatedAt: false } })
 export class ContentReview {
-  _id: Types.ObjectId;
+  @Prop({ type: String })
+  _id: string;
 
   @Prop({ required: true })
   reviewerId: string;
@@ -37,6 +39,9 @@ export const ContentReviewSchema = SchemaFactory.createForClass(ContentReview);
 
 @Schema({ timestamps: true, collection: 'content_pieces' })
 export class ContentPiece {
+  @Prop({ type: String })
+  _id: string;
+
   @Prop({ required: true, index: true })
   organizationId: string;
 

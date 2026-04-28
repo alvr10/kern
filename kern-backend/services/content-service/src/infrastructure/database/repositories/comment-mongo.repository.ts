@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { ContentPiece as MongoContentPiece, ContentPieceDocument } from '../schemas/content-piece.schema';
 import { Comment } from '../../../domain/entities/comment.entity';
 import { CommentRepository } from '../../../domain/repositories/comment.repository';
@@ -14,7 +14,7 @@ export class CommentMongoRepository implements CommentRepository {
   ) {}
 
   async findById(id: string): Promise<Comment | null> {
-    const doc = await this.contentModel.findOne({ 'comments._id': new Types.ObjectId(id) }).exec();
+    const doc = await this.contentModel.findOne({ 'comments._id': id }).exec();
     if (!doc) return null;
     const comment = doc.comments.find(c => c._id.toString() === id);
     return comment ? CommentMapper.toDomain(comment, doc._id.toString()) : null;
