@@ -3,10 +3,13 @@
 import React, { useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { useOrganizations } from "@/lib/api/organizations-service/hooks";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   useKanbanBoard,
   useUpdateContentStatus,
+  contentKeys,
 } from "@/lib/api/content-service/hooks";
+import { contentClient } from "@/lib/api/content-service/client";
 import { Sparkles, Plus } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -43,6 +46,9 @@ export default function CreateContentPage(): React.JSX.Element {
   const [selectedStatus, setSelectedStatus] = useState<ContentStatus>(
     ContentStatus.DRAFT,
   );
+  const [editingItem, setEditingItem] = useState<ContentPieceResponse | null>(
+    null,
+  );
 
   // 1. Get organizations to find the current one by slug
   const { data: organizations } = useOrganizations();
@@ -54,6 +60,7 @@ export default function CreateContentPage(): React.JSX.Element {
   );
 
   const updateStatus = useUpdateContentStatus();
+  const queryClient = useQueryClient();
 
   // Sensors for DND
   const sensors = useSensors(
@@ -73,22 +80,37 @@ export default function CreateContentPage(): React.JSX.Element {
     if (item) setActiveItem(item);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDragOver = (event: DragOverEvent) => {
     // optional: optimistic UI reorder here if you want instant visual feedback
   };
+
+  const updateContent = useMutation({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      contentClient.updateContent(id, data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: contentKeys.kanban(data.organizationId),
+      });
+    },
+  });
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveItem(null);
     if (!over) return;
 
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
     const activeItem = active.data.current?.item as ContentPieceResponse;
     const overType = over.data.current?.type;
     const overStatus = over.data.current?.status as ContentStatus;
     const overItem = over.data.current?.item as ContentPieceResponse;
 
+    // 1. Handle cross-column drag
     let targetStatus: ContentStatus | null = null;
-
     if (overType === "column") {
       targetStatus = overStatus;
     } else if (overType === "card" && overItem) {
@@ -100,14 +122,41 @@ export default function CreateContentPage(): React.JSX.Element {
         id: activeItem.id || activeItem._id!,
         status: targetStatus,
       });
+      return;
+    }
+
+    // 2. Handle same-column reordering
+    if (
+      activeId !== overId &&
+      activeItem &&
+      overItem &&
+      activeItem.status === overItem.status
+    ) {
+      const status = activeItem.status;
+      const columnItems = kanbanData?.[status] || [];
+      const oldIndex = columnItems.findIndex(
+        (i) => (i.id || i._id) === activeId,
+      );
+      const newIndex = columnItems.findIndex((i) => (i.id || i._id) === overId);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        // We update the position to the new index
+        // Note: For a real production app, you'd want a bulk update or a smarter position algorithm (like fractional indexing)
+        updateContent.mutate({
+          id: activeItem.id || activeItem._id!,
+          data: { kanbanPosition: newIndex },
+        });
+      }
     }
   };
 
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const hasAnimated = useRef(false);
+
   useGSAP(
     () => {
-      if (kanbanData) {
+      if (kanbanData && !hasAnimated.current) {
         gsap.from(".column-anim", {
           x: 30,
           opacity: 0,
@@ -115,13 +164,21 @@ export default function CreateContentPage(): React.JSX.Element {
           stagger: 0.1,
           ease: "power3.out",
         });
+        hasAnimated.current = true;
       }
     },
     { scope: containerRef, dependencies: [kanbanData] },
   );
 
   const openAddModal = (status: ContentStatus) => {
+    setEditingItem(null);
     setSelectedStatus(status);
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (item: ContentPieceResponse) => {
+    setEditingItem(item);
+    setSelectedStatus(item.status as ContentStatus);
     setIsModalOpen(true);
   };
 
@@ -173,6 +230,7 @@ export default function CreateContentPage(): React.JSX.Element {
               items={kanbanData?.DRAFT || []}
               count={kanbanData?.DRAFT.length || 0}
               onAddIdea={openAddModal}
+              onEditIdea={openEditModal}
             />
           </div>
           <div className="column-anim">
@@ -183,6 +241,7 @@ export default function CreateContentPage(): React.JSX.Element {
               items={kanbanData?.IN_REVIEW || []}
               count={kanbanData?.IN_REVIEW.length || 0}
               onAddIdea={openAddModal}
+              onEditIdea={openEditModal}
             />
           </div>
           <div className="column-anim">
@@ -193,6 +252,7 @@ export default function CreateContentPage(): React.JSX.Element {
               items={kanbanData?.APPROVED || []}
               count={kanbanData?.APPROVED.length || 0}
               onAddIdea={openAddModal}
+              onEditIdea={openEditModal}
             />
           </div>
           <div className="column-anim">
@@ -203,6 +263,7 @@ export default function CreateContentPage(): React.JSX.Element {
               items={kanbanData?.PUBLISHED || []}
               count={kanbanData?.PUBLISHED.length || 0}
               onAddIdea={openAddModal}
+              onEditIdea={openEditModal}
             />
           </div>
 
@@ -245,6 +306,7 @@ export default function CreateContentPage(): React.JSX.Element {
                 pointerEvents: "none",
               }}
             >
+              <div className={styles.cardTitle}>{activeItem.title}</div>
               <div className={styles.cardBody}>{activeItem.body}</div>
               <div className={styles.cardFooter}>
                 <span className={styles.platformBadge}>
@@ -261,6 +323,7 @@ export default function CreateContentPage(): React.JSX.Element {
         onClose={() => setIsModalOpen(false)}
         initialStatus={selectedStatus}
         organizationId={currentOrg?.id || ""}
+        item={editingItem || undefined}
       />
     </div>
   );

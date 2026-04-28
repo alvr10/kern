@@ -30,6 +30,7 @@ export interface CreateContentDto {
 export interface UpdateContentDto {
   title?: string;
   body?: string;
+  platform?: SocialPlatform;
   hashtags?: string[];
   mediaUrls?: string[];
   scheduledAt?: string | null;

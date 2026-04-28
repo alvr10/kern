@@ -8,37 +8,69 @@ import { ContentStatus } from "@/lib/api/content-service/types";
 import {
   useCreateContent,
   useUpdateContentStatus,
+  useUpdateContent,
 } from "@/lib/api/content-service/hooks";
 import styles from "../page.module.css";
+import { ContentPieceResponse } from "@/lib/api/content-service/types";
 
 export function CreateIdeaModal({
   isOpen,
   onClose,
   initialStatus,
   organizationId,
+  item,
 }: {
   isOpen: boolean;
   onClose: () => void;
   initialStatus: ContentStatus;
   organizationId: string;
+  item?: ContentPieceResponse;
 }) {
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [platform, setPlatform] = useState<SocialPlatform>(
-    SocialPlatform.TWITTER,
-  );
-  const [hashtagsStr, setHashtagsStr] = useState("");
-  const [mediaUrlsStr, setMediaUrlsStr] = useState("");
+  const isEditing = !!item;
 
-  const formatDefaultDate = () => {
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    return now.toISOString().slice(0, 16);
+  const [title, setTitle] = useState(item?.title || "");
+  const [body, setBody] = useState(item?.body || "");
+  const [platform, setPlatform] = useState<SocialPlatform>(
+    item?.platform || SocialPlatform.TWITTER,
+  );
+  const [hashtagsStr, setHashtagsStr] = useState(
+    item?.hashtags?.join(", ") || "",
+  );
+  const [mediaUrlsStr, setMediaUrlsStr] = useState(
+    item?.mediaUrls?.join(", ") || "",
+  );
+
+  const formatDefaultDate = (dateStr?: string) => {
+    const date = dateStr ? new Date(dateStr) : new Date();
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return date.toISOString().slice(0, 16);
   };
-  const [scheduledAt, setScheduledAt] = useState(formatDefaultDate());
+  const [scheduledAt, setScheduledAt] = useState(
+    formatDefaultDate(item?.scheduledAt as string | undefined),
+  );
+
+  // Sync state with item when it changes
+  React.useEffect(() => {
+    if (item) {
+      setTitle(item.title);
+      setBody(item.body);
+      setPlatform(item.platform as SocialPlatform);
+      setHashtagsStr(item.hashtags?.join(", ") || "");
+      setMediaUrlsStr(item.mediaUrls?.join(", ") || "");
+      setScheduledAt(formatDefaultDate(item.scheduledAt as string | undefined));
+    } else {
+      setTitle("");
+      setBody("");
+      setPlatform(SocialPlatform.TWITTER);
+      setHashtagsStr("");
+      setMediaUrlsStr("");
+      setScheduledAt(formatDefaultDate());
+    }
+  }, [item]);
 
   const createContent = useCreateContent();
   const updateStatus = useUpdateContentStatus();
+  const updateContent = useUpdateContent();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,34 +84,50 @@ export function CreateIdeaModal({
       .map((s) => s.trim())
       .filter((s) => s !== "");
 
-    createContent.mutate(
-      {
-        organizationId,
-        title,
-        body,
-        platform,
-        hashtags,
-        mediaUrls,
-        scheduledAt: new Date(scheduledAt).toISOString(),
-      },
-      {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        onSuccess: (data: any) => {
-          if (initialStatus && initialStatus !== ContentStatus.DRAFT) {
-            updateStatus.mutate({
-              id: data.id || data._id,
-              status: initialStatus,
-            });
-          }
-          setTitle("");
-          setBody("");
-          setHashtagsStr("");
-          setMediaUrlsStr("");
-          setScheduledAt(formatDefaultDate());
-          onClose();
+    if (isEditing && item) {
+      updateContent.mutate(
+        {
+          id: item.id || item._id!,
+          data: {
+            title,
+            body,
+            platform,
+            hashtags,
+            mediaUrls,
+            scheduledAt: new Date(scheduledAt).toISOString(),
+          },
         },
-      },
-    );
+        {
+          onSuccess: () => {
+            onClose();
+          },
+        },
+      );
+    } else {
+      createContent.mutate(
+        {
+          organizationId,
+          title,
+          body,
+          platform,
+          hashtags,
+          mediaUrls,
+          scheduledAt: new Date(scheduledAt).toISOString(),
+        },
+        {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          onSuccess: (data: any) => {
+            if (initialStatus && initialStatus !== ContentStatus.DRAFT) {
+              updateStatus.mutate({
+                id: data.id || data._id,
+                status: initialStatus,
+              });
+            }
+            onClose();
+          },
+        },
+      );
+    }
   };
 
   return (
@@ -101,7 +149,9 @@ export function CreateIdeaModal({
                 marginBottom: "20px",
               }}
             >
-              <h2 className={styles.modalTitle}>Nueva Idea</h2>
+              <h2 className={styles.modalTitle}>
+                {isEditing ? "Editar Idea" : "Nueva Idea"}
+              </h2>
               <button onClick={onClose} className={styles.iconButton}>
                 <X size={20} />
               </button>
@@ -191,11 +241,19 @@ export function CreateIdeaModal({
                 <button
                   type="submit"
                   className={styles.createButton}
-                  disabled={createContent.isPending || updateStatus.isPending}
+                  disabled={
+                    createContent.isPending ||
+                    updateStatus.isPending ||
+                    updateContent.isPending
+                  }
                 >
-                  {createContent.isPending || updateStatus.isPending
-                    ? "Creando..."
-                    : "Crear Idea"}
+                  {createContent.isPending ||
+                  updateStatus.isPending ||
+                  updateContent.isPending
+                    ? "Guardando..."
+                    : isEditing
+                      ? "Guardar Cambios"
+                      : "Crear Idea"}
                 </button>
               </div>
             </form>

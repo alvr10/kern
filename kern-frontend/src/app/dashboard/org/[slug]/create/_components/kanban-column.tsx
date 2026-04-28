@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { cn } from "@/lib/utils";
 import { useDroppable } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -15,11 +15,13 @@ import { SortableCard } from "./sortable-card";
 import styles from "../page.module.css";
 
 export function KanbanColumn({
+  id,
   title,
   status,
   items,
   count,
   onAddIdea,
+  onEditIdea,
 }: {
   id: string;
   title: string;
@@ -27,14 +29,18 @@ export function KanbanColumn({
   items: ContentPieceResponse[];
   count: number;
   onAddIdea: (status: ContentStatus) => void;
+  onEditIdea: (item: ContentPieceResponse) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({
-    id: `col-${status}`,
+    id,
     data: { type: "column", status },
   });
 
   return (
-    <div className={styles.column}>
+    <div
+      ref={setNodeRef}
+      className={cn(styles.column, isOver && styles.columnOver)}
+    >
       <div className={styles.columnHeader}>
         <div className={styles.columnTitle}>
           {title}
@@ -57,19 +63,18 @@ export function KanbanColumn({
         items={items.map((i) => i.id || i._id!)}
         strategy={verticalListSortingStrategy}
       >
-        <div
-          ref={setNodeRef}
-          className={styles.cardList}
-          style={{
-            minHeight: 80,
-            backgroundColor: isOver ? "var(--accent)" : undefined,
-            borderRadius: 8,
-            transition: "background-color 0.2s",
-          }}
-        >
+        <div className={styles.cardList}>
           {items.map((item) => (
-            <SortableCard key={item.id || item._id!} item={item} />
+            <SortableCard
+              key={item.id || item._id!}
+              item={item}
+              onEdit={() => onEditIdea(item)}
+            />
           ))}
+          {/* Invisible padding to ensure drops work even when list is empty */}
+          {items.length === 0 && (
+            <div style={{ height: "100px", width: "100%" }} />
+          )}
         </div>
       </SortableContext>
 
