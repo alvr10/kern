@@ -41,38 +41,29 @@
 
 @keyframes glow {
   0% {
-    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5), 0 0 10px rgba(236, 72, 153, 0.3), 0 0 15px rgba(245, 158, 11, 0.2);
+    box-shadow:
+      0 0 5px rgba(59, 130, 246, 0.5),
+      0 0 10px rgba(236, 72, 153, 0.3),
+      0 0 15px rgba(245, 158, 11, 0.2);
   }
   33% {
-    box-shadow: 0 0 15px rgba(236, 72, 153, 0.6), 0 0 20px rgba(245, 158, 11, 0.4), 0 0 25px rgba(59, 130, 246, 0.3);
+    box-shadow:
+      0 0 15px rgba(236, 72, 153, 0.6),
+      0 0 20px rgba(245, 158, 11, 0.4),
+      0 0 25px rgba(59, 130, 246, 0.3);
   }
   66% {
-    box-shadow: 0 0 15px rgba(245, 158, 11, 0.6), 0 0 20px rgba(59, 130, 246, 0.4), 0 0 25px rgba(236, 72, 153, 0.3);
+    box-shadow:
+      0 0 15px rgba(245, 158, 11, 0.6),
+      0 0 20px rgba(59, 130, 246, 0.4),
+      0 0 25px rgba(236, 72, 153, 0.3);
   }
   100% {
-    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5), 0 0 10px rgba(236, 72, 153, 0.3), 0 0 15px rgba(245, 158, 11, 0.2);
+    box-shadow:
+      0 0 5px rgba(59, 130, 246, 0.5),
+      0 0 10px rgba(236, 72, 153, 0.3),
+      0 0 15px rgba(245, 158, 11, 0.2);
   }
-}
-
-.generateButton {
-  background-color: var(--secondary);
-  color: var(--secondary-foreground);
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 500;
-  font-size: 13px;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  animation: glow 3s infinite ease-in-out;
-}
-
-.generateButton:hover {
-  background-color: var(--accent);
-  transform: translateY(-1px);
 }
 
 .createButton {
@@ -331,7 +322,7 @@
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -339,14 +330,113 @@
   padding: 20px;
 }
 
+.modalWrapper {
+  display: flex;
+  gap: 16px;
+  width: auto;
+  align-items: flex-start;
+}
+
 .modalContent {
   background-color: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
-  width: 100%;
-  max-width: 500px;
+  width: 520px;
   padding: 32px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.aiExtension {
+  width: 320px;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.aiTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--foreground);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.proTip {
+  background-color: var(--secondary);
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 13px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+  border: 1px solid var(--border);
+}
+
+.proTip b {
+  color: var(--foreground);
+}
+
+.generateAIButton {
+  width: 100%;
+  background-image: linear-gradient(135deg, #3b82f6, #ec4899, #f59e0b);
+  background-size: 200% auto;
+  color: white;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.generateAIButton:hover:not(:disabled) {
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+}
+
+.generateAIButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.aiToggleButton {
+  background-color: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--foreground);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  margin-bottom: 16px;
+}
+
+.aiToggleButton:hover {
+  background-color: var(--accent);
+}
+
+.aiToggleActive {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
 }
 
 .modalTitle {
@@ -369,7 +459,9 @@
   color: var(--muted-foreground);
 }
 
-.input, .textarea, .select {
+.input,
+.textarea,
+.select {
   background-color: var(--background);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -380,7 +472,9 @@
   transition: border-color 0.2s;
 }
 
-.input:focus, .textarea:focus, .select:focus {
+.input:focus,
+.textarea:focus,
+.select:focus {
   border-color: var(--ring);
 }
 

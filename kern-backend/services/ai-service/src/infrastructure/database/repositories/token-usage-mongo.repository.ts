@@ -23,7 +23,7 @@ export class TokenUsageMongoRepository implements TokenUsageRepository {
     await this.usageModel
       .findOneAndUpdate({ organizationId: usage.organizationId }, data, {
         upsert: true,
-        new: true,
+        returnDocument: 'after',
       })
       .exec();
   }

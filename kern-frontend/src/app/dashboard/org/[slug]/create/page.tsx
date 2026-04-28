@@ -10,7 +10,7 @@ import {
   contentKeys,
 } from "@/lib/api/content-service/hooks";
 import { contentClient } from "@/lib/api/content-service/client";
-import { Sparkles, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import {
@@ -201,10 +201,6 @@ export default function CreateContentPage(): React.JSX.Element {
           </p>
         </div>
         <div className={styles.actions}>
-          <button className={styles.generateButton}>
-            <Sparkles size={16} />
-            Generar con IA
-          </button>
           <button
             className={styles.createButton}
             onClick={() => openAddModal(ContentStatus.DRAFT)}
