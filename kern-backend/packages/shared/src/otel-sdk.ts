@@ -1,5 +1,7 @@
 import { NodeSDK } from '@opentelemetry/sdk-node';
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
+import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
+import { NestInstrumentation } from '@opentelemetry/instrumentation-nestjs-core';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { Resource } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_NAMESPACE } from '@opentelemetry/semantic-conventions';
@@ -13,14 +15,7 @@ const sdk = new NodeSDK({
   traceExporter: new OTLPTraceExporter({
     url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://alloy:4317',
   }),
-  instrumentations: [
-    getNodeAutoInstrumentations({
-      // NestJS specific tweaks if needed
-      '@opentelemetry/instrumentation-nestjs-core': { enabled: true },
-      '@opentelemetry/instrumentation-http': { enabled: true },
-      '@opentelemetry/instrumentation-express': { enabled: true },
-    }),
-  ],
+  instrumentations: [new HttpInstrumentation(), new ExpressInstrumentation(), new NestInstrumentation()],
 });
 
 sdk.start();
