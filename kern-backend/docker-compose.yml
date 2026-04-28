@@ -70,11 +70,8 @@ services:
     ports:
       - "${GATEWAY_PORT:-3000}:3000"
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
       GATEWAY_PORT: 3000
       CONSUL_URL: http://consul:8500
-      # OpenTelemetry Auto-Instrumentation
-      NODE_OPTIONS: "--require @opentelemetry/auto-instrumentations-node/register"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
       OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
       OTEL_TRACES_SAMPLER_ARG: "0.1"
@@ -103,13 +100,10 @@ services:
     container_name: kern-organizations-service
     restart: unless-stopped
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
       PORT: 3000
       SERVICE_NAME: organizations-service
       CONSUL_URL: http://consul:8500
       DATABASE_URL: ${DATABASE_URL}
-      # OpenTelemetry Auto-Instrumentation
-      NODE_OPTIONS: "--require @opentelemetry/auto-instrumentations-node/register"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
       OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
       OTEL_TRACES_SAMPLER_ARG: "0.1"
@@ -136,13 +130,10 @@ services:
     container_name: kern-content-service
     restart: unless-stopped
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
       PORT: 3000
       SERVICE_NAME: content-service
       CONSUL_URL: http://consul:8500
       MONGODB_URI: ${MONGODB_URI}
-      # OpenTelemetry Auto-Instrumentation
-      NODE_OPTIONS: "--require @opentelemetry/auto-instrumentations-node/register"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
       OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
       OTEL_TRACES_SAMPLER_ARG: "0.1"
@@ -171,13 +162,10 @@ services:
     container_name: kern-social-service
     restart: unless-stopped
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
       PORT: 3000
       SERVICE_NAME: social-service
       CONSUL_URL: http://consul:8500
       MONGODB_URI: ${MONGODB_URI}
-      # OpenTelemetry Auto-Instrumentation
-      NODE_OPTIONS: "--require @opentelemetry/auto-instrumentations-node/register"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
       OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
       OTEL_TRACES_SAMPLER_ARG: "0.1"
@@ -206,14 +194,11 @@ services:
     container_name: kern-notifications-service
     restart: unless-stopped
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
       PORT: 3000
       SERVICE_NAME: notifications-service
       CONSUL_URL: http://consul:8500
       MONGODB_URI: ${MONGODB_URI}
       RESEND_API_KEY: ${RESEND_API_KEY}
-      # OpenTelemetry Auto-Instrumentation
-      NODE_OPTIONS: "--require @opentelemetry/auto-instrumentations-node/register"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
       OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
       OTEL_TRACES_SAMPLER_ARG: "0.1"
@@ -244,15 +229,12 @@ services:
     container_name: kern-billing-service
     restart: unless-stopped
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
       PORT: 3000
       SERVICE_NAME: billing-service
       CONSUL_URL: http://consul:8500
       DATABASE_URL: ${DATABASE_URL}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
-      # OpenTelemetry Auto-Instrumentation
-      NODE_OPTIONS: "--require @opentelemetry/auto-instrumentations-node/register"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
       OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
       OTEL_TRACES_SAMPLER_ARG: "0.1"
@@ -279,14 +261,11 @@ services:
     container_name: kern-ai-service
     restart: unless-stopped
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
       PORT: 3000
       SERVICE_NAME: ai-service
       CONSUL_URL: http://consul:8500
       MONGODB_URI: ${MONGODB_URI}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
-      # OpenTelemetry Auto-Instrumentation
-      NODE_OPTIONS: "--require @opentelemetry/auto-instrumentations-node/register"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
       OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
       OTEL_TRACES_SAMPLER_ARG: "0.1"
@@ -317,15 +296,12 @@ services:
     ports:
       - "${ADMIN_PORT:-3009}:3000"
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
       ADMIN_PORT: 3000
       SERVICE_NAME: admin-service
       CONSUL_URL: http://consul:8500
       DATABASE_URL: ${DATABASE_URL}
       MONGODB_URI: ${MONGODB_URI}
       ADMIN_SECRET: ${ADMIN_SECRET:-change-me-in-production}
-      # OpenTelemetry Auto-Instrumentation
-      NODE_OPTIONS: "--require @opentelemetry/auto-instrumentations-node/register"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
       OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
       OTEL_TRACES_SAMPLER_ARG: "0.1"

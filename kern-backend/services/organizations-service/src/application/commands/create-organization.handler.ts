@@ -38,14 +38,7 @@ export class CreateOrganizationHandler implements ICommandHandler<CreateOrganiza
 
     // Create initial membership for the creator
     const membershipId = uuidv4();
-    const membership = new Membership(
-      membershipId,
-      command.creatorId,
-      orgId,
-      MemberRole.ADMIN,
-      new Date(),
-      new Date(),
-    );
+    const membership = new Membership(membershipId, command.creatorId, orgId, MemberRole.ADMIN, new Date(), new Date());
 
     await this.membershipRepository.save(membership);
 

@@ -24,7 +24,9 @@ export class OrganizationsController {
   @Post()
   async create(@Headers() headers: Record<string, string>, @Body() dto: CreateOrganizationDto) {
     const profileId = headers['x-user-id'];
-    const orgId = await this.commandBus.execute(new CreateOrganizationCommand(dto.name, dto.slug, profileId, dto.logoUrl));
+    const orgId = await this.commandBus.execute(
+      new CreateOrganizationCommand(dto.name, dto.slug, profileId, dto.logoUrl),
+    );
     return this.queryBus.execute(new GetOrganizationQuery(orgId));
   }
 

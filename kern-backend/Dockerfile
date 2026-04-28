@@ -88,7 +88,10 @@ ARG SERVICE_NAME
 COPY --from=prod-deps /app/node_modules ./node_modules
 
 # Compiled output only — no source, no tsconfig, no test files.
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/packages/shared/package.json ./packages/shared/
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
+COPY --from=builder /app/services/${SERVICE_NAME}/package.json ./services/${SERVICE_NAME}/
 COPY --from=builder /app/services/${SERVICE_NAME}/dist ./services/${SERVICE_NAME}/dist
 
 # Copy this service's own openapi spec (present for every service that exposes one).
