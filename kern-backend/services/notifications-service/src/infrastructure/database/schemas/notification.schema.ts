@@ -1,33 +1,29 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { NOTIFICATION_TYPE_VALUES, NotificationType } from '@kern/shared';
+import { NotificationType } from '../../../domain/entities/notification.entity';
 
-@Schema({
-  timestamps: { createdAt: true, updatedAt: false },
-  collection: 'notifications',
-})
-export class Notification {
+@Schema({ collection: 'notifications', timestamps: true })
+export class NotificationDocument extends Document {
   @Prop({ required: true, index: true })
-  profileId: string;
+  userId: string;
 
-  @Prop({ index: true })
-  organizationId?: string;
-
-  @Prop({ type: String, enum: NOTIFICATION_TYPE_VALUES, required: true })
-  type: NotificationType;
+  @Prop({ required: true, enum: NotificationType })
+  type: string;
 
   @Prop({ required: true })
-  body: string;
+  title: string;
+
+  @Prop({ required: true })
+  message: string;
+
+  @Prop({ default: false })
+  isRead: boolean;
 
   @Prop({ type: Object })
   metadata?: Record<string, any>;
 
-  @Prop({ index: true })
-  readAt?: Date;
+  @Prop({ default: Date.now })
+  createdAt: Date;
 }
 
-export type NotificationDocument = Notification & Document;
-export const NotificationSchema = SchemaFactory.createForClass(Notification);
-
-NotificationSchema.index({ profileId: 1, createdAt: -1 });
-NotificationSchema.index({ profileId: 1, readAt: 1 });
+export const NotificationSchema = SchemaFactory.createForClass(NotificationDocument);

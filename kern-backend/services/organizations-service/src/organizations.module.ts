@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 // Controllers
 import { OrganizationsController } from './presentation/controllers/organizations.controller';
@@ -60,7 +61,22 @@ const Repositories = [
 ];
 
 @Module({
-  imports: [CqrsModule],
+  imports: [
+    CqrsModule,
+    ClientsModule.register([
+      {
+        name: 'NOTIFICATIONS_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.RABBITMQ_URL || 'amqp://kern:kernpass@rabbitmq:5672'],
+          queue: 'notifications_queue',
+          queueOptions: {
+            durable: false,
+          },
+        },
+      },
+    ]),
+  ],
   controllers: [OrganizationsController, MembersController, InvitationsController, HealthController, AdminController],
   providers: [...CommandHandlers, ...QueryHandlers, ...Repositories],
 })

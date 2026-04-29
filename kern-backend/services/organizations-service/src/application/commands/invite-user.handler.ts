@@ -5,6 +5,7 @@ import { OrganizationRepository, ORGANIZATION_REPOSITORY } from '../../domain/re
 import { Invitation } from '../../domain/entities/invitation.entity';
 import { InvitationStatus } from '../../domain/value-objects/invitation-status.vo';
 import { Inject } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { v4 as uuidv4 } from 'uuid';
 
 @CommandHandler(InviteUserCommand)
@@ -14,6 +15,8 @@ export class InviteUserHandler implements ICommandHandler<InviteUserCommand> {
     private readonly invitationRepository: InvitationRepository,
     @Inject(ORGANIZATION_REPOSITORY)
     private readonly orgRepository: OrganizationRepository,
+    @Inject('NOTIFICATIONS_SERVICE')
+    private readonly notificationsClient: ClientProxy,
   ) {}
 
   async execute(command: InviteUserCommand): Promise<string> {
@@ -46,7 +49,14 @@ export class InviteUserHandler implements ICommandHandler<InviteUserCommand> {
 
     await this.invitationRepository.save(invitation);
 
-    // Here we would dispatch a Domain Event to trigger email sending
+    // Notify the user (notification service will handle the in-app notification)
+    this.notificationsClient.emit('organization.invitation.created', {
+      email: command.email,
+      organizationId: command.organizationId,
+      organizationName: organization.name,
+      inviterId: command.invitedById,
+      role: command.role,
+    });
 
     return id;
   }
