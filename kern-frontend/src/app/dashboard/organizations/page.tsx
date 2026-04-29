@@ -4,6 +4,7 @@ import React, { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useOrganizations } from "@/lib/api/organizations-service/hooks";
+import { OrganizationType } from "@/lib/api/organizations-service/types";
 import { Plus, Building2, ArrowRight, Settings } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -108,7 +109,16 @@ export default function OrganizationsPage(): React.JSX.Element {
                   )}
                 </div>
                 <div className={styles.orgInfo}>
-                  <h3 className={styles.orgName}>{org.name}</h3>
+                  <div className={styles.nameRow}>
+                    <h3 className={styles.orgName}>{org.name}</h3>
+                    <span
+                      className={`${styles.typeBadge} ${org.type === OrganizationType.PERSONAL ? styles.typePersonal : styles.typeTeam}`}
+                    >
+                      {org.type === OrganizationType.PERSONAL
+                        ? "Personal"
+                        : "Equipo"}
+                    </span>
+                  </div>
                   <p className={styles.orgSlug}>kern.id/{org.slug}</p>
                 </div>
               </div>

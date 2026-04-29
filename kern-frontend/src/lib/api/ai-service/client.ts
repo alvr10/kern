@@ -7,12 +7,20 @@ import type {
   PaginatedGenerationsResponse,
   RewriteContentDto,
   TokenUsageResponse,
+  HealthResponse,
 } from "./types";
 
 /**
  * AI Service API Client
  */
 export const aiClient = {
+  /**
+   * Health check
+   */
+  health: (): Promise<HealthResponse> => {
+    return apiClient.get<HealthResponse>("/health");
+  },
+
   /**
    * Generate a social media post with AI
    */

@@ -94,12 +94,41 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 1;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .orgName {
   font-size: 18px;
   font-weight: 600;
   font-family: var(--font-body);
+}
+
+.typeBadge {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.typePersonal {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.typeTeam {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+  border: 1px solid var(--border);
 }
 
 .orgSlug {

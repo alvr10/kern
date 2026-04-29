@@ -18,6 +18,7 @@ export interface CreateContentDto {
   organizationId: string;
   title: string;
   body: string;
+  draftId?: string | null;
   platform: SocialPlatform;
   hashtags?: string[];
   mediaUrls?: string[];
@@ -30,7 +31,6 @@ export interface CreateContentDto {
 export interface UpdateContentDto {
   title?: string;
   body?: string;
-  platform?: SocialPlatform;
   hashtags?: string[];
   mediaUrls?: string[];
   scheduledAt?: string | null;
@@ -65,9 +65,9 @@ export interface CommentResponse {
  */
 export interface ContentPieceResponse {
   id: string;
-  _id?: string;
   organizationId: string;
   authorId: string;
+  draftId: string | null;
   title: string;
   body: string;
   status: ContentStatus;

@@ -5,8 +5,9 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  // if "next" is in search params, use it as the redirection URL
-  const next = searchParams.get("next") ?? "/";
+
+  // Default to the organizations dashboard after login
+  const next = searchParams.get("next") ?? "/dashboard/organizations";
 
   if (code) {
     const cookieStore = await cookies();
@@ -24,20 +25,19 @@ export async function GET(request: Request) {
                 cookieStore.set(name, value, options),
               );
             } catch {
-              // The `setAll` method was called from a Server Component.
-              // This can be ignored if you have middleware refreshing
-              // user sessions.
+              // Ignore if called from a Server Component
             }
           },
         },
       },
     );
+
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     }
   }
 
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+  // Fallback to login if something fails, instead of a 404 error page
+  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
 }

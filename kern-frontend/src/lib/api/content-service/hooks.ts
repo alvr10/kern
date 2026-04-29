@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { SocialPlatform } from "../types";
 import { contentClient } from "./client";
 import type {
+  ContentPieceResponse,
   ContentStatus,
   CreateCommentDto,
   CreateContentDto,
@@ -107,10 +108,9 @@ export const useUpdateContent = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateContentDto }) =>
       contentClient.updateContent(id, data),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onSuccess: (data: any) => {
+    onSuccess: (data: ContentPieceResponse) => {
       queryClient.invalidateQueries({
-        queryKey: contentKeys.detail(data.id || data._id),
+        queryKey: contentKeys.detail(data.id),
       });
       queryClient.invalidateQueries({
         queryKey: contentKeys.lists(data.organizationId),
@@ -151,10 +151,9 @@ export const useUpdateContentStatus = () => {
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: ContentStatus }) =>
       contentClient.updateStatus(id, status),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onSuccess: (data: any) => {
+    onSuccess: (data: ContentPieceResponse) => {
       queryClient.invalidateQueries({
-        queryKey: contentKeys.detail(data.id || data._id),
+        queryKey: contentKeys.detail(data.id),
       });
       queryClient.invalidateQueries({
         queryKey: contentKeys.lists(data.organizationId),
@@ -175,10 +174,9 @@ export const useSubmitReview = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: CreateReviewDto }) =>
       contentClient.submitReview(id, data),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onSuccess: (data: any) => {
+    onSuccess: (data: ContentPieceResponse) => {
       queryClient.invalidateQueries({
-        queryKey: contentKeys.detail(data.id || data._id),
+        queryKey: contentKeys.detail(data.id),
       });
     },
   });

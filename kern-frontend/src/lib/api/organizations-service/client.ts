@@ -7,6 +7,7 @@ import type {
   MemberRole,
   OrganizationResponse,
   UpdateOrganizationDto,
+  TransferOwnershipDto,
 } from "./types";
 
 /**
@@ -51,6 +52,19 @@ export const organizationsClient = {
    */
   deleteOrganization: (id: string): Promise<void> => {
     return apiClient.delete<void>(`/organizations/${id}`);
+  },
+
+  /**
+   * Transfer organization ownership
+   */
+  transferOwnership: (
+    id: string,
+    data: TransferOwnershipDto,
+  ): Promise<OrganizationResponse> => {
+    return apiClient.patch<OrganizationResponse>(
+      `/organizations/${id}/owner`,
+      data,
+    );
   },
 
   /**

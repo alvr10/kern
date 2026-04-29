@@ -1,6 +1,15 @@
 import { SocialPlatform } from "../types";
 
 /**
+ * Health check response
+ */
+export interface HealthResponse {
+  status: string;
+  service: string;
+  timestamp: string;
+}
+
+/**
  * AI action types
  */
 export enum AIActionType {
@@ -16,6 +25,7 @@ export enum AIActionType {
 export interface GenerateContentDto {
   organizationId: string;
   contentPieceId?: string | null;
+  draftId?: string | null;
   platform: SocialPlatform;
   topic: string;
   tone?: string | null;
@@ -28,6 +38,7 @@ export interface GenerateContentDto {
 export interface RewriteContentDto {
   organizationId: string;
   contentPieceId: string;
+  draftId?: string | null;
   originalText: string;
   instructions?: string | null;
 }
@@ -38,6 +49,7 @@ export interface RewriteContentDto {
 export interface ImproveContentDto {
   organizationId: string;
   contentPieceId: string;
+  draftId?: string | null;
   originalText: string;
 }
 
@@ -47,6 +59,7 @@ export interface ImproveContentDto {
 export interface AdaptContentDto {
   organizationId: string;
   contentPieceId: string;
+  draftId?: string | null;
   originalText: string;
   targetPlatform: SocialPlatform;
 }
@@ -58,6 +71,7 @@ export interface AIGenerationResponse {
   id: string;
   organizationId: string;
   contentPieceId: string | null;
+  draftId: string | null;
   actionType: AIActionType;
   platform: SocialPlatform;
   prompt: string;

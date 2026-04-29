@@ -13,6 +13,14 @@ export enum MemberRole {
 }
 
 /**
+ * Organization types
+ */
+export enum OrganizationType {
+  PERSONAL = "PERSONAL",
+  TEAM = "TEAM",
+}
+
+/**
  * Data transfer object for creating an organization
  */
 export interface CreateOrganizationDto {
@@ -31,12 +39,21 @@ export interface UpdateOrganizationDto {
 }
 
 /**
+ * Data transfer object for transferring ownership
+ */
+export interface TransferOwnershipDto {
+  newOwnerId: string;
+}
+
+/**
  * Organization details response
  */
 export interface OrganizationResponse {
   id: string;
   name: string;
   slug: string;
+  type: OrganizationType;
+  ownerId: string;
   logoUrl: string | null;
   brandVoice: Record<string, unknown> | null;
   createdAt: string;

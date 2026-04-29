@@ -5,6 +5,7 @@ import type {
   InviteUserDto,
   MemberRole,
   UpdateOrganizationDto,
+  TransferOwnershipDto,
 } from "./types";
 
 /**
@@ -80,6 +81,23 @@ export const useDeleteOrganization = () => {
     mutationFn: (id: string) => organizationsClient.deleteOrganization(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: organizationKeys.lists() });
+    },
+  });
+};
+
+/**
+ * useTransferOwnership
+ */
+export const useTransferOwnership = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: TransferOwnershipDto }) =>
+      organizationsClient.transferOwnership(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: organizationKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: organizationKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: organizationKeys.members(id) });
     },
   });
 };

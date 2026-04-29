@@ -15,5 +15,4 @@ export * from "./billing-service";
 export * from "./admin-service";
 export * from "./ai-service";
 export * from "./content-service";
-export * from "./projects-service";
 export * from "./social-service";

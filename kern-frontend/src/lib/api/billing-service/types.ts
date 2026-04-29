@@ -12,7 +12,7 @@ export interface PlanResponse {
   slug: string;
   monthlyTokenLimit: number;
   memberLimit: number;
-  projectLimit: number;
+  organizationLimit: number;
   priceMonthlyUsd: number;
   features: string[];
   isActive: boolean;

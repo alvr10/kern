@@ -15,6 +15,18 @@ export const aiKeys = {
   generations: (orgId: string) =>
     [...aiKeys.all, "generations", orgId] as const,
   tokenUsage: (orgId: string) => [...aiKeys.all, "token-usage", orgId] as const,
+  health: () => [...aiKeys.all, "health"] as const,
+};
+
+/**
+ * useAIHealth
+ */
+export const useAIHealth = () => {
+  return useQuery({
+    queryKey: aiKeys.health(),
+    queryFn: () => aiClient.health(),
+    refetchInterval: 30000, // Check every 30 seconds
+  });
 };
 
 /**
