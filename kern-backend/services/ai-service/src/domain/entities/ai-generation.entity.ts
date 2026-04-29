@@ -6,6 +6,7 @@ export class AIGeneration {
     public readonly id: string,
     public readonly organizationId: string,
     public readonly contentPieceId: string | null,
+    public readonly draftId: string | null,
     public readonly actionType: AiActionType,
     public readonly platform: SocialPlatform,
     public readonly prompt: string,

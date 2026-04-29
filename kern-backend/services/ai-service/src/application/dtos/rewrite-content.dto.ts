@@ -10,6 +10,10 @@ export class RewriteContentDto {
   contentPieceId: string;
 
   @IsString()
+  @IsOptional()
+  draftId?: string;
+
+  @IsString()
   @IsNotEmpty()
   originalText: string;
 

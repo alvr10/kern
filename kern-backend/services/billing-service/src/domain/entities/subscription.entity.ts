@@ -31,4 +31,12 @@ export class Subscription {
   public cancel(): void {
     this.stripeCancelAtPeriodEnd = true;
   }
+
+  public addUsage(amount: number): void {
+    this.tokensUsed += amount;
+  }
+
+  public isLimitReached(): boolean {
+    return this.tokensUsed >= this.tokensLimit;
+  }
 }

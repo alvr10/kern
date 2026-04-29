@@ -9,6 +9,7 @@ export class AIGenerationMapper {
       (mongo as any)._id.toString(),
       mongo.organizationId,
       mongo.contentPieceId ? mongo.contentPieceId.toString() : null,
+      mongo.draftId || null,
       mongo.action as AiActionType,
       mongo.platform as SocialPlatform,
       mongo.prompt,
@@ -23,6 +24,7 @@ export class AIGenerationMapper {
     return {
       organizationId: domain.organizationId,
       contentPieceId: domain.contentPieceId,
+      draftId: domain.draftId,
       action: domain.actionType,
       platform: domain.platform,
       prompt: domain.prompt,

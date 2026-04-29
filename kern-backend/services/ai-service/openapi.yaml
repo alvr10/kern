@@ -207,6 +207,10 @@ components:
           type: string
           nullable: true
           description: Link to an existing content piece if applicable
+        draftId:
+          type: string
+          nullable: true
+          description: Client-side session ID to link generations before the content is saved.
         platform:
           $ref: '#/components/schemas/SocialPlatform'
         topic:
@@ -228,6 +232,9 @@ components:
           type: string
         contentPieceId:
           type: string
+        draftId:
+          type: string
+          nullable: true
         originalText:
           type: string
         instructions:
@@ -242,6 +249,9 @@ components:
           type: string
         contentPieceId:
           type: string
+        draftId:
+          type: string
+          nullable: true
         originalText:
           type: string
 
@@ -253,6 +263,9 @@ components:
           type: string
         contentPieceId:
           type: string
+        draftId:
+          type: string
+          nullable: true
         originalText:
           type: string
         targetPlatform:
@@ -266,6 +279,9 @@ components:
         organizationId:
           type: string
         contentPieceId:
+          type: string
+          nullable: true
+        draftId:
           type: string
           nullable: true
         actionType:

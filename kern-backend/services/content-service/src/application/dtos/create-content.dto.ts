@@ -11,6 +11,10 @@ export class CreateContentDto {
   title: string;
 
   @IsString()
+  @IsOptional()
+  draftId?: string;
+
+  @IsString()
   @IsNotEmpty()
   body: string;
 

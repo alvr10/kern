@@ -25,6 +25,7 @@ export class ContentController {
       new CreateContentCommand(
         dto.organizationId,
         authorId,
+        dto.draftId || null,
         dto.title,
         dto.body,
         dto.platform,

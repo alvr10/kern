@@ -10,6 +10,10 @@ export class GenerateContentDto {
   @IsOptional()
   contentPieceId?: string;
 
+  @IsString()
+  @IsOptional()
+  draftId?: string;
+
   @IsEnum(SocialPlatform)
   platform: SocialPlatform;
 

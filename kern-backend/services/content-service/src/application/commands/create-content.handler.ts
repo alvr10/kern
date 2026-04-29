@@ -20,6 +20,7 @@ export class CreateContentHandler implements ICommandHandler<CreateContentComman
       id,
       command.organizationId,
       command.authorId,
+      command.draftId || null,
       command.title,
       command.body,
       ContentStatus.DRAFT,

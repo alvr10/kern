@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { GenerationsController } from './presentation/controllers/generations.controller';
 import { HealthController } from './presentation/controllers/health.controller';
 import { AdminController } from './presentation/controllers/admin.controller';
@@ -26,6 +27,19 @@ const Handlers = [GenerateContentHandler, RewriteContentHandler, GetTokenUsageHa
     MongooseModule.forFeature([
       { name: AIGeneration.name, schema: AIGenerationSchema },
       { name: TokenUsage.name, schema: TokenUsageSchema },
+    ]),
+    ClientsModule.register([
+      {
+        name: 'BILLING_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.RABBITMQ_URL || 'amqp://kern:kernpass@rabbitmq:5672'],
+          queue: 'billing_queue',
+          queueOptions: {
+            durable: false,
+          },
+        },
+      },
     ]),
   ],
   controllers: [GenerationsController, HealthController, AdminController],

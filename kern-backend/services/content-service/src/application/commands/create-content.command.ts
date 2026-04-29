@@ -5,6 +5,7 @@ export class CreateContentCommand implements ICommand {
   constructor(
     public readonly organizationId: string,
     public readonly authorId: string,
+    public readonly draftId: string | null,
     public readonly title: string,
     public readonly body: string,
     public readonly platform: SocialPlatform,

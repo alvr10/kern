@@ -7,6 +7,7 @@ export class ContentPiece {
     public readonly id: string,
     public readonly organizationId: string,
     public readonly authorId: string,
+    public readonly draftId: string | null,
     public title: string,
     public body: string,
     public status: ContentStatus,

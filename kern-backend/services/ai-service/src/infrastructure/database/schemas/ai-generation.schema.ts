@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 import { AI_ACTION_TYPE_VALUES, AiActionType, SOCIAL_PLATFORM_VALUES, SocialPlatform } from '@kern/shared';
 
 @Schema({
@@ -7,8 +7,11 @@ import { AI_ACTION_TYPE_VALUES, AiActionType, SOCIAL_PLATFORM_VALUES, SocialPlat
   collection: 'ai_generations',
 })
 export class AIGeneration {
-  @Prop({ type: Types.ObjectId, ref: 'ContentPiece', index: true })
-  contentPieceId?: Types.ObjectId;
+  @Prop({ type: String, index: true })
+  contentPieceId?: string;
+
+  @Prop({ type: String, index: true })
+  draftId?: string;
 
   @Prop({ required: true, index: true })
   profileId: string;

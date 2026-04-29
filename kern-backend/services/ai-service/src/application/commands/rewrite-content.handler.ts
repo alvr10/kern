@@ -7,6 +7,7 @@ import { AIGeneration } from '../../domain/entities/ai-generation.entity';
 import { TokenUsage } from '../../domain/entities/token-usage.entity';
 import { AiActionType } from '../../domain/value-objects/ai-action-type.vo';
 import { Inject } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { v4 as uuidv4 } from 'uuid';
 import { SocialPlatform } from '../../domain/value-objects/social-platform.vo';
 
@@ -17,6 +18,8 @@ export class RewriteContentHandler implements ICommandHandler<RewriteContentComm
     private readonly generationRepository: AIGenerationRepository,
     @Inject(TOKEN_USAGE_REPOSITORY)
     private readonly usageRepository: TokenUsageRepository,
+    @Inject('BILLING_SERVICE')
+    private readonly billingClient: ClientProxy,
     private readonly geminiClient: GeminiClient,
   ) {}
 
@@ -35,10 +38,16 @@ export class RewriteContentHandler implements ICommandHandler<RewriteContentComm
     usage.addUsage(tokensUsed);
     await this.usageRepository.save(usage);
 
+    this.billingClient.emit('ai.tokens_consumed', {
+      organizationId: command.organizationId,
+      tokens: tokensUsed,
+    });
+
     const generation = new AIGeneration(
       uuidv4(),
       command.organizationId,
       command.contentPieceId,
+      command.draftId || null,
       AiActionType.REWRITE,
       SocialPlatform.TWITTER, // Dummy platform for rewrite
       userPrompt,

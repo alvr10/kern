@@ -7,6 +7,7 @@ import { AIGeneration } from '../../domain/entities/ai-generation.entity';
 import { TokenUsage } from '../../domain/entities/token-usage.entity';
 import { AiActionType } from '../../domain/value-objects/ai-action-type.vo';
 import { Inject } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { v4 as uuidv4 } from 'uuid';
 
 @CommandHandler(GenerateContentCommand)
@@ -16,6 +17,8 @@ export class GenerateContentHandler implements ICommandHandler<GenerateContentCo
     private readonly generationRepository: AIGenerationRepository,
     @Inject(TOKEN_USAGE_REPOSITORY)
     private readonly usageRepository: TokenUsageRepository,
+    @Inject('BILLING_SERVICE')
+    private readonly billingClient: ClientProxy,
     private readonly geminiClient: GeminiClient,
   ) {}
 
@@ -44,11 +47,18 @@ export class GenerateContentHandler implements ICommandHandler<GenerateContentCo
     usage.addUsage(tokensUsed);
     await this.usageRepository.save(usage);
 
+    // Emit event to billing service for PostgreSQL sync
+    this.billingClient.emit('ai.tokens_consumed', {
+      organizationId: command.organizationId,
+      tokens: tokensUsed,
+    });
+
     // 5. Save Record
     const generation = new AIGeneration(
       uuidv4(),
       command.organizationId,
       command.contentPieceId || null,
+      command.draftId || null,
       AiActionType.GENERATE,
       command.platform,
       userPrompt,

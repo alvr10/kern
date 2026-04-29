@@ -7,6 +7,7 @@ export class GenerateContentCommand implements ICommand {
     public readonly platform: SocialPlatform,
     public readonly topic: string,
     public readonly contentPieceId?: string | null,
+    public readonly draftId?: string | null,
     public readonly tone?: string | null,
     public readonly maxLength?: number | null,
   ) {}

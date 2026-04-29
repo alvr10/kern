@@ -42,6 +42,9 @@ export class ContentPiece {
   @Prop({ type: String })
   _id: string;
 
+  @Prop({ type: String, index: true, unique: true, sparse: true })
+  draftId?: string;
+
   @Prop({ required: true, index: true })
   organizationId: string;
 

@@ -198,7 +198,6 @@ services:
       SERVICE_NAME: notifications-service
       CONSUL_URL: http://consul:8500
       MONGODB_URI: ${MONGODB_URI}
-      RESEND_API_KEY: ${RESEND_API_KEY}
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
       OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
       OTEL_TRACES_SAMPLER_ARG: "0.1"

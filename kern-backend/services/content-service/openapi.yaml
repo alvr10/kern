@@ -331,6 +331,10 @@ components:
           type: string
         body:
           type: string
+        draftId:
+          type: string
+          nullable: true
+          description: Client-side session ID used to link AI generations.
         platform:
           $ref: '#/components/schemas/SocialPlatform'
         hashtags:
@@ -379,6 +383,9 @@ components:
           type: string
         authorId:
           type: string
+        draftId:
+          type: string
+          nullable: true
         title:
           type: string
         body:
