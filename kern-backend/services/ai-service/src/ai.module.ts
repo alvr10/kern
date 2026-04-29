@@ -5,6 +5,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { GenerationsController } from './presentation/controllers/generations.controller';
 import { HealthController } from './presentation/controllers/health.controller';
 import { AdminController } from './presentation/controllers/admin.controller';
+import { BillingEventsConsumer } from './presentation/consumers/billing-events.consumer';
 
 import { GenerateContentHandler } from './application/commands/generate-content.handler';
 import { RewriteContentHandler } from './application/commands/rewrite-content.handler';
@@ -42,7 +43,7 @@ const Handlers = [GenerateContentHandler, RewriteContentHandler, GetTokenUsageHa
       },
     ]),
   ],
-  controllers: [GenerationsController, HealthController, AdminController],
+  controllers: [GenerationsController, HealthController, AdminController, BillingEventsConsumer],
   providers: [
     ...Handlers,
     GeminiClient,

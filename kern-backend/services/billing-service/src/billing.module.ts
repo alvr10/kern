@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { SubscriptionsController } from './presentation/controllers/subscriptions.controller';
 import { WebhooksController } from './presentation/controllers/webhooks.controller';
 import { AiEventsConsumer } from './presentation/consumers/ai-events.consumer';
@@ -22,7 +23,22 @@ const Handlers = [
 ];
 
 @Module({
-  imports: [CqrsModule],
+  imports: [
+    CqrsModule,
+    ClientsModule.register([
+      {
+        name: 'AI_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.RABBITMQ_URL || 'amqp://kern:kernpass@rabbitmq:5672'],
+          queue: 'ai_queue',
+          queueOptions: {
+            durable: false,
+          },
+        },
+      },
+    ]),
+  ],
   controllers: [SubscriptionsController, WebhooksController, AiEventsConsumer],
   providers: [
     ...Handlers,
