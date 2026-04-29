@@ -1,0 +1,103 @@
+asyncapi: '3.0.0'
+info:
+  title: KERN Event-Driven Architecture
+  version: '1.0.0'
+  description: Especificación de eventos asíncronos vía RabbitMQ para el ecosistema KERN.
+
+servers:
+  rabbitmq:
+    host: rabbitmq:5672
+    protocol: amqp
+    description: Broker de mensajería principal.
+
+channels:
+  notifications_queue:
+    address: notifications_queue
+    messages:
+      invitationCreated:
+        $ref: '#/components/messages/InvitationCreated'
+
+  billing_usage_queue:
+    address: billing.usage_updated
+    messages:
+      usageUpdated:
+        $ref: '#/components/messages/UsageUpdated'
+
+  ai_tokens_queue:
+    address: ai.tokens_consumed
+    messages:
+      tokensConsumed:
+        $ref: '#/components/messages/TokensConsumed'
+
+components:
+  messages:
+    InvitationCreated:
+      name: organization.invitation.created
+      title: Invitación de Organización Creada
+      summary: Notifica que un usuario ha sido invitado a una organización.
+      payload:
+        $ref: '#/components/schemas/InvitationCreatedPayload'
+
+    UsageUpdated:
+      name: billing.usage_updated
+      title: Uso de Facturación Actualizado
+      summary: Notifica cambios en el balance de tokens de una organización.
+      payload:
+        $ref: '#/components/schemas/UsageUpdatedPayload'
+
+    TokensConsumed:
+      name: ai.tokens_consumed
+      title: Tokens consumidos por IA
+      summary: Notifica el consumo de tokens tras una operación de IA.
+      payload:
+        $ref: '#/components/schemas/TokensConsumedPayload'
+
+  schemas:
+    InvitationCreatedPayload:
+      type: object
+      required:
+        - email
+        - organizationId
+        - organizationName
+        - inviterId
+        - role
+      properties:
+        email:
+          type: string
+          format: email
+        organizationId:
+          type: string
+        organizationName:
+          type: string
+        inviterId:
+          type: string
+        inviterName:
+          type: string
+        role:
+          type: string
+          enum: [OWNER, ADMIN, MEMBER, VIEWER]
+
+    UsageUpdatedPayload:
+      type: object
+      required:
+        - organizationId
+        - tokensUsed
+        - tokensLimit
+      properties:
+        organizationId:
+          type: string
+        tokensUsed:
+          type: number
+        tokensLimit:
+          type: number
+
+    TokensConsumedPayload:
+      type: object
+      required:
+        - organizationId
+        - tokens
+      properties:
+        organizationId:
+          type: string
+        tokens:
+          type: number
