@@ -7,6 +7,8 @@ services:
     ports:
       - "8500:8500" # UI + API
     command: agent -dev -client=0.0.0.0 -ui
+    volumes:
+      - consul_data:/consul/data
     networks:
       - kern-network
     healthcheck:
@@ -48,6 +50,8 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-kern}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-kernpass}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - kern-network
     healthcheck:
@@ -330,6 +334,7 @@ services:
     volumes:
       - ./infra/alloy/config.alloy:/etc/alloy/config.alloy
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - alloy_data:/var/lib/alloy
     command: run --server.http.listen-addr=0.0.0.0:12345 /etc/alloy/config.alloy
     networks:
       - kern-network
@@ -434,6 +439,9 @@ volumes:
   loki_data:
   grafana_data:
   minio_data:
+  rabbitmq_data:
+  consul_data:
+  alloy_data:
 
 networks:
   kern-network:

@@ -18,7 +18,7 @@ export class TransferOwnershipHandler implements ICommandHandler<TransferOwnersh
       throw new NotFoundException('Organization not found');
     }
 
-    if (organization.type === OrganizationType.Personal) {
+    if (organization.type === OrganizationType.PERSONAL) {
       throw new ForbiddenException('Cannot transfer ownership of a personal organization.');
     }
 
