@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { createPortal } from "react-dom";
 import { useOrganizations } from "@/lib/api/organizations-service/hooks";
+import { useSubscription } from "@/lib/api/billing-service/hooks";
 import { useAuth } from "@/lib/api/auth/hooks";
 import { cn } from "@/lib/utils";
 
@@ -86,6 +87,20 @@ export default function DashboardLayout({
   };
   const { data: organizations } = useOrganizations();
   const currentOrg = organizations?.find((org) => org.slug === slug);
+  const { data: subscription } = useSubscription(currentOrg?.id || "");
+
+  const getPlanLabel = () => {
+    if (!subscription) return "Plan Gratuito";
+    switch (subscription.planId) {
+      case "plan_pro":
+        return "Plan Pro";
+      case "plan_team":
+        return "Plan Equipo";
+      case "plan_free":
+      default:
+        return "Plan Gratuito";
+    }
+  };
 
   const toggleProfileMenu = () => {
     if (!isProfileMenuOpen && profileRef.current) {
@@ -245,16 +260,6 @@ export default function DashboardLayout({
                   <Building2 size={20} />
                   <span>Organizaciones</span>
                 </Link>
-                <Link
-                  href="/dashboard/settings"
-                  className={cn(
-                    styles.navItem,
-                    pathname === "/dashboard/settings" && styles.activeNavItem,
-                  )}
-                >
-                  <Settings size={20} />
-                  <span>Ajustes</span>
-                </Link>
               </div>
             )}
           </nav>
@@ -317,7 +322,7 @@ export default function DashboardLayout({
                   <span className={styles.userName}>
                     {currentOrg?.name || "Mi Organización"}
                   </span>
-                  <span className={styles.planName}>Plan Gratuito</span>
+                  <span className={styles.planName}>{getPlanLabel()}</span>
                 </div>
               </div>
             </div>
@@ -347,7 +352,7 @@ export default function DashboardLayout({
                         {currentOrg?.name || "Mi Organización"}
                       </div>
                       <div className={styles.planDetails}>
-                        Plan gratuito · 0 canales
+                        {getPlanLabel()} · 0 canales
                       </div>
                       <button className={styles.upgradeButton}>
                         <Sparkles size={14} style={{ marginRight: 8 }} />

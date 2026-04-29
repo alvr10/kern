@@ -40,6 +40,25 @@
   gap: 12px;
 }
 
+.tokenBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--secondary);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  transition: all 0.2s ease;
+}
+
+.tokenBadge:hover {
+  background-color: var(--accent);
+  color: var(--foreground);
+}
+
 @keyframes glow {
   0% {
     box-shadow:
@@ -95,13 +114,16 @@
 }
 
 .column {
-  flex: 0 0 300px;
+  width: 320px;
+  min-width: 320px;
+  max-width: 320px;
+  flex: 0 0 320px;
   background-color: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
-  height: 100%; /* Reach to bottom */
+  height: 100%;
   transition: all 0.2s ease;
 }
 
@@ -162,10 +184,12 @@
   flex-direction: column;
   gap: 12px;
   overflow-y: auto;
-  flex: 1; /* Allow content list to scroll while column header/footer stay fixed */
+  flex: 1;
 }
 
 .card {
+  width: 100%;
+  max-width: 100%;
   background-color: var(--background);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -176,6 +200,9 @@
   cursor: grab;
   transition: all 0.2s;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .cardActive {

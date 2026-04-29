@@ -10,7 +10,8 @@ import {
   contentKeys,
 } from "@/lib/api/content-service/hooks";
 import { contentClient } from "@/lib/api/content-service/client";
-import { Plus } from "lucide-react";
+import { useSubscription } from "@/lib/api/billing-service/hooks";
+import { Plus, HandCoins } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import {
@@ -59,6 +60,9 @@ export default function CreateContentPage(): React.JSX.Element {
     currentOrg?.id || "",
   );
 
+  // 3. Get subscription (Source of Truth for tokens)
+  const { data: subscription } = useSubscription(currentOrg?.id || "");
+
   const updateStatus = useUpdateContentStatus();
   const queryClient = useQueryClient();
 
@@ -89,7 +93,7 @@ export default function CreateContentPage(): React.JSX.Element {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mutationFn: ({ id, data }: { id: string; data: any }) =>
       contentClient.updateContent(id, data),
-    onSuccess: (data) => {
+    onSuccess: (data: ContentPieceResponse) => {
       queryClient.invalidateQueries({
         queryKey: contentKeys.kanban(data.organizationId),
       });
@@ -119,7 +123,7 @@ export default function CreateContentPage(): React.JSX.Element {
 
     if (targetStatus && activeItem && activeItem.status !== targetStatus) {
       updateStatus.mutate({
-        id: activeItem.id || activeItem._id!,
+        id: activeItem.id || (activeItem as any)._id,
         status: targetStatus,
       });
       return;
@@ -135,15 +139,17 @@ export default function CreateContentPage(): React.JSX.Element {
       const status = activeItem.status;
       const columnItems = kanbanData?.[status] || [];
       const oldIndex = columnItems.findIndex(
-        (i) => (i.id || i._id) === activeId,
+        (i) => (i.id || (i as any)._id) === activeId,
       );
-      const newIndex = columnItems.findIndex((i) => (i.id || i._id) === overId);
+      const newIndex = columnItems.findIndex(
+        (i) => (i.id || (i as any)._id) === overId,
+      );
 
       if (oldIndex !== -1 && newIndex !== -1) {
         // We update the position to the new index
         // Note: For a real production app, you'd want a bulk update or a smarter position algorithm (like fractional indexing)
         updateContent.mutate({
-          id: activeItem.id || activeItem._id!,
+          id: activeItem.id || (activeItem as any)._id,
           data: { kanbanPosition: newIndex },
         });
       }
@@ -194,7 +200,25 @@ export default function CreateContentPage(): React.JSX.Element {
     <div className={styles.container} ref={containerRef}>
       <header className={styles.header}>
         <div className={styles.titleSection}>
-          <h1 className={styles.title}>Crear Contenido</h1>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              marginBottom: "8px",
+            }}
+          >
+            <h1 className={styles.title}>Crear Contenido</h1>
+            {subscription && (
+              <div className={styles.tokenBadge}>
+                <HandCoins size={14} />
+                <span>
+                  {subscription.tokensLimit - subscription.tokensUsed} tokens
+                  disponibles
+                </span>
+              </div>
+            )}
+          </div>
           <p className={styles.subtitle}>
             Organiza tus ideas y planifica tus publicaciones para{" "}
             {currentOrg?.name}.

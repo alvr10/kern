@@ -155,6 +155,13 @@
   border: 1px solid var(--border);
 }
 
+.proBadge {
+  background-color: rgba(184, 150, 87, 0.1);
+  color: #b89657;
+  border-color: rgba(184, 150, 87, 0.3);
+  font-weight: 600;
+}
+
 .emptyState {
   display: flex;
   flex-direction: column;

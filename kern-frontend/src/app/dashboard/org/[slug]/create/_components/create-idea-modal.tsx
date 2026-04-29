@@ -12,7 +12,8 @@ import {
 } from "@/lib/api/content-service/hooks";
 import styles from "../page.module.css";
 import { ContentPieceResponse } from "@/lib/api/content-service/types";
-import { Sparkles, Wand2 } from "lucide-react";
+import { useSubscription } from "@/lib/api/billing-service/hooks";
+import { Sparkles, Wand2, HandCoins } from "lucide-react";
 import { useGenerateContent } from "@/lib/api/ai-service/hooks";
 
 export function CreateIdeaModal({
@@ -29,6 +30,7 @@ export function CreateIdeaModal({
   item?: ContentPieceResponse;
 }) {
   const isEditing = !!item;
+  const { data: subscription } = useSubscription(organizationId);
 
   const [title, setTitle] = useState(item?.title || "");
   const [body, setBody] = useState(item?.body || "");
@@ -44,6 +46,7 @@ export function CreateIdeaModal({
 
   // AI Generation States
   const [aiTopic, setAiTopic] = useState("");
+  const [draftId, setDraftId] = useState<string | null>(item?.draftId || null);
 
   const formatDefaultDate = (dateStr?: string) => {
     const date = dateStr ? new Date(dateStr) : new Date();
@@ -63,6 +66,7 @@ export function CreateIdeaModal({
       setHashtagsStr(item.hashtags?.join(", ") || "");
       setMediaUrlsStr(item.mediaUrls?.join(", ") || "");
       setScheduledAt(formatDefaultDate(item.scheduledAt as string | undefined));
+      setDraftId(item.draftId);
     } else {
       setTitle("");
       setBody("");
@@ -70,8 +74,9 @@ export function CreateIdeaModal({
       setHashtagsStr("");
       setMediaUrlsStr("");
       setScheduledAt(formatDefaultDate());
+      setDraftId(crypto.randomUUID());
     }
-  }, [item]);
+  }, [item, isOpen]);
 
   const createContent = useCreateContent();
   const updateStatus = useUpdateContentStatus();
@@ -86,6 +91,7 @@ export function CreateIdeaModal({
         organizationId,
         platform,
         topic: aiTopic,
+        draftId,
       },
       {
         onSuccess: (response) => {
@@ -132,11 +138,10 @@ export function CreateIdeaModal({
     if (isEditing && item) {
       updateContent.mutate(
         {
-          id: item.id || item._id!,
+          id: item.id || (item as any)._id,
           data: {
             title,
             body,
-            platform,
             hashtags,
             mediaUrls,
             scheduledAt: new Date(scheduledAt).toISOString(),
@@ -158,6 +163,7 @@ export function CreateIdeaModal({
           hashtags,
           mediaUrls,
           scheduledAt: new Date(scheduledAt).toISOString(),
+          draftId,
         },
         {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -316,10 +322,32 @@ export function CreateIdeaModal({
               exit={{ x: -20, opacity: 0 }}
               className={styles.aiExtension}
             >
-              <h3 className={styles.aiTitle}>
-                <Wand2 size={20} />
-                Asistente IA
-              </h3>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <h3 className={styles.aiTitle}>
+                  <Wand2 size={20} />
+                  Asistente IA
+                </h3>
+                {subscription && (
+                  <div
+                    style={{
+                      fontSize: "11px",
+                      color: "var(--muted-foreground)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}
+                  >
+                    <HandCoins size={12} />
+                    {subscription.tokensLimit - subscription.tokensUsed}
+                  </div>
+                )}
+              </div>
 
               <div className={styles.formGroup}>
                 <label className={styles.label}>

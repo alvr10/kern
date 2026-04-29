@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { aiClient } from "./client";
+import { billingKeys } from "../billing-service/hooks";
 import type {
   AdaptContentDto,
   GenerateContentDto,
@@ -44,6 +45,9 @@ export const useGenerateContent = () => {
       queryClient.invalidateQueries({
         queryKey: aiKeys.generations(organizationId),
       });
+      queryClient.invalidateQueries({
+        queryKey: billingKeys.subscription(organizationId),
+      });
     },
   });
 };
@@ -62,6 +66,9 @@ export const useRewriteContent = () => {
       });
       queryClient.invalidateQueries({
         queryKey: aiKeys.generations(organizationId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: billingKeys.subscription(organizationId),
       });
     },
   });
@@ -82,6 +89,9 @@ export const useImproveContent = () => {
       queryClient.invalidateQueries({
         queryKey: aiKeys.generations(organizationId),
       });
+      queryClient.invalidateQueries({
+        queryKey: billingKeys.subscription(organizationId),
+      });
     },
   });
 };
@@ -100,6 +110,9 @@ export const useAdaptContent = () => {
       });
       queryClient.invalidateQueries({
         queryKey: aiKeys.generations(organizationId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: billingKeys.subscription(organizationId),
       });
     },
   });

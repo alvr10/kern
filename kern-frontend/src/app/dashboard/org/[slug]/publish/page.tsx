@@ -18,7 +18,6 @@ import {
 import styles from "./page.module.css";
 import { cn } from "@/lib/utils";
 import { useOrganizations } from "@/lib/api/organizations-service/hooks";
-import { useProjects } from "@/lib/api/projects-service/hooks";
 import { useContentCalendar } from "@/lib/api/content-service/hooks";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -46,13 +45,9 @@ export default function PublishPage() {
   const { data: organizations } = useOrganizations();
   const currentOrg = organizations?.find((org) => org.slug === slug);
 
-  // 2. Get projects for this organization
-  const { data: projects } = useProjects(currentOrg?.id || "");
-  const defaultProject = projects?.[0];
-
-  // 3. Get calendar data
+  // 2. Get calendar data
   const { data: calendarData } = useContentCalendar(
-    defaultProject?.id || "",
+    currentOrg?.id || "",
     "2026-04-26T00:00:00Z",
     "2026-05-02T23:59:59Z",
   );

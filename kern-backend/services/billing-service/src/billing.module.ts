@@ -2,11 +2,15 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { SubscriptionsController } from './presentation/controllers/subscriptions.controller';
+import { PlansController } from './presentation/controllers/plans.controller';
 import { WebhooksController } from './presentation/controllers/webhooks.controller';
 import { AiEventsConsumer } from './presentation/consumers/ai-events.consumer';
 import { CreateCheckoutSessionHandler } from './application/commands/create-checkout-session.handler';
+import { CancelSubscriptionHandler } from './application/commands/cancel-subscription.handler';
 import { HandleStripeWebhookHandler } from './application/commands/handle-stripe-webhook.handler';
 import { GetSubscriptionHandler } from './application/queries/get-subscription.handler';
+import { ListPlansHandler } from './application/queries/list-plans.handler';
+import { GetPlanHandler } from './application/queries/get-plan.handler';
 import { DeductTokensHandler } from './application/commands/deduct-tokens.handler';
 import { StripeClient } from './infrastructure/external-api/stripe.client';
 import { PLAN_REPOSITORY } from './domain/repositories/plan.repository';
@@ -17,8 +21,11 @@ import { PrismaService } from './infrastructure/database/prisma.service';
 
 const Handlers = [
   CreateCheckoutSessionHandler,
+  CancelSubscriptionHandler,
   HandleStripeWebhookHandler,
   GetSubscriptionHandler,
+  ListPlansHandler,
+  GetPlanHandler,
   DeductTokensHandler,
 ];
 
@@ -39,7 +46,7 @@ const Handlers = [
       },
     ]),
   ],
-  controllers: [SubscriptionsController, WebhooksController, AiEventsConsumer],
+  controllers: [SubscriptionsController, PlansController, WebhooksController, AiEventsConsumer],
   providers: [
     ...Handlers,
     StripeClient,
