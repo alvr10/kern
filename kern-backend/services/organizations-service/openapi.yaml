@@ -366,6 +366,14 @@ components:
         joinedAt:
           type: string
           format: date-time
+        profile:
+          type: object
+          properties:
+            name:
+              type: string
+            avatarUrl:
+              type: string
+              nullable: true
 
     InviteUserDto:
       type: object

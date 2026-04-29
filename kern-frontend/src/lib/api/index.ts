@@ -16,3 +16,4 @@ export * from "./admin-service";
 export * from "./ai-service";
 export * from "./content-service";
 export * from "./social-service";
+export * from "./notifications-service";

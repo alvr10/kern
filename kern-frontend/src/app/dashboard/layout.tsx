@@ -260,6 +260,28 @@ export default function DashboardLayout({
                   <Building2 size={20} />
                   <span>Organizaciones</span>
                 </Link>
+                <Link
+                  href="/dashboard/notifications"
+                  className={cn(
+                    styles.navItem,
+                    pathname === "/dashboard/notifications" &&
+                      styles.activeNavItem,
+                  )}
+                >
+                  <Bell size={20} />
+                  <span>Notificaciones</span>
+                </Link>
+                <Link
+                  href="/dashboard/settings"
+                  className={cn(
+                    styles.navItem,
+                    pathname === "/dashboard/settings" &&
+                      styles.activeNavItem,
+                  )}
+                >
+                  <Settings size={20} />
+                  <span>Ajustes</span>
+                </Link>
               </div>
             )}
           </nav>
@@ -388,10 +410,14 @@ export default function DashboardLayout({
                     <div className={styles.popupDivider} />
 
                     <div className={styles.popupNav}>
-                      <div className={styles.popupItem}>
+                      <Link
+                        href={`/dashboard/org/${slug}/settings`}
+                        className={styles.popupItem}
+                        onClick={() => setIsProfileMenuOpen(false)}
+                      >
                         <Settings size={16} />
                         <span>Ajustes</span>
-                      </div>
+                      </Link>
                       <div className={styles.popupItem}>
                         <LayoutGrid size={16} />
                         <span>Canales</span>
@@ -444,14 +470,6 @@ export default function DashboardLayout({
                         <span>Funciones Beta</span>
                         <span className={styles.betaBadge}>Próximamente</span>
                       </div>
-                      <Link
-                        href={`/dashboard/org/${slug}/settings/invite-member`}
-                        className={styles.popupItem}
-                        onClick={() => setIsProfileMenuOpen(false)}
-                      >
-                        <Users size={16} />
-                        <span>Invitar miembros</span>
-                      </Link>
                     </div>
 
                     <div className={styles.popupDivider} />

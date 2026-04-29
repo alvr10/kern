@@ -25,8 +25,10 @@ class AppController {
   }
 }
 
+import { NotificationsController } from './presentation/controllers/notifications.controller';
+
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, DiscoveryClientModule, MetricsModule],
-  controllers: [AppController],
+  controllers: [AppController, NotificationsController],
 })
 export class AppModule {}

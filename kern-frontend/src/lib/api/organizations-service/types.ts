@@ -69,6 +69,10 @@ export interface MembershipResponse {
   organizationId: string;
   role: MemberRole;
   joinedAt: string;
+  profile?: {
+    name: string;
+    avatarUrl: string | null;
+  };
 }
 
 /**

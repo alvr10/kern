@@ -9,6 +9,7 @@ export class ListMembersHandler implements IQueryHandler<ListMembersQuery> {
   async execute(query: ListMembersQuery): Promise<any[]> {
     const members = await this.prisma.membership.findMany({
       where: { organizationId: query.organizationId },
+      include: { profile: true },
     });
 
     return members;
