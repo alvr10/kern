@@ -5,6 +5,7 @@ import { MembershipRepository, MEMBERSHIP_REPOSITORY } from '../../domain/reposi
 import { Organization } from '../../domain/entities/organization.entity';
 import { Membership } from '../../domain/entities/membership.entity';
 import { MemberRole } from '../../domain/value-objects/member-role.vo';
+import { OrganizationType } from '../../domain/value-objects/organization-type.vo';
 import { Inject } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -28,6 +29,8 @@ export class CreateOrganizationHandler implements ICommandHandler<CreateOrganiza
       orgId,
       command.name,
       command.slug,
+      OrganizationType.TEAM, // Manual creation via API defaults to TEAM
+      command.creatorId,
       command.logoUrl || null,
       null,
       new Date(),

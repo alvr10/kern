@@ -88,7 +88,8 @@ alter table public.organizations enable row level security;
 create policy "organizations: members can select"
   on public.organizations for select
   using (
-    public.is_org_member(
+    owner_id = auth.uid()::text
+    or public.is_org_member(
       id,
       array['ADMIN'::"MemberRole", 'EDITOR'::"MemberRole", 'VIEWER'::"MemberRole"]
     )
@@ -96,16 +97,28 @@ create policy "organizations: members can select"
 
 create policy "organizations: authenticated can insert"
   on public.organizations for insert
-  with check (auth.role() = 'authenticated');
+  with check (
+    auth.role() = 'authenticated'
+    and owner_id = auth.uid()::text
+  );
 
-create policy "organizations: admin can update"
+create policy "organizations: owner or admin can update"
   on public.organizations for update
-  using  (public.is_org_member(id, array['ADMIN'::"MemberRole"]))
-  with check (public.is_org_member(id, array['ADMIN'::"MemberRole"]));
+  using  (
+    owner_id = auth.uid()::text
+    or public.is_org_member(id, array['ADMIN'::"MemberRole"])
+  )
+  with check (
+    owner_id = auth.uid()::text
+    or public.is_org_member(id, array['ADMIN'::"MemberRole"])
+  );
 
-create policy "organizations: admin can delete"
+create policy "organizations: owner or admin can delete"
   on public.organizations for delete
-  using (public.is_org_member(id, array['ADMIN'::"MemberRole"]));
+  using (
+    owner_id = auth.uid()::text
+    or public.is_org_member(id, array['ADMIN'::"MemberRole"])
+  );
 
 -- ============================================================
 -- memberships

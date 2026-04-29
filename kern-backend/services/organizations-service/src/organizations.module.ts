@@ -16,6 +16,7 @@ import { InviteUserHandler } from './application/commands/invite-user.handler';
 import { AcceptInvitationHandler } from './application/commands/accept-invitation.handler';
 import { UpdateMemberRoleHandler } from './application/commands/update-member-role.handler';
 import { RemoveMemberHandler } from './application/commands/remove-member.handler';
+import { TransferOwnershipHandler } from './application/commands/transfer-ownership.handler';
 
 // Query Handlers
 import { ListOrganizationsHandler } from './application/queries/list-organizations.handler';
@@ -38,6 +39,7 @@ const CommandHandlers = [
   AcceptInvitationHandler,
   UpdateMemberRoleHandler,
   RemoveMemberHandler,
+  TransferOwnershipHandler,
 ];
 
 const QueryHandlers = [ListOrganizationsHandler, GetOrganizationHandler, ListMembersHandler];

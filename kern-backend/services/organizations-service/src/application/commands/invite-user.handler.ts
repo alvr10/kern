@@ -1,6 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InviteUserCommand } from './invite-user.command';
 import { InvitationRepository, INVITATION_REPOSITORY } from '../../domain/repositories/invitation.repository';
+import { OrganizationRepository, ORGANIZATION_REPOSITORY } from '../../domain/repositories/organization.repository';
 import { Invitation } from '../../domain/entities/invitation.entity';
 import { InvitationStatus } from '../../domain/value-objects/invitation-status.vo';
 import { Inject } from '@nestjs/common';
@@ -11,9 +12,20 @@ export class InviteUserHandler implements ICommandHandler<InviteUserCommand> {
   constructor(
     @Inject(INVITATION_REPOSITORY)
     private readonly invitationRepository: InvitationRepository,
+    @Inject(ORGANIZATION_REPOSITORY)
+    private readonly orgRepository: OrganizationRepository,
   ) {}
 
   async execute(command: InviteUserCommand): Promise<string> {
+    const organization = await this.orgRepository.findById(command.organizationId);
+    if (!organization) {
+      throw new Error('Organization not found');
+    }
+
+    if (!organization.canInvite()) {
+      throw new Error('Invitations are not allowed for personal organizations.');
+    }
+
     const id = uuidv4();
     const token = uuidv4(); // in reality, maybe a secure random string
     const expiresAt = new Date();

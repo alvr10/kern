@@ -7,6 +7,8 @@ import { UpdateOrganizationCommand } from '../../application/commands/update-org
 import { DeleteOrganizationCommand } from '../../application/commands/delete-organization.command';
 import { GetOrganizationQuery } from '../../application/queries/get-organization.query';
 import { ListOrganizationsQuery } from '../../application/queries/list-organizations.query';
+import { TransferOwnershipDto } from '../../application/dtos/transfer-ownership.dto';
+import { TransferOwnershipCommand } from '../../application/commands/transfer-ownership.command';
 
 @Controller('organizations')
 export class OrganizationsController {
@@ -44,5 +46,16 @@ export class OrganizationsController {
   @Delete(':id')
   async remove(@Param('id') id: string) {
     await this.commandBus.execute(new DeleteOrganizationCommand(id));
+  }
+
+  @Patch(':id/owner')
+  async transferOwnership(
+    @Param('id') id: string,
+    @Headers() headers: Record<string, string>,
+    @Body() dto: TransferOwnershipDto,
+  ) {
+    const requesterId = headers['x-user-id'];
+    await this.commandBus.execute(new TransferOwnershipCommand(id, requesterId, dto.newOwnerId));
+    return this.queryBus.execute(new GetOrganizationQuery(id));
   }
 }

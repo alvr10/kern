@@ -115,6 +115,34 @@ paths:
       responses:
         '204':
           description: Deleted
+        '403':
+          description: Forbidden - Personal organizations cannot be deleted.
+
+  /organizations/{id}/owner:
+    patch:
+      tags: [Organizations]
+      summary: Transfer organization ownership
+      description: Transfers ownership to another member. Only allowed for TEAM organizations.
+      operationId: transferOwnership
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferOwnershipDto'
+      responses:
+        '200':
+          description: Ownership transferred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponse'
+        '403':
+          description: Forbidden - Only current owner can transfer, or organization is PERSONAL.
 
   /organizations/{id}/members:
     get:
@@ -206,6 +234,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvitationResponse'
+        '403':
+          description: Forbidden - Invitations are not allowed for personal organizations.
 
   /invitations/{token}/accept:
     post:
@@ -260,6 +290,10 @@ components:
       type: string
       enum: [ADMIN, EDITOR, VIEWER]
 
+    OrganizationType:
+      type: string
+      enum: [PERSONAL, TEAM]
+
     CreateOrganizationDto:
       type: object
       required: [name, slug]
@@ -284,6 +318,14 @@ components:
         brandVoice:
           type: object
 
+    TransferOwnershipDto:
+      type: object
+      required: [newOwnerId]
+      properties:
+        newOwnerId:
+          type: string
+          description: The ID of the profile to transfer ownership to.
+
     OrganizationResponse:
       type: object
       properties:
@@ -292,6 +334,10 @@ components:
         name:
           type: string
         slug:
+          type: string
+        type:
+          $ref: '#/components/schemas/OrganizationType'
+        ownerId:
           type: string
         logoUrl:
           type: string

@@ -1,6 +1,6 @@
 // ============================================================
 // Kern — PostgreSQL Schema (Supabase)
-// Handles: Auth, Users, Orgs, Billing, Access Control
+// Handles: Users, Orgs, Billing, Access Control
 //
 // MongoDB handles: Content, Comments, Reviews, AI logs,
 //                  Notifications (see mongoose-schemas.ts)
@@ -42,6 +42,11 @@ enum InvitationStatus {
   REVOKED
 }
 
+enum OrganizationType {
+  PERSONAL
+  TEAM
+}
+
 // ============================================================
 // PROFILES
 // Mirrors auth.users — auto-created by the trigger below.
@@ -62,8 +67,9 @@ model Profile {
   updatedAt DateTime @updatedAt      @map("updated_at")
 
   // Relations (all within PostgreSQL)
-  memberships     Membership[]
-  sentInvitations Invitation[] @relation("InvitedBy")
+  memberships        Membership[]
+  ownedOrganizations Organization[] @relation("OwnedOrganizations")
+  sentInvitations    Invitation[]   @relation("InvitedBy")
 
   // Note: contentPieces, aiGenerations, notifications live in MongoDB.
   // Reference this profile by its `id` (UUID string) from those collections.
@@ -81,7 +87,6 @@ model Plan {
   slug                 String   @unique
   monthlyTokenLimit    Int      @map("monthly_token_limit")
   memberLimit          Int      @map("member_limit")
-  organizationLimit    Int      @map("organization_limit")
   priceMonthlyUsd      Decimal  @db.Decimal(10, 2) @map("price_monthly_usd")
   stripePriceIdMonthly String?  @map("stripe_price_id_monthly")
   stripePriceIdYearly  String?  @map("stripe_price_id_yearly")
@@ -107,7 +112,7 @@ model Subscription {
 
   // Token tracking — reset on each billing period via Stripe webhook
   tokensUsed         Int     @default(0) @map("tokens_used")
-  tokensLimit        Int     @map("tokens_limit") // snapshot of plan limit at subscription time
+  tokensLimit        Int     @default(0) @map("tokens_limit") // snapshot of plan limit at subscription time
   tokensAlertSent80  Boolean @default(false) @map("tokens_alert_sent_80")
   tokensAlertSent100 Boolean @default(false) @map("tokens_alert_sent_100")
 
@@ -128,16 +133,19 @@ model Subscription {
 // ============================================================
 
 model Organization {
-  id         String    @id @default(cuid())
+  id         String           @id @default(cuid())
+  type       OrganizationType @default(TEAM)
+  ownerId    String           @map("owner_id")
   name       String
-  slug       String    @unique
-  logoUrl    String?   @map("logo_url")
+  slug       String           @unique
+  logoUrl    String?          @map("logo_url")
   // { tone, style, keywords: string[], avoidWords: string[] }
-  brandVoice Json?     @map("brand_voice")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt      @map("updated_at")
-  deletedAt  DateTime? @map("deleted_at") // soft delete
+  brandVoice Json?            @map("brand_voice")
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt      @map("updated_at")
+  deletedAt  DateTime?        @map("deleted_at") // soft delete
 
+  owner        Profile       @relation("OwnedOrganizations", fields: [ownerId], references: [id])
   subscription Subscription?
   memberships  Membership[]
   invitations  Invitation[]
