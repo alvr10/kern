@@ -9,7 +9,7 @@
     "prisma:push": "prisma db push"
   },
   "dependencies": {
-    "@kern/shared": "^1.0.0",
+    "@kern/shared": "workspace:*",
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.0",

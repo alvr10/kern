@@ -76,20 +76,20 @@ The root `package.json` contains orchestrated scripts for the entire monorepo:
 
 ```bash
 # Boot the entire infrastructure + services
-npm run up:d
+pnpm run up:d
 
 # View real-time logs
-npm run logs
+pnpm run logs
 
 # Format the entire codebase (Prettier)
-npm run format
+pnpm run format
 
 # Run platform-wide linting (ESLint v10 Flat Config)
-npm run lint
+pnpm run lint
 
 # Check formatting/lint without fixing
-npm run format:check
-npm run lint:check
+pnpm run format:check
+pnpm run lint:check
 ```
 
 ---

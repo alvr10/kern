@@ -1,8 +1,9 @@
 # =============================================================================
-# STAGE 1: deps — Install ALL dependencies (dev included) for the build step.
-#           We do this in isolation so the layer is cached until package*.json changes.
+# STAGE 1: deps — Full install for all packages to build the dependency graph.
 # =============================================================================
 FROM node:22-slim AS deps
+
+ENV CI=true
 
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends openssl python3 build-essential && \
@@ -10,66 +11,69 @@ RUN apt-get update -y && \
 
 WORKDIR /app
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
 COPY .npmrc ./
-COPY package*.json ./
-COPY packages/shared/package*.json ./packages/shared/
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages/shared/package.json ./packages/shared/
+COPY services/api-gateway/package.json ./services/api-gateway/
+COPY services/organizations-service/package.json ./services/organizations-service/
+COPY services/content-service/package.json ./services/content-service/
+COPY services/social-service/package.json ./services/social-service/
+COPY services/ai-service/package.json ./services/ai-service/
+COPY services/billing-service/package.json ./services/billing-service/
+COPY services/notifications-service/package.json ./services/notifications-service/
+COPY services/admin-service/package.json ./services/admin-service/
 
-ARG SERVICE_NAME
-COPY services/${SERVICE_NAME}/package*.json ./services/${SERVICE_NAME}/
-
-# Full install (dev + prod) — needed to compile TypeScript.
-RUN npm install \
-      --fetch-retries=5 \
-      --fetch-retry-mintimeout=10000 \
-      --fetch-retry-maxtimeout=60000
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 # =============================================================================
-# STAGE 2: builder — Compile TypeScript and generate Prisma client.
+# STAGE 2: builder — Compile TypeScript
 # =============================================================================
 FROM deps AS builder
 
-# Bring in the full source tree (node_modules already present from deps stage).
+ARG SERVICE_NAME
+
 COPY tsconfig.base.json ./
 COPY packages/shared/ ./packages/shared/
 COPY services/${SERVICE_NAME}/ ./services/${SERVICE_NAME}/
-
-# Copy the root Prisma schema if it exists (shared schema pattern).
 COPY prisma/ ./prisma/
 
-# Generate Prisma client only for services that declare @prisma/client as a dependency.
-# The schema lives at the root (shared), but not every service uses Prisma.
-RUN if [ -d "./node_modules/@prisma/client" ]; then \
+# Generate Prisma client in the builder so TypeScript has access to the generated types.
+RUN if grep -q '"@prisma/client"' "./services/${SERVICE_NAME}/package.json"; then \
       npx prisma generate --schema=./prisma/schema.prisma; \
     fi
 
-# Build shared lib first, then the target service.
-RUN npm run build -w @kern/shared
-RUN npm run build -w @kern/${SERVICE_NAME}
+RUN pnpm --filter @kern/shared build
+RUN pnpm --filter @kern/${SERVICE_NAME} build
 
 # =============================================================================
-# STAGE 3: prod-deps — Strip devDependencies without touching the network.
-#           Copy node_modules from builder, then prune — pure filesystem, no registry.
+# STAGE 3: deployer — Extract service and generate production Prisma client
 # =============================================================================
-FROM node:22-slim AS prod-deps
+FROM builder AS deployer
 
-RUN apt-get update -y && \
-    apt-get install -y --no-install-recommends openssl && \
-    rm -rf /var/lib/apt/lists/*
+# Force a flat node_modules for the deployed output.
+# The isolated (symlink) linker causes @prisma/client to resolve from inside
+# .pnpm/... where it cannot find the generated .prisma/client folder.
+RUN echo "node-linker=hoisted" >> .npmrc && \
+    pnpm --filter @kern/${SERVICE_NAME} --prod deploy --legacy /app/out
 
-WORKDIR /app
-
-COPY .npmrc ./
-COPY package*.json ./
-COPY packages/shared/package*.json ./packages/shared/
-
-ARG SERVICE_NAME
-COPY services/${SERVICE_NAME}/package*.json ./services/${SERVICE_NAME}/
-
-# Bring in the full node_modules from the builder (dev + prod).
-COPY --from=builder /app/node_modules ./node_modules
-
-# Prune devDependencies in-place — no network, no registry, just fs deletes.
-RUN npm prune --omit=dev --ignore-scripts && npm cache clean --force
+# Robustly find and copy the generated Prisma client into the deploy output.
+# With pnpm's isolated linker, prisma generate may write .prisma into
+# node_modules/.pnpm/*/node_modules/.prisma instead of the root node_modules/.prisma
+RUN if grep -q '"@prisma/client"' "./services/${SERVICE_NAME}/package.json"; then \
+      PRISMA_DIR=$(find /app/node_modules -type d -name ".prisma" 2>/dev/null | head -1) && \
+      echo "Found .prisma at: $PRISMA_DIR" && \
+      if [ -n "$PRISMA_DIR" ]; then \
+        cp -R "$PRISMA_DIR" /app/out/node_modules/.prisma; \
+        echo "Copied .prisma to /app/out/node_modules/.prisma"; \
+      else \
+        echo "ERROR: .prisma not found anywhere in node_modules!"; \
+        exit 1; \
+      fi \
+    fi
 
 # =============================================================================
 # STAGE 4: runner — Minimal production image.
@@ -84,25 +88,19 @@ WORKDIR /app
 
 ARG SERVICE_NAME
 
-# Production node_modules (no devDeps, no build tools).
-COPY --from=prod-deps /app/node_modules ./node_modules
+# Copy the deployed bundle (includes prod deps, package.json, and generated prisma)
+COPY --from=deployer /app/out/node_modules ./node_modules
+COPY --from=deployer /app/out/package.json ./package.json
 
-# Compiled output only — no source, no tsconfig, no test files.
-COPY --from=builder /app/package.json ./
+# Copy the compiled dist folders from the builder stage.
 COPY --from=builder /app/packages/shared/package.json ./packages/shared/
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
-COPY --from=builder /app/services/${SERVICE_NAME}/package.json ./services/${SERVICE_NAME}/
 COPY --from=builder /app/services/${SERVICE_NAME}/dist ./services/${SERVICE_NAME}/dist
 
-# Copy this service's own openapi spec (present for every service that exposes one).
-# The trailing wildcard makes the COPY a no-op when the file is absent.
+# Copy OpenAPI specs
 COPY --from=builder /app/services/${SERVICE_NAME}/openapi.yaml* ./services/${SERVICE_NAME}/
 
-# For the api-gateway only: it serves peer specs as static files at runtime.
-# We copy them straight from the build context since each builder stage only
-# contains a single service's source tree.
-# Bracket-glob trick: `[l]` matches 'l' making it optional — no-op if file absent.
-# mkdir ensures the destination dirs exist so the optional COPY doesn't error.
+# Gateway static specs support
 RUN mkdir -p \
       services/organizations-service \
       services/content-service \
@@ -123,10 +121,6 @@ COPY services/admin-service/openapi.yam[l] ./services/admin-service/
 ENV NODE_ENV=production
 ENV SERVICE_NAME=${SERVICE_NAME}
 
-ARG PORT=3000
-EXPOSE ${PORT}
-
-# Run as non-root for security hardening.
 USER node
 
 CMD ["sh", "-c", "node services/${SERVICE_NAME}/dist/main.js"]

@@ -7,7 +7,7 @@
     "start:dev": "ts-node-dev --respawn --transpile-only src/main.ts"
   },
   "dependencies": {
-    "@kern/shared": "^1.0.0",
+    "@kern/shared": "workspace:*",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^4.0.0",
