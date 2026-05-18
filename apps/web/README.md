@@ -26,16 +26,19 @@ KERN es un centro operativo que permite a las empresas organizar su flujo de tra
 ## 🏁 Inicio Rápido
 
 1. Instalación de dependencias:
+
 ```bash
-npm install
+pnpm install
 ```
 
 2. Ejecución en entorno de desarrollo:
+
 ```bash
-npm run dev
+pnpm dev
 ```
 
 3. Construcción para producción:
+
 ```bash
-npm run build
+pnpm build
 ```

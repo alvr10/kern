@@ -1,5 +1,5 @@
 {
-  "name": "@kern/shared",
+  "name": "@kern/core-backend",
   "version": "1.0.0",
   "description": "Shared types and utilities for KERN microservices",
   "main": "dist/index.js",
