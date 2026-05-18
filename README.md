@@ -1,86 +1,87 @@
-# KERN — Unified Enterprise Monorepo
+# KERN — Monorepo Empresarial Unificado
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![Architecture](https://img.shields.io/badge/architecture-Hexagonal%20%2F%20DDD%20%2F%20Monorepo-orange.svg)
 ![Stack](https://img.shields.io/badge/stack-Next.js%20%7C%20NestJS%20%7C%20Supabase%20%7C%20Prisma%20%7C%20MongoDB-green.svg)
+![License](https://img.shields.io/badge/license-Proprietary-red.svg)
 
-**KERN** is a production-grade, highly scalable microservices and web ecosystem designed for high-performance content management, AI-driven automation, and social media orchestration. This repository unites both the frontend web applications and backend domain microservices under a single unified monorepo.
-
----
-
-## 🏛️ Monorepo Structure & Principles
-
-This project operates under strict software engineering patterns:
-
-- **Orchestration**: Managed by [Turborepo](https://turbo.build/) and [PNPM Workspaces](https://pnpm.io/workspaces).
-- **Frontend**: [Next.js](https://nextjs.org/) dashboard and landing portals (`apps/web`).
-- **Backend Architecture**: NestJS microservices following **Hexagonal Architecture** (Clean Architecture) with **Domain-Driven Design (DDD)** and command-query separation (CQRS).
-- **Database Architecture**:
-  - **Supabase / PostgreSQL**: Managed via **Prisma** client isolation (`packages/database`).
-  - **MongoDB**: Schema definition via **Mongoose** client isolation.
-- **Service Discovery**: HashiCorp Consul.
-- **Observability**: OpenTelemetry + Prometheus/Grafana LGTM Stack.
+**KERN** es un ecosistema web y de microservicios altamente escalable y de nivel de producción, diseñado para la gestión de contenido de alto rendimiento, la automatización impulsada por IA y la orquestación de redes sociales. Este repositorio une tanto las aplicaciones web del frontend como los microservicios de dominio del backend bajo un único monorepo unificado.
 
 ---
 
-## 📁 Repository Layout
+## 🏛️ Estructura y Principios del Monorepo
+
+Este proyecto opera bajo estrictos patrones de ingeniería de software:
+
+- **Orquestación**: Gestionado por [Turborepo](https://turbo.build/) y [PNPM Workspaces](https://pnpm.io/workspaces).
+- **Frontend**: Portal de inicio y panel de control (dashboard) en [Next.js](https://nextjs.org/) (`apps/web`).
+- **Arquitectura del Backend**: Microservicios de NestJS que siguen la **Arquitectura Hexagonal** (Clean Architecture) con **Diseño Guiado por el Dominio (DDD)** y segregación de comandos y consultas (CQRS).
+- **Arquitectura de Base de Datos**:
+  - **Supabase / PostgreSQL**: Gestionado mediante aislamiento de cliente **Prisma** (`packages/database`).
+  - **MongoDB**: Definición de esquemas mediante aislamiento de cliente **Mongoose**.
+- **Descubrimiento de Servicios (Service Discovery)**: HashiCorp Consul.
+- **Observabilidad**: Pila (Stack) LGTM de OpenTelemetry + Prometheus/Grafana.
+
+---
+
+## 📁 Diseño del Repositorio (Layout)
 
 ```text
 kern/
 ├── apps/
-│   ├── web/                    # Next.js 16 Web Portal (Dashboard, Onboarding)
-│   └── api-gateway/            # NestJS API Gateway (Public Entry, Rate Limiting)
+│   ├── web/                    # Portal Web en Next.js 16 (Panel de control, incorporación / onboarding)
+│   └── api-gateway/            # API Gateway en NestJS (Entrada pública, limitación de tasa / rate limiting)
 ├── services/
-│   ├── organizations-service/  # Teams, Roles & Workspace Management (Postgres)
-│   ├── content-service/        # Content Pieces, Kanban & Calendars (MongoDB)
-│   ├── social-service/         # Social accounts & publishing engine (MongoDB)
-│   ├── ai-service/             # Gemini AI Engine & Token Quotas (MongoDB)
-│   ├── billing-service/        # Stripe payment fulfillment (Postgres)
-│   ├── notifications-service/  # Multi-channel alerts (MongoDB)
-│   └── admin-service/          # Platform Analytics & Oversight (Dual DB)
+│   ├── organizations-service/  # Gestión de equipos, roles y espacios de trabajo (Postgres)
+│   ├── content-service/        # Elementos de contenido, tableros Kanban y calendarios (MongoDB)
+│   ├── social-service/         # Cuentas sociales y motor de publicación (MongoDB)
+│   ├── ai-service/             # Motor de IA Gemini y cuotas de tokens (MongoDB)
+│   ├── billing-service/        # Cumplimiento de pagos con Stripe (Postgres)
+│   ├── notifications-service/  # Motor de notificaciones en la aplicación, correo electrónico y push (MongoDB)
+│   └── admin-service/          # Métricas del panel administrativo y supervisión (Base de datos dual)
 ├── packages/
-│   ├── core-backend/           # Shared NestJS guards, filters, interceptors, and utils
-│   ├── database/               # Centralized Prisma Schema and PostgreSQL clients
-│   ├── config-typescript/      # Shared strict TSConfig definitions
-│   ├── config-eslint/          # Shared Flat ESLint Rules
-│   └── config-prettier/        # Shared global formatting definitions
-└── infra/                      # Consul, RabbitMQ, Alloy config files
+│   ├── core-backend/           # Protectores (guards), filtros, interceptores y utilidades compartidas de NestJS
+│   ├── database/               # Esquema centralizado de Prisma y clientes de PostgreSQL
+│   ├── config-typescript/      # Definiciones estrictas y compartidas de TSConfig
+│   ├── config-eslint/          # Reglas compartidas de Flat ESLint
+│   └── config-prettier/        # Definiciones de formateo global compartidas
+└── infra/                      # Archivos de configuración de Consul, RabbitMQ y Alloy
 ```
 
 ---
 
-## 🗺️ Service Ports Map
+## 🗺️ Mapa de Puertos de Servicios
 
-| Target                  | Location                         | Port            | Database            | Primary Responsibility                           |
-| :---------------------- | :------------------------------- | :-------------- | :------------------ | :----------------------------------------------- |
-| `web`                   | `apps/web`                       | **3001** (Prod) | Supabase API        | Frontend Dashboard User Interface                |
-| `api-gateway`           | `apps/api-gateway`               | **3000**        | —                   | Single public gateway, HTTP proxy, Rate Limiting |
-| `organizations-service` | `services/organizations-service` | 3002            | PostgreSQL (Prisma) | Teams, Members, Roles, Workspaces                |
-| `content-service`       | `services/content-service`       | 3004            | MongoDB (Mongoose)  | Content curation, Kanban boards, schedules       |
-| `social-service`        | `services/social-service`        | 3005            | MongoDB (Mongoose)  | API integration to social networks               |
-| `ai-service`            | `services/ai-service`            | 3006            | MongoDB (Mongoose)  | Gemini 1.5 prompt validation, usage auditing     |
-| `billing-service`       | `services/billing-service`       | 3007            | PostgreSQL (Prisma) | Stripe Plans, Subscriptions & Invoicing          |
-| `notifications-service` | `services/notifications-service` | 3008            | MongoDB (Mongoose)  | In-app, Email & Push notification engine         |
-| `admin-service`         | `services/admin-service`         | 3009            | PostgreSQL + Mongo  | Administrative panel metrics, system override    |
+| Objetivo                | Ubicación                        | Puerto          | Base de Datos       | Responsabilidad Primaria                                            |
+| :---------------------- | :------------------------------- | :-------------- | :------------------ | :------------------------------------------------------------------ |
+| `web`                   | `apps/web`                       | **3001** (Prod) | API de Supabase     | Interfaz de usuario del panel de control web                        |
+| `api-gateway`           | `apps/api-gateway`               | **3000**        | —                   | Puerta de enlace pública única, proxy HTTP, limitación de tasa      |
+| `organizations-service` | `services/organizations-service` | 3002            | PostgreSQL (Prisma) | Equipos, miembros, roles, espacios de trabajo                       |
+| `content-service`       | `services/content-service`       | 3004            | MongoDB (Mongoose)  | Curación de contenido, tableros Kanban, agendas                     |
+| `social-service`        | `services/social-service`        | 3005            | MongoDB (Mongoose)  | Integración de API con redes sociales                               |
+| `ai-service`            | `services/ai-service`            | 3006            | MongoDB (Mongoose)  | Validación de prompts de Gemini 1.5, auditoría de uso               |
+| `billing-service`       | `services/billing-service`       | 3007            | PostgreSQL (Prisma) | Planes de Stripe, suscripciones y facturación                       |
+| `notifications-service` | `services/notifications-service` | 3008            | MongoDB (Mongoose)  | Motor de notificaciones en la aplicación, correo electrónico y push |
+| `admin-service`         | `services/admin-service`         | 3009            | PostgreSQL + Mongo  | Métricas del panel administrativo, anulación del sistema            |
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Primeros Pasos
 
-### 1. Prerequisites
+### 1. Requisitos Previos
 
-- Docker & Docker Compose
-- Node.js 22+ & PNPM (v9+)
+- Docker y Docker Compose
+- Node.js 22+ y PNPM (v9 o superior)
 
-### 2. Environment Setup
+### 2. Configuración del Entorno
 
-Create a `.env` file at the root and fill in your Supabase, MongoDB, Stripe, and Gemini keys:
+Cree un archivo `.env` en la raíz y complete sus claves de Supabase, MongoDB, Stripe y Gemini:
 
 ```bash
 cp .env.example .env
 ```
 
-Create a `.env.local` inside the web app for browser-facing configurations:
+Cree un archivo `.env.local` dentro de la aplicación web para las configuraciones orientadas al navegador:
 
 ```bash
 cp apps/web/.env.example apps/web/.env.local
@@ -88,53 +89,53 @@ cp apps/web/.env.example apps/web/.env.local
 
 ---
 
-## 🐳 Docker Deployment & Profiles
+## 🐳 Despliegue y Perfiles de Docker
 
-To balance rapid development and comprehensive deployment, we use **Docker Compose Profiles** to easily control the Next.js frontend build.
+Para equilibrar el desarrollo rápido y el despliegue completo, utilizamos **Perfiles de Docker Compose** para controlar fácilmente la compilación del frontend en Next.js.
 
-### Option A: Standard Dev Mode (Recommended) ⚡
+### Opción A: Modo de Desarrollo Estándar (Recomendado) ⚡
 
-Run all backend microservices, gateways, service meshes, and databases inside Docker, while running the Next.js frontend locally (which features fast, sub-second hot-reloads):
+Ejecute todos los microservicios del backend, pasarelas de enlace (gateways), mallas de servicio (service meshes) y bases de datos dentro de Docker, mientras ejecuta el frontend de Next.js localmente (lo que ofrece recargas rápidas en menos de un segundo):
 
 ```bash
-# Start all backend microservices & databases
-docker-compose up -d
+# Iniciar todos los microservicios y bases de datos del backend
+docker compose up -d
 
-# Start the Next.js web application locally
+# Iniciar la aplicación web de Next.js localmente
 pnpm --filter @kern/web dev
 ```
 
-### Option B: Full-Stack Container Build (All-In-One) 📦
+### Opción B: Compilación de Contenedores Full-Stack (Todo en Uno) 📦
 
-Build and spin up the entire platform—including the Next.js container—inside Docker:
+Compile y ponga en marcha toda la plataforma, incluido el contenedor de Next.js, dentro de Docker:
 
 ```bash
-# Force Docker to build and run EVERYTHING including the Next.js container
-docker-compose --profile frontend up --build -d
+# Forzar a Docker a compilar y ejecutar TODO, incluido el contenedor de Next.js
+docker compose --profile frontend up --build -d
 ```
 
 ---
 
-## 🛠️ Monorepo Operations
+## 🛠️ Operaciones del Monorepo
 
-Standard developer operations can be orchestrated directly from the monorepo root:
+Las operaciones estándar del desarrollador se pueden orquestar directamente desde la raíz del monorepo:
 
 ```bash
-# Run the entire platform locally in development mode
-pnpm run dev
+# Ejecutar toda la plataforma localmente en modo de desarrollo
+pnpm dev
 
-# Compile all applications and services inside the monorepo
-pnpm run build
+# Compilar todas las aplicaciones y servicios dentro del monorepo
+pnpm build
 
-# Run linting rules workspace-wide (Flat Config)
-pnpm run lint
+# Ejecutar reglas de linting en todo el espacio de trabajo (Flat Config)
+pnpm lint
 
-# Auto-format all files using Prettier
-pnpm run format
+# Formatear automáticamente todos los archivos usando Prettier
+pnpm format
 ```
 
 ---
 
-## 🛡️ License
+## 🛡️ Licencia
 
-Proprietary — All rights reserved.
+Este proyecto está bajo la [Licencia de Software Propietario](LICENSE).
