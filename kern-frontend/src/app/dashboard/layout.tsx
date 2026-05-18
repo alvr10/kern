@@ -422,10 +422,14 @@ export default function DashboardLayout({
                         <LayoutGrid size={16} />
                         <span>Canales</span>
                       </div>
-                      <div className={styles.popupItem}>
+                      <Link
+                        href={`/dashboard/org/${slug}/billing`}
+                        className={styles.popupItem}
+                        onClick={() => setIsProfileMenuOpen(false)}
+                      >
                         <CreditCard size={16} />
                         <span>Planes y Facturación</span>
-                      </div>
+                      </Link>
                       <div
                         className={styles.popupItem}
                         onMouseEnter={(e) =>

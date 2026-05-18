@@ -9,5 +9,6 @@ export class Plan {
     public readonly features: string[],
     public readonly isActive: boolean,
     public readonly stripePriceIdMonthly: string | null,
+    public readonly stripePriceIdYearly: string | null,
   ) {}
 }

@@ -1,7 +1,5 @@
 import { apiClient } from "../client";
 import type {
-  CheckoutSessionResponse,
-  CreateCheckoutDto,
   PlanResponse,
   SubscriptionResponse,
 } from "./types";
@@ -32,27 +30,11 @@ export const billingClient = {
       `/billing/subscriptions/${organizationId}`,
     );
   },
-
+  
   /**
-   * Create a Stripe Checkout session to start a subscription
+   * Create a checkout session for a plan
    */
-  createCheckoutSession: (
-    data: CreateCheckoutDto,
-  ): Promise<CheckoutSessionResponse> => {
-    return apiClient.post<CheckoutSessionResponse>(
-      "/billing/subscriptions",
-      data,
-    );
-  },
-
-  /**
-   * Cancel the subscription at period end
-   */
-  cancelSubscription: (
-    organizationId: string,
-  ): Promise<SubscriptionResponse> => {
-    return apiClient.post<SubscriptionResponse>(
-      `/billing/subscriptions/${organizationId}/cancel`,
-    );
+  createCheckoutSession: (dto: import("./types").CreateCheckoutDto): Promise<import("./types").CheckoutSessionResponse> => {
+    return apiClient.post<import("./types").CheckoutSessionResponse>("/billing/subscriptions", dto);
   },
 };

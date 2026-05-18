@@ -1,6 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { billingClient } from "./client";
-import type { CreateCheckoutDto } from "./types";
 
 /**
  * Query Keys
@@ -50,28 +49,7 @@ export const useSubscription = (organizationId: string) => {
  */
 export const useCreateCheckoutSession = () => {
   return useMutation({
-    mutationFn: (data: CreateCheckoutDto) =>
-      billingClient.createCheckoutSession(data),
-    onSuccess: (data) => {
-      // Redirect to Stripe Checkout
-      window.location.href = data.checkoutUrl;
-    },
-  });
-};
-
-/**
- * useCancelSubscription
- */
-export const useCancelSubscription = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (organizationId: string) =>
-      billingClient.cancelSubscription(organizationId),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: billingKeys.subscription(data.organizationId),
-      });
-    },
+    mutationFn: (dto: import("./types").CreateCheckoutDto) =>
+      billingClient.createCheckoutSession(dto),
   });
 };

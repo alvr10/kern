@@ -13,6 +13,7 @@ export class PlanMapper {
       prisma.features as string[],
       prisma.isActive,
       prisma.stripePriceIdMonthly,
+      prisma.stripePriceIdYearly,
     );
   }
 }

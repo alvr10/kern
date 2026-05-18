@@ -12,9 +12,10 @@ export interface PlanResponse {
   slug: string;
   monthlyTokenLimit: number;
   memberLimit: number;
-  organizationLimit: number;
-  priceMonthlyUsd: number;
-  features: string[];
+  priceMonthlyUsd: string;
+  stripePriceIdMonthly: string | null;
+  stripePriceIdYearly: string | null;
+  features: string | string[];
   isActive: boolean;
 }
 
@@ -51,6 +52,7 @@ export interface SubscriptionResponse {
 export interface CreateCheckoutDto {
   organizationId: string;
   planId: string;
+  interval: "monthly" | "yearly";
   successUrl: string;
   cancelUrl: string;
 }

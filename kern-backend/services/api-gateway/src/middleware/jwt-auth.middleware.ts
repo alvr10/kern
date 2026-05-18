@@ -5,8 +5,8 @@ import { Request, Response, NextFunction } from 'express';
 const PUBLIC_ROUTES: Array<{ method: string; prefix: string }> = [
   { method: 'GET', prefix: '/health' },
   { method: 'GET', prefix: '/api/docs' },
-  { method: 'GET', prefix: '/billing/plans' }, // Public plan list
-  { method: 'POST', prefix: '/billing/webhooks' }, // Stripe webhooks use their own sig
+  { method: 'GET', prefix: '/api/v1/billing/plans' }, // Public plan list
+  { method: 'POST', prefix: '/api/v1/billing/webhooks' }, // Stripe webhooks use their own sig
 ];
 
 function isPublicRoute(method: string, path: string): boolean {
@@ -26,7 +26,10 @@ function getSupabaseClient(): SupabaseClient {
 }
 
 export async function jwtAuthMiddleware(req: Request, res: Response, next: NextFunction): Promise<void> {
-  if (isPublicRoute(req.method, req.path)) {
+  const isPublic = isPublicRoute(req.method, req.path);
+  console.log(`[jwtAuth] ${req.method} ${req.path} - Public: ${isPublic}`);
+  
+  if (isPublic) {
     next();
     return;
   }

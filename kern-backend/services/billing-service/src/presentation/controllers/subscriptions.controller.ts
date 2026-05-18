@@ -17,12 +17,13 @@ export class SubscriptionsController {
     dto: {
       organizationId: string;
       planId: string;
+      interval: 'monthly' | 'yearly';
       successUrl: string;
       cancelUrl: string;
     },
   ) {
     return this.commandBus.execute(
-      new CreateCheckoutSessionCommand(dto.organizationId, dto.planId, dto.successUrl, dto.cancelUrl),
+      new CreateCheckoutSessionCommand(dto.organizationId, dto.planId, dto.interval, dto.successUrl, dto.cancelUrl),
     );
   }
 

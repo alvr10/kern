@@ -9,7 +9,7 @@ export class Subscription {
   constructor(
     public readonly id: string,
     public readonly organizationId: string,
-    public readonly planId: string,
+    public planId: string,
     public status: SubscriptionStatus,
     public tokensUsed: number,
     public tokensLimit: number,
@@ -20,6 +20,11 @@ export class Subscription {
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
   ) {}
+
+  public changePlan(planId: string, tokensLimit: number): void {
+    this.planId = planId;
+    this.tokensLimit = tokensLimit;
+  }
 
   public activate(stripeSubscriptionId: string, stripeCustomerId: string, periodEnd: Date): void {
     this.status = SubscriptionStatus.ACTIVE;
