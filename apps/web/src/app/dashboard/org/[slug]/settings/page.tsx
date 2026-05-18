@@ -27,7 +27,7 @@ export default function SettingsPage() {
   // 1. Get current organization
   const { data: organizations, isLoading: isOrgLoading } = useOrganizations();
   const organization = organizations?.find(org => org.slug === slug);
-  const organizationId = organization?.id || (organization as any)?._id;
+  const organizationId = organization?.id || (organization as { _id?: string })?._id;
 
   // 2. State for General Settings
   const [name, setName] = useState('');
@@ -49,6 +49,7 @@ export default function SettingsPage() {
   // Sync state when org loads
   useEffect(() => {
     if (organization) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setName(organization.name);
     }
   }, [organization]);

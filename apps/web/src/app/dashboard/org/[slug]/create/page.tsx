@@ -107,7 +107,7 @@ export default function CreateContentPage(): React.JSX.Element {
 
     if (targetStatus && activeItem && activeItem.status !== targetStatus) {
       updateStatus.mutate({
-        id: activeItem.id || (activeItem as any)._id,
+        id: activeItem.id || (activeItem as { _id?: string })._id || '',
         status: targetStatus,
       });
       return;
@@ -117,14 +117,14 @@ export default function CreateContentPage(): React.JSX.Element {
     if (activeId !== overId && activeItem && overItem && activeItem.status === overItem.status) {
       const status = activeItem.status;
       const columnItems = kanbanData?.[status] || [];
-      const oldIndex = columnItems.findIndex(i => (i.id || (i as any)._id) === activeId);
-      const newIndex = columnItems.findIndex(i => (i.id || (i as any)._id) === overId);
+      const oldIndex = columnItems.findIndex(i => (i.id || (i as { _id?: string })._id) === activeId);
+      const newIndex = columnItems.findIndex(i => (i.id || (i as { _id?: string })._id) === overId);
 
       if (oldIndex !== -1 && newIndex !== -1) {
         // We update the position to the new index
         // Note: For a real production app, you'd want a bulk update or a smarter position algorithm (like fractional indexing)
         updateContent.mutate({
-          id: activeItem.id || (activeItem as any)._id,
+          id: activeItem.id || (activeItem as { _id?: string })._id || '',
           data: { kanbanPosition: newIndex },
         });
       }

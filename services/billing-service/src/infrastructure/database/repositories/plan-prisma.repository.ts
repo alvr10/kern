@@ -24,4 +24,13 @@ export class PlanPrismaRepository implements PlanRepository {
     const plan = await this.prisma.plan.findUnique({ where: { slug } });
     return plan ? PlanMapper.toDomain(plan) : null;
   }
+
+  async findByStripePriceId(priceId: string): Promise<Plan | null> {
+    const plan = await this.prisma.plan.findFirst({
+      where: {
+        OR: [{ stripePriceIdMonthly: priceId }, { stripePriceIdYearly: priceId }],
+      },
+    });
+    return plan ? PlanMapper.toDomain(plan) : null;
+  }
 }

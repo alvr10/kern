@@ -30,6 +30,7 @@ export class StripeClient implements OnModuleInit {
       payment_method_types: ['card'],
       mode: 'subscription',
       customer: params.customerId,
+      client_reference_id: params.organizationId,
       line_items: [{ price: params.priceId, quantity: 1 }],
       success_url: params.successUrl,
       cancel_url: params.cancelUrl,

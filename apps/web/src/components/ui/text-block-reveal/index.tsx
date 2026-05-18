@@ -142,7 +142,7 @@ export default function TextBlockReveal({
       children as React.ReactElement<{
         ref: React.RefObject<HTMLDivElement | null>;
       }>,
-      // eslint-disable-next-line react-hooks/refs
+
       {
         ref: containerRef,
       },

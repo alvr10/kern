@@ -44,7 +44,7 @@ export const useDisconnectSocialAccount = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, organizationId }: { id: string; organizationId: string }) => socialClient.disconnectAccount(id),
+    mutationFn: ({ id }: { id: string; organizationId: string }) => socialClient.disconnectAccount(id),
     onSuccess: (_, { organizationId }) => {
       queryClient.invalidateQueries({
         queryKey: socialKeys.accounts(organizationId),

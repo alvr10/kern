@@ -17,8 +17,13 @@ export class CreateCheckoutSessionHandler implements ICommandHandler<CreateCheck
 
   async execute(command: CreateCheckoutSessionCommand): Promise<{ checkoutUrl: string }> {
     const plan = await this.planRepository.findById(command.planId);
-    if (!plan || !plan.stripePriceIdMonthly) {
-      throw new NotFoundException('Plan not found or not available for subscription');
+    if (!plan) {
+      throw new NotFoundException('Plan not found');
+    }
+
+    const priceId = command.interval === 'monthly' ? plan.stripePriceIdMonthly : plan.stripePriceIdYearly;
+    if (!priceId) {
+      throw new NotFoundException(`Plan ${plan.name} has no ${command.interval} price configured`);
     }
 
     const subscription = await this.subscriptionRepository.findByOrganizationId(command.organizationId);
@@ -26,7 +31,7 @@ export class CreateCheckoutSessionHandler implements ICommandHandler<CreateCheck
     const session = await this.stripeClient.createCheckoutSession({
       customerId: subscription?.stripeCustomerId || undefined,
       organizationId: command.organizationId,
-      priceId: plan.stripePriceIdMonthly,
+      priceId: priceId,
       successUrl: command.successUrl,
       cancelUrl: command.cancelUrl,
     });

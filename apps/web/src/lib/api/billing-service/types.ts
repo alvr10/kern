@@ -14,6 +14,7 @@ export interface PlanResponse {
   memberLimit: number;
   organizationLimit: number;
   priceMonthlyUsd: number;
+  priceYearlyUsd: number;
   features: string[];
   isActive: boolean;
 }
@@ -51,6 +52,7 @@ export interface SubscriptionResponse {
 export interface CreateCheckoutDto {
   organizationId: string;
   planId: string;
+  interval: 'monthly' | 'yearly';
   successUrl: string;
   cancelUrl: string;
 }

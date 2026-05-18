@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { useOrganizations } from '@/lib/api/organizations-service/hooks';
 import { OrganizationType, OrganizationResponse } from '@/lib/api/organizations-service/types';
 import { useSubscription } from '@/lib/api/billing-service/hooks';
-import { SubscriptionStatus } from '@/lib/api/billing-service/types';
 import { Plus, Building2, ArrowRight, Settings } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
@@ -19,7 +18,6 @@ import styles from './page.module.css';
  */
 const OrganizationCard = ({
   org,
-  index,
   innerRef,
 }: {
   org: OrganizationResponse;

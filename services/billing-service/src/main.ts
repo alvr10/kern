@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['log', 'warn', 'error'],
+    rawBody: true,
   });
   app.enableCors();
   app.setGlobalPrefix('/api/v1', { exclude: ['/health'] });

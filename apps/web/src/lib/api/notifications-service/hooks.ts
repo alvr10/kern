@@ -4,7 +4,7 @@ import { notificationsClient } from './client';
 export const notificationKeys = {
   all: ['notifications'] as const,
   lists: () => [...notificationKeys.all, 'list'] as const,
-  list: (params: any) => [...notificationKeys.lists(), params] as const,
+  list: (params: { read?: boolean; page?: number; limit?: number }) => [...notificationKeys.lists(), params] as const,
   unreadCount: () => [...notificationKeys.all, 'unread-count'] as const,
 };
 

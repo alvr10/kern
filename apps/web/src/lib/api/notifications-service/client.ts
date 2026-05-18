@@ -17,7 +17,7 @@ export interface NotificationResponse {
   title: string;
   body: string;
   read: boolean;
-  metadata: Record<string, any> | null;
+  metadata: Record<string, unknown> | null;
   createdAt: string;
 }
 

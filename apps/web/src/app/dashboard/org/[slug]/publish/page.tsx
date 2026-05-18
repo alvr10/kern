@@ -46,11 +46,7 @@ export default function PublishPage() {
   const currentOrg = organizations?.find(org => org.slug === slug);
 
   // 2. Get calendar data
-  const { data: calendarData } = useContentCalendar(
-    currentOrg?.id || '',
-    '2026-04-26T00:00:00Z',
-    '2026-05-02T23:59:59Z',
-  );
+  useContentCalendar(currentOrg?.id || '', '2026-04-26T00:00:00Z', '2026-05-02T23:59:59Z');
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [direction, setDirection] = useState(0); // -1 for past, 1 for future

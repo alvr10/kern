@@ -36,18 +36,28 @@ export class HandleStripeWebhookHandler implements ICommandHandler<HandleStripeW
         await this.handleSubscriptionDeleted(event.data.object);
         break;
       case 'customer.subscription.updated':
+      case 'customer.subscription.created':
         await this.handleSubscriptionUpdated(event.data.object);
+        break;
+      case 'invoice.paid':
+        await this.handleInvoicePaid(event.data.object);
+        break;
+      case 'invoice.payment_failed':
+        await this.handlePaymentFailed(event.data.object);
         break;
     }
   }
 
   private async handleCheckoutCompleted(session: any) {
-    const organizationId = session.metadata.organizationId;
+    const organizationId = session.client_reference_id;
     const stripeSubscriptionId = session.subscription as string;
     const stripeCustomerId = session.customer as string;
 
-    // In a real app, we'd fetch the subscription from Stripe to get the period end and plan
-    // For simplicity, we'll assume we have the organizationId and can update it.
+    if (!organizationId) {
+      console.error('Missing client_reference_id in Stripe session', session.id);
+      return;
+    }
+
     const subscription = await this.subscriptionRepository.findByOrganizationId(organizationId);
 
     if (subscription) {
@@ -69,6 +79,46 @@ export class HandleStripeWebhookHandler implements ICommandHandler<HandleStripeW
     if (subscription) {
       subscription.stripeCurrentPeriodEnd = new Date(stripeSub.current_period_end * 1000);
       subscription.stripeCancelAtPeriodEnd = stripeSub.cancel_at_period_end;
+
+      // Handle status mapping
+      const statusMap: Record<string, SubscriptionStatus> = {
+        active: SubscriptionStatus.ACTIVE,
+        trialing: SubscriptionStatus.TRIALING,
+        past_due: SubscriptionStatus.PAST_DUE,
+        canceled: SubscriptionStatus.CANCELED,
+        unpaid: SubscriptionStatus.CANCELED,
+      };
+      subscription.status = statusMap[stripeSub.status] || subscription.status;
+
+      // Update plan if the price ID changed
+      const priceId = stripeSub.items.data[0].price.id;
+      const plan = await this.planRepository.findByStripePriceId(priceId);
+
+      if (plan && plan.id !== subscription.planId) {
+        subscription.changePlan(plan.id, plan.monthlyTokenLimit);
+      }
+
+      await this.subscriptionRepository.save(subscription);
+    }
+  }
+
+  private async handleInvoicePaid(invoice: any) {
+    if (!invoice.subscription) return;
+
+    const subscription = await this.subscriptionRepository.findByStripeSubscriptionId(invoice.subscription);
+    if (subscription) {
+      subscription.tokensUsed = 0;
+      subscription.status = SubscriptionStatus.ACTIVE;
+      await this.subscriptionRepository.save(subscription);
+    }
+  }
+
+  private async handlePaymentFailed(invoice: any) {
+    if (!invoice.subscription) return;
+
+    const subscription = await this.subscriptionRepository.findByStripeSubscriptionId(invoice.subscription);
+    if (subscription) {
+      subscription.status = SubscriptionStatus.PAST_DUE;
       await this.subscriptionRepository.save(subscription);
     }
   }

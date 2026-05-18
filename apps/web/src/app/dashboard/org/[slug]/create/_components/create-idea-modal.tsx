@@ -48,6 +48,7 @@ export function CreateIdeaModal({
   // Sync state with item when it changes
   React.useEffect(() => {
     if (item) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTitle(item.title);
       setBody(item.body);
       setPlatform(item.platform as SocialPlatform);
@@ -124,7 +125,7 @@ export function CreateIdeaModal({
     if (isEditing && item) {
       updateContent.mutate(
         {
-          id: item.id || (item as any)._id,
+          id: item.id || (item as { _id?: string })._id || '',
           data: {
             title,
             body,

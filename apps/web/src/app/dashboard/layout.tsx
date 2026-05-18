@@ -28,7 +28,6 @@ import {
   ChevronRight,
   Sparkles,
   Keyboard,
-  Users,
 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useOrganizations } from '@/lib/api/organizations-service/hooks';
@@ -320,10 +319,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       <div className={styles.userEmail}>{user?.email || 'usuario@ejemplo.com'}</div>
                       <div className={styles.orgName}>{currentOrg?.name || 'Mi Organización'}</div>
                       <div className={styles.planDetails}>{getPlanLabel()} · 0 canales</div>
-                      <button className={styles.upgradeButton}>
+                      <Link
+                        href={`/dashboard/org/${slug}/billing`}
+                        className={styles.upgradeButton}
+                        onClick={() => setIsProfileMenuOpen(false)}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
                         <Sparkles size={14} style={{ marginRight: 8 }} />
                         Mejorar Plan
-                      </button>
+                      </Link>
                     </div>
 
                     <div className={styles.popupDivider} />
@@ -354,10 +358,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <LayoutGrid size={16} />
                         <span>Canales</span>
                       </div>
-                      <div className={styles.popupItem}>
+                      <Link
+                        href={`/dashboard/org/${slug}/billing`}
+                        className={styles.popupItem}
+                        onClick={() => setIsProfileMenuOpen(false)}
+                      >
                         <CreditCard size={16} />
                         <span>Planes y Facturación</span>
-                      </div>
+                      </Link>
                       <div
                         className={styles.popupItem}
                         onMouseEnter={e => handleSubMenuEnter('help', e.currentTarget.getBoundingClientRect())}
