@@ -3,7 +3,7 @@
  * TypeScript types for authentication
  */
 
-import type { User as AuthUser, Session } from "@supabase/supabase-js";
+import type { User as AuthUser, Session } from '@supabase/supabase-js';
 
 /**
  * Re-export Supabase types

@@ -1,4 +1,4 @@
-import { SocialPlatform } from "../types";
+import { SocialPlatform } from '../types';
 
 /**
  * Health check response
@@ -13,10 +13,10 @@ export interface HealthResponse {
  * AI action types
  */
 export enum AIActionType {
-  GENERATE = "GENERATE",
-  REWRITE = "REWRITE",
-  ADAPT = "ADAPT",
-  IMPROVE = "IMPROVE",
+  GENERATE = 'GENERATE',
+  REWRITE = 'REWRITE',
+  ADAPT = 'ADAPT',
+  IMPROVE = 'IMPROVE',
 }
 
 /**

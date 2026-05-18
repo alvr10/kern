@@ -13,7 +13,7 @@ export class OrganizationEventConsumer {
   @EventPattern('organization.invitation.created')
   async handleInvitationCreated(@Payload() data: any): Promise<void> {
     this.logger.log(`Received organization invitation event: ${JSON.stringify(data)}`);
-    
+
     // The event from organization-service contains email, organizationName, etc.
     const { email, userId, organizationName, inviterName, inviterId } = data;
     const targetUserId = userId || email;

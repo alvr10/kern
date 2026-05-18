@@ -7,17 +7,17 @@
  * Member roles within an organization
  */
 export enum MemberRole {
-  ADMIN = "ADMIN",
-  EDITOR = "EDITOR",
-  VIEWER = "VIEWER",
+  ADMIN = 'ADMIN',
+  EDITOR = 'EDITOR',
+  VIEWER = 'VIEWER',
 }
 
 /**
  * Organization types
  */
 export enum OrganizationType {
-  PERSONAL = "PERSONAL",
-  TEAM = "TEAM",
+  PERSONAL = 'PERSONAL',
+  TEAM = 'TEAM',
 }
 
 /**
@@ -90,7 +90,7 @@ export interface InvitationResponse {
   id: string;
   email: string;
   role: MemberRole;
-  status: "PENDING" | "ACCEPTED" | "EXPIRED" | "REVOKED";
+  status: 'PENDING' | 'ACCEPTED' | 'EXPIRED' | 'REVOKED';
   expiresAt: string;
   createdAt: string;
 }

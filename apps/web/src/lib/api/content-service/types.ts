@@ -1,14 +1,14 @@
-import { SocialPlatform } from "../types";
+import { SocialPlatform } from '../types';
 
 /**
  * Content status enum
  */
 export enum ContentStatus {
-  DRAFT = "DRAFT",
-  IN_REVIEW = "IN_REVIEW",
-  APPROVED = "APPROVED",
-  PUBLISHED = "PUBLISHED",
-  ARCHIVED = "ARCHIVED",
+  DRAFT = 'DRAFT',
+  IN_REVIEW = 'IN_REVIEW',
+  APPROVED = 'APPROVED',
+  PUBLISHED = 'PUBLISHED',
+  ARCHIVED = 'ARCHIVED',
 }
 
 /**
@@ -65,6 +65,7 @@ export interface CommentResponse {
  */
 export interface ContentPieceResponse {
   id: string;
+  _id?: string;
   organizationId: string;
   authorId: string;
   draftId: string | null;

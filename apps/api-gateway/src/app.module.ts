@@ -1,6 +1,6 @@
 import { Controller, Get, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { DiscoveryClientModule, LoggerModule, MetricsModule } from '@kern/shared';
+import { DiscoveryClientModule, LoggerModule, MetricsModule } from '@kern/core-backend';
 
 @Controller('health')
 class HealthController {

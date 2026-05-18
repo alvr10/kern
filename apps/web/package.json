@@ -1,13 +1,13 @@
 {
-  "name": "kern-frontend",
+  "name": "@kern/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "lint:fix": "eslint --fix",
+    "lint": "eslint --fix",
+    "lint:check": "eslint",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx}\""
   },
@@ -33,6 +33,9 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@kern/config-typescript": "workspace:*",
+    "@kern/config-eslint": "workspace:*",
+    "@kern/config-prettier": "workspace:*",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -1,5 +1,5 @@
-import { apiClient } from "../client";
-import { SocialPlatform } from "../types";
+import { apiClient } from '../client';
+import { SocialPlatform } from '../types';
 import type {
   CommentResponse,
   ContentPieceResponse,
@@ -10,7 +10,7 @@ import type {
   KanbanResponse,
   PaginatedContentResponse,
   UpdateContentDto,
-} from "./types";
+} from './types';
 
 /**
  * Content Service API Client
@@ -26,21 +26,21 @@ export const contentClient = {
     page?: number;
     limit?: number;
   }): Promise<PaginatedContentResponse> => {
-    return apiClient.get<PaginatedContentResponse>("/content", { params });
+    return apiClient.get<PaginatedContentResponse>('/content', { params });
   },
 
   /**
    * Create a new content piece
    */
   createContent: (data: CreateContentDto): Promise<ContentPieceResponse> => {
-    return apiClient.post<ContentPieceResponse>("/content", data);
+    return apiClient.post<ContentPieceResponse>('/content', data);
   },
 
   /**
    * Get content pieces grouped by status for Kanban view
    */
   getKanban: (organizationId: string): Promise<KanbanResponse> => {
-    return apiClient.get<KanbanResponse>("/content/kanban", {
+    return apiClient.get<KanbanResponse>('/content/kanban', {
       params: { organizationId },
     });
   },
@@ -48,12 +48,8 @@ export const contentClient = {
   /**
    * Get scheduled content pieces for a date range
    */
-  getCalendar: (
-    organizationId: string,
-    from: string,
-    to: string,
-  ): Promise<ContentPieceResponse[]> => {
-    return apiClient.get<ContentPieceResponse[]>("/content/calendar", {
+  getCalendar: (organizationId: string, from: string, to: string): Promise<ContentPieceResponse[]> => {
+    return apiClient.get<ContentPieceResponse[]>('/content/calendar', {
       params: { organizationId, from, to },
     });
   },
@@ -68,10 +64,7 @@ export const contentClient = {
   /**
    * Update a content piece
    */
-  updateContent: (
-    id: string,
-    data: UpdateContentDto,
-  ): Promise<ContentPieceResponse> => {
+  updateContent: (id: string, data: UpdateContentDto): Promise<ContentPieceResponse> => {
     return apiClient.patch<ContentPieceResponse>(`/content/${id}`, data);
   },
 
@@ -85,10 +78,7 @@ export const contentClient = {
   /**
    * Transition content piece status
    */
-  updateStatus: (
-    id: string,
-    status: ContentStatus,
-  ): Promise<ContentPieceResponse> => {
+  updateStatus: (id: string, status: ContentStatus): Promise<ContentPieceResponse> => {
     return apiClient.patch<ContentPieceResponse>(`/content/${id}/status`, {
       status,
     });
@@ -97,10 +87,7 @@ export const contentClient = {
   /**
    * Submit a review for a content piece
    */
-  submitReview: (
-    id: string,
-    data: CreateReviewDto,
-  ): Promise<ContentPieceResponse> => {
+  submitReview: (id: string, data: CreateReviewDto): Promise<ContentPieceResponse> => {
     return apiClient.post<ContentPieceResponse>(`/content/${id}/reviews`, data);
   },
 
@@ -114,10 +101,7 @@ export const contentClient = {
   /**
    * Add a comment to a content piece
    */
-  addComment: (
-    id: string,
-    data: CreateCommentDto,
-  ): Promise<CommentResponse> => {
+  addComment: (id: string, data: CreateCommentDto): Promise<CommentResponse> => {
     return apiClient.post<CommentResponse>(`/content/${id}/comments`, data);
   },
 };

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import React, { useState, useRef, useEffect } from "react";
-import { createPortal } from "react-dom";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import {
   CheckCircle2,
   Clock,
@@ -13,26 +13,13 @@ import {
   Copy,
   Trash2,
   FolderInput,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import {
-  ContentPieceResponse,
-  ContentStatus,
-} from "@/lib/api/content-service/types";
-import {
-  useUpdateContentStatus,
-  useCreateContent,
-  useDeleteContent,
-} from "@/lib/api/content-service/hooks";
-import styles from "../page.module.css";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { ContentPieceResponse, ContentStatus } from '@/lib/api/content-service/types';
+import { useUpdateContentStatus, useCreateContent, useDeleteContent } from '@/lib/api/content-service/hooks';
+import styles from '../page.module.css';
 
-export function SortableCard({
-  item,
-  onEdit,
-}: {
-  item: ContentPieceResponse;
-  onEdit?: () => void;
-}) {
+export function SortableCard({ item, onEdit }: { item: ContentPieceResponse; onEdit?: () => void }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showStatusMenu, setShowStatusMenu] = useState(false);
   const [menuRect, setMenuRect] = useState<{
@@ -65,7 +52,7 @@ export function SortableCard({
   };
 
   const handleDelete = () => {
-    if (confirm("¿Estás seguro de que quieres eliminar esta idea?")) {
+    if (confirm('¿Estás seguro de que quieres eliminar esta idea?')) {
       deleteContent.mutate({
         id: item.id || item._id!,
         organizationId: item.organizationId,
@@ -86,17 +73,10 @@ export function SortableCard({
   }, [isMenuOpen]);
 
   const itemId = item.id || item._id!;
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: itemId,
     data: {
-      type: "card",
+      type: 'card',
       item,
     },
   });
@@ -119,24 +99,20 @@ export function SortableCard({
       <div className={styles.cardBody}>{item.body}</div>
       <div className={styles.cardFooter}>
         <span className={styles.platformBadge}>{item.platform}</span>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          {item.status === "APPROVED" && (
-            <CheckCircle2 size={14} color="#10b981" />
-          )}
-          {item.status === "DRAFT" && <Clock size={14} color="#666" />}
-          {item.status === "IN_REVIEW" && (
-            <AlertCircle size={14} color="#f59e0b" />
-          )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {item.status === 'APPROVED' && <CheckCircle2 size={14} color="#10b981" />}
+          {item.status === 'DRAFT' && <Clock size={14} color="#666" />}
+          {item.status === 'IN_REVIEW' && <AlertCircle size={14} color="#f59e0b" />}
           <button
             ref={buttonRef}
             className={styles.iconButton}
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={(e) => {
+            onPointerDown={e => e.stopPropagation()}
+            onClick={e => {
               e.stopPropagation();
               setIsMenuOpen(!isMenuOpen);
               setShowStatusMenu(false);
             }}
-            style={{ padding: "2px" }}
+            style={{ padding: '2px' }}
           >
             <MoreHorizontal size={14} />
           </button>
@@ -147,43 +123,40 @@ export function SortableCard({
               <>
                 {/* Overlay to close menu on click outside */}
                 <div
-                  style={{ position: "fixed", inset: 0, zIndex: 9998 }}
-                  onClick={(e) => {
+                  style={{ position: 'fixed', inset: 0, zIndex: 9998 }}
+                  onClick={e => {
                     e.stopPropagation();
                     setIsMenuOpen(false);
                   }}
                 />
                 <div
-                  onPointerDown={(e) => e.stopPropagation()}
+                  onPointerDown={e => e.stopPropagation()}
                   className={styles.cardActionMenu}
                   style={{
-                    position: "absolute",
+                    position: 'absolute',
                     top: menuRect.top + 4,
                     left: menuRect.left,
-                    backgroundColor: "var(--card)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "8px",
-                    padding: "4px",
+                    backgroundColor: 'var(--card)',
+                    border: '1px solid var(--border)',
+                    borderRadius: '8px',
+                    padding: '4px',
                     zIndex: 9999,
-                    minWidth: "180px",
-                    boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                    minWidth: '180px',
+                    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
                   }}
                 >
                   <button
-                    className={cn(
-                      styles.menuItem,
-                      showStatusMenu && styles.menuItemActive,
-                    )}
-                    onClick={(e) => {
+                    className={cn(styles.menuItem, showStatusMenu && styles.menuItemActive)}
+                    onClick={e => {
                       e.stopPropagation();
                       setShowStatusMenu(!showStatusMenu);
                     }}
                   >
                     <div
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
                       }}
                     >
                       <FolderInput size={14} />
@@ -192,10 +165,8 @@ export function SortableCard({
                     <ChevronRight
                       size={14}
                       style={{
-                        transform: showStatusMenu
-                          ? "rotate(90deg)"
-                          : "rotate(0deg)",
-                        transition: "transform 0.2s",
+                        transform: showStatusMenu ? 'rotate(90deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.2s',
                       }}
                     />
                   </button>
@@ -203,19 +174,16 @@ export function SortableCard({
                   {showStatusMenu && (
                     <div
                       style={{
-                        backgroundColor: "var(--secondary)",
-                        borderRadius: "6px",
-                        margin: "4px",
-                        padding: "2px",
+                        backgroundColor: 'var(--secondary)',
+                        borderRadius: '6px',
+                        margin: '4px',
+                        padding: '2px',
                       }}
                     >
-                      {Object.values(ContentStatus).map((status) => (
+                      {Object.values(ContentStatus).map(status => (
                         <button
                           key={status}
-                          className={cn(
-                            styles.menuSubItem,
-                            item.status === status && styles.menuItemActive,
-                          )}
+                          className={cn(styles.menuSubItem, item.status === status && styles.menuItemActive)}
                           onClick={() => handleStatusChange(status)}
                         >
                           {status}
@@ -227,9 +195,9 @@ export function SortableCard({
                   <button className={styles.menuItem} onClick={handleDuplicate}>
                     <div
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
                       }}
                     >
                       <Copy size={14} />
@@ -239,21 +207,18 @@ export function SortableCard({
 
                   <div
                     style={{
-                      height: "1px",
-                      backgroundColor: "var(--border)",
-                      margin: "4px 0",
+                      height: '1px',
+                      backgroundColor: 'var(--border)',
+                      margin: '4px 0',
                     }}
                   />
 
-                  <button
-                    className={cn(styles.menuItem, styles.menuItemDelete)}
-                    onClick={handleDelete}
-                  >
+                  <button className={cn(styles.menuItem, styles.menuItemDelete)} onClick={handleDelete}>
                     <div
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
                       }}
                     >
                       <Trash2 size={14} />

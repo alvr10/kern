@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState, useRef } from "react";
-import styles from "./layout.module.css";
-import Link from "next/link";
-import { usePathname, useParams } from "next/navigation";
-import { useTheme } from "next-themes";
+import React, { useEffect, useState, useRef } from 'react';
+import styles from './layout.module.css';
+import Link from 'next/link';
+import { usePathname, useParams } from 'next/navigation';
+import { useTheme } from 'next-themes';
 import {
   Building2,
   Bell,
@@ -29,22 +29,18 @@ import {
   Sparkles,
   Keyboard,
   Users,
-} from "lucide-react";
-import { createPortal } from "react-dom";
-import { useOrganizations } from "@/lib/api/organizations-service/hooks";
-import { useSubscription } from "@/lib/api/billing-service/hooks";
-import { useAuth } from "@/lib/api/auth/hooks";
-import { cn } from "@/lib/utils";
+} from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { useOrganizations } from '@/lib/api/organizations-service/hooks';
+import { useSubscription } from '@/lib/api/billing-service/hooks';
+import { useAuth } from '@/lib/api/auth/hooks';
+import { cn } from '@/lib/utils';
 
 /**
  * Dashboard Layout
  * Provides sidebar navigation and main content area
  */
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}): React.JSX.Element {
+export default function DashboardLayout({ children }: { children: React.ReactNode }): React.JSX.Element {
   const pathname = usePathname();
   const params = useParams();
   const slug = params?.slug as string;
@@ -55,9 +51,7 @@ export default function DashboardLayout({
     bottom: number;
     left: number;
   } | null>(null);
-  const [activeSubMenu, setActiveSubMenu] = useState<"help" | "apps" | null>(
-    null,
-  );
+  const [activeSubMenu, setActiveSubMenu] = useState<'help' | 'apps' | null>(null);
   const [subMenuRect, setSubMenuRect] = useState<{
     top: number;
     left: number;
@@ -67,13 +61,10 @@ export default function DashboardLayout({
 
   const { user } = useAuth();
 
-  const handleSubMenuEnter = (type: "help" | "apps", rect: DOMRect) => {
+  const handleSubMenuEnter = (type: 'help' | 'apps', rect: DOMRect) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
-    const estimatedHeight = type === "help" ? 240 : 220;
-    const top =
-      rect.top + estimatedHeight > window.innerHeight
-        ? window.innerHeight - estimatedHeight - 10
-        : rect.top;
+    const estimatedHeight = type === 'help' ? 240 : 220;
+    const top = rect.top + estimatedHeight > window.innerHeight ? window.innerHeight - estimatedHeight - 10 : rect.top;
 
     // Use a small overlap (left: rect.right - 2) to bridge the hover gap
     setSubMenuRect({ top, left: rect.right - 2 });
@@ -86,19 +77,19 @@ export default function DashboardLayout({
     }, 150); // Grace period to move mouse to sub-menu
   };
   const { data: organizations } = useOrganizations();
-  const currentOrg = organizations?.find((org) => org.slug === slug);
-  const { data: subscription } = useSubscription(currentOrg?.id || "");
+  const currentOrg = organizations?.find(org => org.slug === slug);
+  const { data: subscription } = useSubscription(currentOrg?.id || '');
 
   const getPlanLabel = () => {
-    if (!subscription) return "Plan Gratuito";
+    if (!subscription) return 'Plan Gratuito';
     switch (subscription.planId) {
-      case "plan_pro":
-        return "Plan Pro";
-      case "plan_team":
-        return "Plan Equipo";
-      case "plan_free":
+      case 'plan_pro':
+        return 'Plan Pro';
+      case 'plan_team':
+        return 'Plan Equipo';
+      case 'plan_free':
       default:
-        return "Plan Gratuito";
+        return 'Plan Gratuito';
     }
   };
 
@@ -119,52 +110,47 @@ export default function DashboardLayout({
     setMounted(true);
   }, []);
 
-  const isOrgPage = pathname.includes("/dashboard/org/");
+  const isOrgPage = pathname.includes('/dashboard/org/');
 
   const navItems = [
     {
-      label: "Crear",
+      label: 'Crear',
       icon: <Lightbulb size={20} />,
       href: `/dashboard/org/${slug}/create`,
-      active: pathname.includes("/create"),
+      active: pathname.includes('/create'),
     },
     {
-      label: "Publicar",
+      label: 'Publicar',
       icon: <Calendar size={20} />,
       href: `/dashboard/org/${slug}/publish`,
-      active: pathname.includes("/publish"),
-      badge: "0",
+      active: pathname.includes('/publish'),
+      badge: '0',
     },
     {
-      label: "Comunidad",
+      label: 'Comunidad',
       icon: <MessageSquare size={20} />,
-      href: "#",
-      active: pathname.includes("/community"),
-      badge: "Próximamente",
+      href: '#',
+      active: pathname.includes('/community'),
+      badge: 'Próximamente',
       disabled: true,
     },
   ];
 
   const channels = [
     {
-      label: "Instagram",
+      label: 'Instagram',
       icon: <Camera size={18} className="text-pink-500" />,
-      href: "#",
+      href: '#',
     },
     {
-      label: "Threads",
-      icon: (
-        <AtSign
-          size={18}
-          className={cn(theme === "dark" ? "text-white" : "text-black")}
-        />
-      ),
-      href: "#",
+      label: 'Threads',
+      icon: <AtSign size={18} className={cn(theme === 'dark' ? 'text-white' : 'text-black')} />,
+      href: '#',
     },
     {
-      label: "LinkedIn",
+      label: 'LinkedIn',
       icon: <Briefcase size={18} className="text-blue-600" />,
-      href: "#",
+      href: '#',
     },
   ];
 
@@ -183,7 +169,7 @@ export default function DashboardLayout({
             {isOrgPage ? (
               <>
                 <div className={styles.navGroup}>
-                  {navItems.map((item) => (
+                  {navItems.map(item => (
                     <Link
                       key={item.label}
                       href={item.href}
@@ -192,18 +178,12 @@ export default function DashboardLayout({
                         item.active && styles.activeNavItem,
                         item.disabled && styles.disabledNavItem,
                       )}
-                      onClick={(e) => item.disabled && e.preventDefault()}
+                      onClick={e => item.disabled && e.preventDefault()}
                     >
                       <span className={styles.navIcon}>{item.icon}</span>
                       <span className={styles.navLabel}>{item.label}</span>
                       {item.badge && (
-                        <span
-                          className={cn(
-                            styles.badge,
-                            item.badge === "Próximamente" &&
-                              styles.badgeComingSoon,
-                          )}
-                        >
+                        <span className={cn(styles.badge, item.badge === 'Próximamente' && styles.badgeComingSoon)}>
                           {item.badge}
                         </span>
                       )}
@@ -223,12 +203,8 @@ export default function DashboardLayout({
                     </div>
                   </div>
                   <div className={styles.channelList}>
-                    {channels.map((channel) => (
-                      <Link
-                        key={channel.label}
-                        href={channel.href}
-                        className={styles.channelItem}
-                      >
+                    {channels.map(channel => (
+                      <Link key={channel.label} href={channel.href} className={styles.channelItem}>
                         <div className={styles.channelIconWrapper}>
                           {channel.icon}
                           <div className={styles.plusOverlay}>
@@ -251,33 +227,21 @@ export default function DashboardLayout({
               <div className={styles.navGroup}>
                 <Link
                   href="/dashboard/organizations"
-                  className={cn(
-                    styles.navItem,
-                    pathname === "/dashboard/organizations" &&
-                      styles.activeNavItem,
-                  )}
+                  className={cn(styles.navItem, pathname === '/dashboard/organizations' && styles.activeNavItem)}
                 >
                   <Building2 size={20} />
                   <span>Organizaciones</span>
                 </Link>
                 <Link
                   href="/dashboard/notifications"
-                  className={cn(
-                    styles.navItem,
-                    pathname === "/dashboard/notifications" &&
-                      styles.activeNavItem,
-                  )}
+                  className={cn(styles.navItem, pathname === '/dashboard/notifications' && styles.activeNavItem)}
                 >
                   <Bell size={20} />
                   <span>Notificaciones</span>
                 </Link>
                 <Link
                   href="/dashboard/settings"
-                  className={cn(
-                    styles.navItem,
-                    pathname === "/dashboard/settings" &&
-                      styles.activeNavItem,
-                  )}
+                  className={cn(styles.navItem, pathname === '/dashboard/settings' && styles.activeNavItem)}
                 >
                   <Settings size={20} />
                   <span>Ajustes</span>
@@ -298,28 +262,16 @@ export default function DashboardLayout({
                   <div className={styles.dot} />
                 </div>
                 <div className={styles.promoIcons}>
-                  <div
-                    className={styles.promoIcon}
-                    style={{ background: "#000" }}
-                  >
+                  <div className={styles.promoIcon} style={{ background: '#000' }}>
                     <AtSign size={12} color="#fff" />
                   </div>
-                  <div
-                    className={styles.promoIcon}
-                    style={{ background: "#1877F2" }}
-                  >
+                  <div className={styles.promoIcon} style={{ background: '#1877F2' }}>
                     <Briefcase size={12} color="#fff" />
                   </div>
-                  <div
-                    className={styles.promoIcon}
-                    style={{ background: "#9146FF" }}
-                  >
+                  <div className={styles.promoIcon} style={{ background: '#9146FF' }}>
                     <AtSign size={12} color="#fff" />
                   </div>
-                  <div
-                    className={styles.promoIcon}
-                    style={{ background: "#FF0000" }}
-                  >
+                  <div className={styles.promoIcon} style={{ background: '#FF0000' }}>
                     <Plus size={12} color="#fff" />
                   </div>
                 </div>
@@ -335,15 +287,13 @@ export default function DashboardLayout({
                 ref={profileRef}
                 className={styles.userProfile}
                 onClick={toggleProfileMenu}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: 'pointer' }}
               >
                 <div className={styles.avatar}>
                   <Building2 size={16} />
                 </div>
                 <div className={styles.userInfo}>
-                  <span className={styles.userName}>
-                    {currentOrg?.name || "Mi Organización"}
-                  </span>
+                  <span className={styles.userName}>{currentOrg?.name || 'Mi Organización'}</span>
                   <span className={styles.planName}>{getPlanLabel()}</span>
                 </div>
               </div>
@@ -354,28 +304,22 @@ export default function DashboardLayout({
               createPortal(
                 <>
                   <div
-                    style={{ position: "fixed", inset: 0, zIndex: 9998 }}
+                    style={{ position: 'fixed', inset: 0, zIndex: 9998 }}
                     onClick={() => setIsProfileMenuOpen(false)}
                   />
                   <div
                     className={styles.orgPopup}
                     style={{
-                      position: "fixed",
+                      position: 'fixed',
                       bottom: profileMenuRect.bottom,
                       left: profileMenuRect.left,
                       zIndex: 9999,
                     }}
                   >
                     <div className={styles.popupHeader}>
-                      <div className={styles.userEmail}>
-                        {user?.email || "usuario@ejemplo.com"}
-                      </div>
-                      <div className={styles.orgName}>
-                        {currentOrg?.name || "Mi Organización"}
-                      </div>
-                      <div className={styles.planDetails}>
-                        {getPlanLabel()} · 0 canales
-                      </div>
+                      <div className={styles.userEmail}>{user?.email || 'usuario@ejemplo.com'}</div>
+                      <div className={styles.orgName}>{currentOrg?.name || 'Mi Organización'}</div>
+                      <div className={styles.planDetails}>{getPlanLabel()} · 0 canales</div>
                       <button className={styles.upgradeButton}>
                         <Sparkles size={14} style={{ marginRight: 8 }} />
                         Mejorar Plan
@@ -385,21 +329,9 @@ export default function DashboardLayout({
                     <div className={styles.popupDivider} />
 
                     <div className={styles.popupNav}>
-                      <div
-                        className={styles.popupItem}
-                        onClick={() =>
-                          setTheme(theme === "dark" ? "light" : "dark")
-                        }
-                      >
-                        {mounted &&
-                          (theme === "dark" ? (
-                            <Sun size={16} />
-                          ) : (
-                            <Moon size={16} />
-                          ))}
-                        <span>
-                          Modo {theme === "dark" ? "Claro" : "Oscuro"}
-                        </span>
+                      <div className={styles.popupItem} onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+                        {mounted && (theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />)}
+                        <span>Modo {theme === 'dark' ? 'Claro' : 'Oscuro'}</span>
                       </div>
                       <div className={styles.popupItem}>
                         <Bell size={16} />
@@ -428,20 +360,12 @@ export default function DashboardLayout({
                       </div>
                       <div
                         className={styles.popupItem}
-                        onMouseEnter={(e) =>
-                          handleSubMenuEnter(
-                            "help",
-                            e.currentTarget.getBoundingClientRect(),
-                          )
-                        }
+                        onMouseEnter={e => handleSubMenuEnter('help', e.currentTarget.getBoundingClientRect())}
                         onMouseLeave={handleSubMenuLeave}
                       >
                         <HelpCircle size={16} />
                         <span>Ayuda y Soporte</span>
-                        <ChevronRight
-                          size={14}
-                          style={{ marginLeft: "auto" }}
-                        />
+                        <ChevronRight size={14} style={{ marginLeft: 'auto' }} />
                       </div>
                     </div>
 
@@ -450,20 +374,12 @@ export default function DashboardLayout({
                     <div className={styles.popupNav}>
                       <div
                         className={styles.popupItem}
-                        onMouseEnter={(e) =>
-                          handleSubMenuEnter(
-                            "apps",
-                            e.currentTarget.getBoundingClientRect(),
-                          )
-                        }
+                        onMouseEnter={e => handleSubMenuEnter('apps', e.currentTarget.getBoundingClientRect())}
                         onMouseLeave={handleSubMenuLeave}
                       >
                         <Layers size={16} />
                         <span>Apps e Integraciones</span>
-                        <ChevronRight
-                          size={14}
-                          style={{ marginLeft: "auto" }}
-                        />
+                        <ChevronRight size={14} style={{ marginLeft: 'auto' }} />
                       </div>
                       <div className={styles.popupItem}>
                         <FlaskConical size={16} />
@@ -474,29 +390,25 @@ export default function DashboardLayout({
 
                     <div className={styles.popupDivider} />
 
-                    <div
-                      className={styles.popupItem}
-                      style={{ color: "#ef4444" }}
-                    >
+                    <div className={styles.popupItem} style={{ color: '#ef4444' }}>
                       <LogOut size={16} />
                       <span>Cerrar sesión</span>
                     </div>
                   </div>
 
                   {/* Sub-menus */}
-                  {activeSubMenu === "help" && subMenuRect && (
+                  {activeSubMenu === 'help' && subMenuRect && (
                     <div
                       className={styles.subMenu}
                       style={{
-                        position: "fixed",
+                        position: 'fixed',
                         top: subMenuRect.top,
                         left: subMenuRect.left,
                         zIndex: 10000,
                       }}
                       onMouseEnter={() => {
-                        if (closeTimer.current)
-                          clearTimeout(closeTimer.current);
-                        setActiveSubMenu("help");
+                        if (closeTimer.current) clearTimeout(closeTimer.current);
+                        setActiveSubMenu('help');
                       }}
                       onMouseLeave={handleSubMenuLeave}
                     >
@@ -517,59 +429,42 @@ export default function DashboardLayout({
                         <span>Atajos de teclado</span>
                       </div>
                       <div className={styles.popupDivider} />
-                      <div className={styles.popupSectionTitle}>
-                        Estado de la App
-                      </div>
+                      <div className={styles.popupSectionTitle}>Estado de la App</div>
                       <div className={styles.popupItem}>
                         <div className={styles.statusDot} />
-                        <span style={{ color: "var(--success)" }}>
-                          Todos los sistemas operativos
-                        </span>
+                        <span style={{ color: 'var(--success)' }}>Todos los sistemas operativos</span>
                       </div>
                     </div>
                   )}
 
-                  {activeSubMenu === "apps" && subMenuRect && (
+                  {activeSubMenu === 'apps' && subMenuRect && (
                     <div
                       className={styles.subMenu}
                       style={{
-                        position: "fixed",
+                        position: 'fixed',
                         top: subMenuRect.top,
                         left: subMenuRect.left,
                         zIndex: 10000,
                       }}
                       onMouseEnter={() => {
-                        if (closeTimer.current)
-                          clearTimeout(closeTimer.current);
-                        setActiveSubMenu("apps");
+                        if (closeTimer.current) clearTimeout(closeTimer.current);
+                        setActiveSubMenu('apps');
                       }}
                       onMouseLeave={handleSubMenuLeave}
                     >
-                      <div
-                        className={cn(styles.popupItem, styles.disabledItem)}
-                      >
+                      <div className={cn(styles.popupItem, styles.disabledItem)}>
                         <span>Kern para iOS</span>
-                        <span className={styles.comingSoonBadge}>
-                          Próximamente
-                        </span>
+                        <span className={styles.comingSoonBadge}>Próximamente</span>
                       </div>
-                      <div
-                        className={cn(styles.popupItem, styles.disabledItem)}
-                      >
+                      <div className={cn(styles.popupItem, styles.disabledItem)}>
                         <span>Kern para Android</span>
-                        <span className={styles.comingSoonBadge}>
-                          Próximamente
-                        </span>
+                        <span className={styles.comingSoonBadge}>Próximamente</span>
                       </div>
-                      <div
-                        className={cn(styles.popupItem, styles.disabledItem)}
-                      >
+                      <div className={cn(styles.popupItem, styles.disabledItem)}>
                         <span>API</span>
                         <span className={styles.betaBadge}>Beta</span>
                       </div>
-                      <div
-                        className={cn(styles.popupItem, styles.disabledItem)}
-                      >
+                      <div className={cn(styles.popupItem, styles.disabledItem)}>
                         <span>Integraciones</span>
                         <span className={styles.betaBadge}>Beta</span>
                       </div>

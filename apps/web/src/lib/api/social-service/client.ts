@@ -1,9 +1,5 @@
-import { apiClient } from "../client";
-import type {
-  ConnectSocialAccountDto,
-  PublishResultResponse,
-  SocialAccountResponse,
-} from "./types";
+import { apiClient } from '../client';
+import type { ConnectSocialAccountDto, PublishResultResponse, SocialAccountResponse } from './types';
 
 /**
  * Social Service API Client
@@ -13,7 +9,7 @@ export const socialClient = {
    * List connected social accounts for an organization
    */
   listAccounts: (organizationId: string): Promise<SocialAccountResponse[]> => {
-    return apiClient.get<SocialAccountResponse[]>("/social/accounts", {
+    return apiClient.get<SocialAccountResponse[]>('/social/accounts', {
       params: { organizationId },
     });
   },
@@ -21,10 +17,8 @@ export const socialClient = {
   /**
    * Connect a new social media account
    */
-  connectAccount: (
-    data: ConnectSocialAccountDto,
-  ): Promise<SocialAccountResponse> => {
-    return apiClient.post<SocialAccountResponse>("/social/accounts", data);
+  connectAccount: (data: ConnectSocialAccountDto): Promise<SocialAccountResponse> => {
+    return apiClient.post<SocialAccountResponse>('/social/accounts', data);
   },
 
   /**
@@ -38,8 +32,6 @@ export const socialClient = {
    * Publish a content piece immediately to its platform
    */
   publishNow: (contentPieceId: string): Promise<PublishResultResponse> => {
-    return apiClient.post<PublishResultResponse>(
-      `/social/publish/${contentPieceId}`,
-    );
+    return apiClient.post<PublishResultResponse>(`/social/publish/${contentPieceId}`);
   },
 };

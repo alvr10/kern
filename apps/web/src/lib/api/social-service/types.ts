@@ -1,4 +1,4 @@
-import { SocialPlatform } from "../types";
+import { SocialPlatform } from '../types';
 
 /**
  * Data transfer object for connecting a social account

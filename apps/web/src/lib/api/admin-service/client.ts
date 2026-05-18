@@ -1,11 +1,11 @@
-import { apiClient } from "../client";
+import { apiClient } from '../client';
 import type {
   AdminUserDetailResponse,
   AnalyticsOverviewResponse,
   OrgTokenUsageResponse,
   PaginatedOrgsResponse,
   PaginatedUsersResponse,
-} from "./types";
+} from './types';
 
 /**
  * Admin Service API Client
@@ -19,37 +19,26 @@ export const adminClient = {
     adminSecret: string,
     params?: { page?: number; limit?: number; search?: string },
   ): Promise<PaginatedUsersResponse> => {
-    return apiClient.get<PaginatedUsersResponse>("/admin/users", {
+    return apiClient.get<PaginatedUsersResponse>('/admin/users', {
       params,
-      headers: { "x-admin-secret": adminSecret },
+      headers: { 'x-admin-secret': adminSecret },
     });
   },
 
   /**
    * Get user profile with memberships
    */
-  getUser: (
-    adminSecret: string,
-    id: string,
-  ): Promise<AdminUserDetailResponse> => {
+  getUser: (adminSecret: string, id: string): Promise<AdminUserDetailResponse> => {
     return apiClient.get<AdminUserDetailResponse>(`/admin/users/${id}`, {
-      headers: { "x-admin-secret": adminSecret },
+      headers: { 'x-admin-secret': adminSecret },
     });
   },
 
   /**
    * Ban or unban a user
    */
-  banUser: (
-    adminSecret: string,
-    id: string,
-    banned: boolean,
-  ): Promise<void> => {
-    return apiClient.patch<void>(
-      `/admin/users/${id}/ban`,
-      { banned },
-      { headers: { "x-admin-secret": adminSecret } },
-    );
+  banUser: (adminSecret: string, id: string, banned: boolean): Promise<void> => {
+    return apiClient.patch<void>(`/admin/users/${id}/ban`, { banned }, { headers: { 'x-admin-secret': adminSecret } });
   },
 
   /**
@@ -59,9 +48,9 @@ export const adminClient = {
     adminSecret: string,
     params?: { page?: number; limit?: number },
   ): Promise<PaginatedOrgsResponse> => {
-    return apiClient.get<PaginatedOrgsResponse>("/admin/organizations", {
+    return apiClient.get<PaginatedOrgsResponse>('/admin/organizations', {
       params,
-      headers: { "x-admin-secret": adminSecret },
+      headers: { 'x-admin-secret': adminSecret },
     });
   },
 
@@ -70,7 +59,7 @@ export const adminClient = {
    */
   deleteOrganization: (adminSecret: string, id: string): Promise<void> => {
     return apiClient.delete<void>(`/admin/organizations/${id}`, {
-      headers: { "x-admin-secret": adminSecret },
+      headers: { 'x-admin-secret': adminSecret },
     });
   },
 
@@ -78,12 +67,9 @@ export const adminClient = {
    * Platform-wide KPIs
    */
   getOverview: (adminSecret: string): Promise<AnalyticsOverviewResponse> => {
-    return apiClient.get<AnalyticsOverviewResponse>(
-      "/admin/analytics/overview",
-      {
-        headers: { "x-admin-secret": adminSecret },
-      },
-    );
+    return apiClient.get<AnalyticsOverviewResponse>('/admin/analytics/overview', {
+      headers: { 'x-admin-secret': adminSecret },
+    });
   },
 
   /**
@@ -93,9 +79,9 @@ export const adminClient = {
     adminSecret: string,
     params?: { page?: number; limit?: number },
   ): Promise<OrgTokenUsageResponse[]> => {
-    return apiClient.get<OrgTokenUsageResponse[]>("/admin/analytics/tokens", {
+    return apiClient.get<OrgTokenUsageResponse[]>('/admin/analytics/tokens', {
       params,
-      headers: { "x-admin-secret": adminSecret },
+      headers: { 'x-admin-secret': adminSecret },
     });
   },
 };

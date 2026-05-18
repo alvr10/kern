@@ -1,12 +1,12 @@
-import { apiClient } from "../client";
+import { apiClient } from '../client';
 
 export enum NotificationType {
-  INVITATION = "INVITATION",
-  TOKEN_ALERT_80 = "TOKEN_ALERT_80",
-  TOKEN_ALERT_100 = "TOKEN_ALERT_100",
-  CONTENT_APPROVED = "CONTENT_APPROVED",
-  CONTENT_REJECTED = "CONTENT_REJECTED",
-  PLAN_UPGRADED = "PLAN_UPGRADED",
+  INVITATION = 'INVITATION',
+  TOKEN_ALERT_80 = 'TOKEN_ALERT_80',
+  TOKEN_ALERT_100 = 'TOKEN_ALERT_100',
+  CONTENT_APPROVED = 'CONTENT_APPROVED',
+  CONTENT_REJECTED = 'CONTENT_REJECTED',
+  PLAN_UPGRADED = 'PLAN_UPGRADED',
 }
 
 export interface NotificationResponse {
@@ -34,17 +34,17 @@ export const notificationsClient = {
     page?: number;
     limit?: number;
   }): Promise<PaginatedNotificationsResponse> => {
-    return apiClient.get<PaginatedNotificationsResponse>("/notifications", {
+    return apiClient.get<PaginatedNotificationsResponse>('/notifications', {
       params,
     });
   },
   getUnreadCount: (): Promise<{ count: number }> => {
-    return apiClient.get<{ count: number }>("/notifications/unread-count");
+    return apiClient.get<{ count: number }>('/notifications/unread-count');
   },
   markAsRead: (id: string): Promise<NotificationResponse> => {
     return apiClient.patch<NotificationResponse>(`/notifications/${id}/read`, {});
   },
   markAllAsRead: (): Promise<void> => {
-    return apiClient.patch<void>("/notifications/read-all", {});
+    return apiClient.patch<void>('/notifications/read-all', {});
   },
 };

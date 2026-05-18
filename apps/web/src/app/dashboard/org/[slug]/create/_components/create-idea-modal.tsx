@@ -1,20 +1,16 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
-import { SocialPlatform } from "@/lib/api/types";
-import { ContentStatus } from "@/lib/api/content-service/types";
-import {
-  useCreateContent,
-  useUpdateContentStatus,
-  useUpdateContent,
-} from "@/lib/api/content-service/hooks";
-import styles from "../page.module.css";
-import { ContentPieceResponse } from "@/lib/api/content-service/types";
-import { useSubscription } from "@/lib/api/billing-service/hooks";
-import { Sparkles, Wand2, HandCoins } from "lucide-react";
-import { useGenerateContent } from "@/lib/api/ai-service/hooks";
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
+import { SocialPlatform } from '@/lib/api/types';
+import { ContentStatus } from '@/lib/api/content-service/types';
+import { useCreateContent, useUpdateContentStatus, useUpdateContent } from '@/lib/api/content-service/hooks';
+import styles from '../page.module.css';
+import { ContentPieceResponse } from '@/lib/api/content-service/types';
+import { useSubscription } from '@/lib/api/billing-service/hooks';
+import { Sparkles, Wand2, HandCoins } from 'lucide-react';
+import { useGenerateContent } from '@/lib/api/ai-service/hooks';
 
 export function CreateIdeaModal({
   isOpen,
@@ -32,20 +28,14 @@ export function CreateIdeaModal({
   const isEditing = !!item;
   const { data: subscription } = useSubscription(organizationId);
 
-  const [title, setTitle] = useState(item?.title || "");
-  const [body, setBody] = useState(item?.body || "");
-  const [platform, setPlatform] = useState<SocialPlatform>(
-    item?.platform || SocialPlatform.TWITTER,
-  );
-  const [hashtagsStr, setHashtagsStr] = useState(
-    item?.hashtags?.join(", ") || "",
-  );
-  const [mediaUrlsStr, setMediaUrlsStr] = useState(
-    item?.mediaUrls?.join(", ") || "",
-  );
+  const [title, setTitle] = useState(item?.title || '');
+  const [body, setBody] = useState(item?.body || '');
+  const [platform, setPlatform] = useState<SocialPlatform>(item?.platform || SocialPlatform.TWITTER);
+  const [hashtagsStr, setHashtagsStr] = useState(item?.hashtags?.join(', ') || '');
+  const [mediaUrlsStr, setMediaUrlsStr] = useState(item?.mediaUrls?.join(', ') || '');
 
   // AI Generation States
-  const [aiTopic, setAiTopic] = useState("");
+  const [aiTopic, setAiTopic] = useState('');
   const [draftId, setDraftId] = useState<string | null>(item?.draftId || null);
 
   const formatDefaultDate = (dateStr?: string) => {
@@ -53,9 +43,7 @@ export function CreateIdeaModal({
     date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
     return date.toISOString().slice(0, 16);
   };
-  const [scheduledAt, setScheduledAt] = useState(
-    formatDefaultDate(item?.scheduledAt as string | undefined),
-  );
+  const [scheduledAt, setScheduledAt] = useState(formatDefaultDate(item?.scheduledAt as string | undefined));
 
   // Sync state with item when it changes
   React.useEffect(() => {
@@ -63,16 +51,16 @@ export function CreateIdeaModal({
       setTitle(item.title);
       setBody(item.body);
       setPlatform(item.platform as SocialPlatform);
-      setHashtagsStr(item.hashtags?.join(", ") || "");
-      setMediaUrlsStr(item.mediaUrls?.join(", ") || "");
+      setHashtagsStr(item.hashtags?.join(', ') || '');
+      setMediaUrlsStr(item.mediaUrls?.join(', ') || '');
       setScheduledAt(formatDefaultDate(item.scheduledAt as string | undefined));
       setDraftId(item.draftId);
     } else {
-      setTitle("");
-      setBody("");
+      setTitle('');
+      setBody('');
       setPlatform(SocialPlatform.TWITTER);
-      setHashtagsStr("");
-      setMediaUrlsStr("");
+      setHashtagsStr('');
+      setMediaUrlsStr('');
       setScheduledAt(formatDefaultDate());
       setDraftId(crypto.randomUUID());
     }
@@ -94,7 +82,7 @@ export function CreateIdeaModal({
         draftId,
       },
       {
-        onSuccess: (response) => {
+        onSuccess: response => {
           try {
             // Try to parse if AI returns JSON-like structure
             // Otherwise assume generatedText is the body
@@ -102,9 +90,7 @@ export function CreateIdeaModal({
 
             // Simple parsing logic for Title: Body: Hashtags:
             const titleMatch = text.match(/T[ií]tulo:\s*(.*)/i);
-            const bodyMatch = text.match(
-              /Contenido:\s*([\s\S]*?)(?=Hashtags:|$)/i,
-            );
+            const bodyMatch = text.match(/Contenido:\s*([\s\S]*?)(?=Hashtags:|$)/i);
             const hashtagsMatch = text.match(/Hashtags:\s*(.*)/i);
 
             if (titleMatch) setTitle(titleMatch[1].trim());
@@ -127,13 +113,13 @@ export function CreateIdeaModal({
     e.preventDefault();
 
     const hashtags = hashtagsStr
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => s !== "");
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s !== '');
     const mediaUrls = mediaUrlsStr
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => s !== "");
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s !== '');
 
     if (isEditing && item) {
       updateContent.mutate(
@@ -197,15 +183,13 @@ export function CreateIdeaModal({
               <div
                 className={styles.modalHeader}
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "20px",
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '20px',
                 }}
               >
-                <h2 className={styles.modalTitle}>
-                  {isEditing ? "Editar Idea" : "Nueva Idea"}
-                </h2>
+                <h2 className={styles.modalTitle}>{isEditing ? 'Editar Idea' : 'Nueva Idea'}</h2>
                 <button onClick={onClose} className={styles.iconButton}>
                   <X size={20} />
                 </button>
@@ -218,7 +202,7 @@ export function CreateIdeaModal({
                     type="text"
                     className={styles.input}
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={e => setTitle(e.target.value)}
                     placeholder="Ej: Post sobre novedades"
                     required
                   />
@@ -228,7 +212,7 @@ export function CreateIdeaModal({
                   <textarea
                     className={styles.textarea}
                     value={body}
-                    onChange={(e) => setBody(e.target.value)}
+                    onChange={e => setBody(e.target.value)}
                     placeholder="¿En qué estás pensando?"
                     required
                   />
@@ -238,9 +222,7 @@ export function CreateIdeaModal({
                   <select
                     className={styles.select}
                     value={platform}
-                    onChange={(e) =>
-                      setPlatform(e.target.value as SocialPlatform)
-                    }
+                    onChange={e => setPlatform(e.target.value as SocialPlatform)}
                   >
                     <option value={SocialPlatform.INSTAGRAM}>Instagram</option>
                     <option value={SocialPlatform.LINKEDIN}>LinkedIn</option>
@@ -250,47 +232,37 @@ export function CreateIdeaModal({
                   </select>
                 </div>
                 <div className={styles.formGroup}>
-                  <label className={styles.label}>
-                    Hashtags (separados por coma)
-                  </label>
+                  <label className={styles.label}>Hashtags (separados por coma)</label>
                   <input
                     type="text"
                     className={styles.input}
                     value={hashtagsStr}
-                    onChange={(e) => setHashtagsStr(e.target.value)}
+                    onChange={e => setHashtagsStr(e.target.value)}
                     placeholder="Ej: #tech, #dev"
                   />
                 </div>
                 <div className={styles.formGroup}>
-                  <label className={styles.label}>
-                    URLs de Media (separadas por coma)
-                  </label>
+                  <label className={styles.label}>URLs de Media (separadas por coma)</label>
                   <input
                     type="text"
                     className={styles.input}
                     value={mediaUrlsStr}
-                    onChange={(e) => setMediaUrlsStr(e.target.value)}
+                    onChange={e => setMediaUrlsStr(e.target.value)}
                     placeholder="Ej: https://img.com/1.jpg"
                   />
                 </div>
                 <div className={styles.formGroup}>
-                  <label className={styles.label}>
-                    Fecha y Hora de Publicación
-                  </label>
+                  <label className={styles.label}>Fecha y Hora de Publicación</label>
                   <input
                     type="datetime-local"
                     className={styles.input}
                     value={scheduledAt}
-                    onChange={(e) => setScheduledAt(e.target.value)}
+                    onChange={e => setScheduledAt(e.target.value)}
                     required
                   />
                 </div>
                 <div className={styles.modalActions}>
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className={styles.cancelButton}
-                  >
+                  <button type="button" onClick={onClose} className={styles.cancelButton}>
                     Cancelar
                   </button>
                   <button
@@ -303,13 +275,11 @@ export function CreateIdeaModal({
                       generateAI.isPending
                     }
                   >
-                    {createContent.isPending ||
-                    updateStatus.isPending ||
-                    updateContent.isPending
-                      ? "Guardando..."
+                    {createContent.isPending || updateStatus.isPending || updateContent.isPending
+                      ? 'Guardando...'
                       : isEditing
-                        ? "Guardar Cambios"
-                        : "Crear Idea"}
+                        ? 'Guardar Cambios'
+                        : 'Crear Idea'}
                   </button>
                 </div>
               </form>
@@ -324,9 +294,9 @@ export function CreateIdeaModal({
             >
               <div
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
                 }}
               >
                 <h3 className={styles.aiTitle}>
@@ -336,11 +306,11 @@ export function CreateIdeaModal({
                 {subscription && (
                   <div
                     style={{
-                      fontSize: "11px",
-                      color: "var(--muted-foreground)",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "4px",
+                      fontSize: '11px',
+                      color: 'var(--muted-foreground)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
                     }}
                   >
                     <HandCoins size={12} />
@@ -350,21 +320,18 @@ export function CreateIdeaModal({
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>
-                  ¿Sobre qué quieres escribir?
-                </label>
+                <label className={styles.label}>¿Sobre qué quieres escribir?</label>
                 <textarea
                   className={styles.textarea}
-                  style={{ minHeight: "120px" }}
+                  style={{ minHeight: '120px' }}
                   value={aiTopic}
-                  onChange={(e) => setAiTopic(e.target.value)}
+                  onChange={e => setAiTopic(e.target.value)}
                   placeholder="Ej: Un post sobre los beneficios de la meditación para programadores..."
                 />
               </div>
 
               <div className={styles.proTip}>
-                <b>Pro Tip:</b> Sé específico con el tema y el tono que deseas
-                para obtener mejores resultados.
+                <b>Pro Tip:</b> Sé específico con el tema y el tono que deseas para obtener mejores resultados.
               </div>
 
               <button
@@ -374,7 +341,7 @@ export function CreateIdeaModal({
                 disabled={generateAI.isPending || !aiTopic}
               >
                 {generateAI.isPending ? (
-                  "Generando..."
+                  'Generando...'
                 ) : (
                   <>
                     <Sparkles size={18} />

@@ -1,15 +1,9 @@
-"use client";
+'use client';
 
-import {
-  useLayoutEffect,
-  useRef,
-  createContext,
-  useContext,
-  useCallback,
-} from "react";
-import { usePathname, useRouter } from "next/navigation";
-import gsap from "gsap";
-import styles from "./slide-reveal-transition.module.css";
+import { useLayoutEffect, useRef, createContext, useContext, useCallback } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import gsap from 'gsap';
+import styles from './slide-reveal-transition.module.css';
 
 // ─── Context ────────────────────────────────────────────────────────────────
 
@@ -36,9 +30,7 @@ interface SlideRevealTransitionProps {
  * while revealing the new one with a clip-path effect.
  * Based on the native View Transition API.
  */
-export default function SlideRevealTransition({
-  children,
-}: SlideRevealTransitionProps) {
+export default function SlideRevealTransition({ children }: SlideRevealTransitionProps) {
   const router = useRouter();
   const pathname = usePathname();
   const finishTransition = useRef<(() => void) | null>(null);
@@ -60,7 +52,7 @@ export default function SlideRevealTransition({
       }
 
       document.startViewTransition(() => {
-        return new Promise<void>((resolve) => {
+        return new Promise<void>(resolve => {
           finishTransition.current = resolve;
           router.push(href);
         });
@@ -87,7 +79,7 @@ export function useEntranceAnimations() {
 
   const playEntrance = useCallback(() => {
     // 1. Navigation links animation
-    const links = document.querySelectorAll(".transition-link");
+    const links = document.querySelectorAll('.transition-link');
     if (links.length > 0) {
       gsap.fromTo(
         links,
@@ -97,30 +89,22 @@ export function useEntranceAnimations() {
           opacity: 1,
           duration: 1,
           stagger: 0.1,
-          ease: "power4.out",
+          ease: 'power4.out',
           delay: 0.2,
         },
       );
     }
 
     // 2. Title animation (Hero)
-    const heroes = document.querySelectorAll(".transition-hero");
+    const heroes = document.querySelectorAll('.transition-hero');
     if (heroes.length > 0) {
-      gsap.fromTo(
-        heroes,
-        { y: 100, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.2, ease: "power4.out", delay: 0.3 },
-      );
+      gsap.fromTo(heroes, { y: 100, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2, ease: 'power4.out', delay: 0.3 });
     }
 
     // 3. Paragraph animation
-    const infos = document.querySelectorAll(".transition-info");
+    const infos = document.querySelectorAll('.transition-info');
     if (infos.length > 0) {
-      gsap.fromTo(
-        infos,
-        { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.5, ease: "power4.out", delay: 0.4 },
-      );
+      gsap.fromTo(infos, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 1.5, ease: 'power4.out', delay: 0.4 });
     }
   }, []);
 

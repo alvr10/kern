@@ -1,12 +1,7 @@
-import { useMutation } from "@tanstack/react-query";
-import { useAuthStore } from "../../../core/stores/auth-store";
-import { supabase } from "./client";
-import type {
-  AuthError,
-  SignInCredentials,
-  SignUpCredentials,
-  UpdatePasswordRequest,
-} from "./types";
+import { useMutation } from '@tanstack/react-query';
+import { useAuthStore } from '../../../core/stores/auth-store';
+import { supabase } from './client';
+import type { AuthError, SignInCredentials, SignUpCredentials, UpdatePasswordRequest } from './types';
 
 /**
  * useAuth — reads auth state from the singleton store.
@@ -52,8 +47,7 @@ export const useSignUp = () =>
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
-      if (error)
-        throw { message: error.message, status: error.status } as AuthError;
+      if (error) throw { message: error.message, status: error.status } as AuthError;
     },
   });
 
@@ -79,8 +73,7 @@ export const useResetPassword = () =>
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
-      if (error)
-        throw { message: error.message, status: error.status } as AuthError;
+      if (error) throw { message: error.message, status: error.status } as AuthError;
     },
   });
 
@@ -91,7 +84,6 @@ export const useUpdatePassword = () =>
   useMutation<void, AuthError, UpdatePasswordRequest>({
     mutationFn: async ({ password }) => {
       const { error } = await supabase.auth.updateUser({ password });
-      if (error)
-        throw { message: error.message, status: error.status } as AuthError;
+      if (error) throw { message: error.message, status: error.status } as AuthError;
     },
   });

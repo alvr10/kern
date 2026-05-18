@@ -3,9 +3,9 @@
  * Type-safe wrapper around fetch API with error handling and interceptors
  */
 
-import { useAuthStore } from "../../core/stores/auth-store";
-import { getEndpointUrl } from "./config";
-import { ApiClientError, type HttpMethod, type RequestConfig } from "./types";
+import { useAuthStore } from '../../core/stores/auth-store';
+import { getEndpointUrl } from './config';
+import { ApiClientError, type HttpMethod, type RequestConfig } from './types';
 
 /**
  * Get auth token from store
@@ -17,12 +17,10 @@ const getAuthToken = (): string | null => {
 /**
  * Build headers with auth token
  */
-const buildHeaders = (
-  customHeaders?: Record<string, string>,
-): Record<string, string> => {
+const buildHeaders = (customHeaders?: Record<string, string>): Record<string, string> => {
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
   };
 
   // Add auth token if available
@@ -38,10 +36,8 @@ const buildHeaders = (
 /**
  * Builds query string from params object
  */
-const buildQueryString = (
-  params?: Record<string, string | number | boolean | undefined>,
-): string => {
-  if (!params) return "";
+const buildQueryString = (params?: Record<string, string | number | boolean | undefined>): string => {
+  if (!params) return '';
 
   const searchParams = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
@@ -51,23 +47,18 @@ const buildQueryString = (
   });
 
   const queryString = searchParams.toString();
-  return queryString ? `?${queryString}` : "";
+  return queryString ? `?${queryString}` : '';
 };
 
 /**
  * Makes an HTTP request to the API
  */
-async function request<T>(
-  method: HttpMethod,
-  endpoint: string,
-  body?: unknown,
-  config?: RequestConfig,
-): Promise<T> {
+async function request<T>(method: HttpMethod, endpoint: string, body?: unknown, config?: RequestConfig): Promise<T> {
   const url = getEndpointUrl(endpoint) + buildQueryString(config?.params);
 
   const headers = buildHeaders(config?.headers);
 
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === 'development') {
     console.log(`[API Request] ${method} ${url}`, body);
   }
 
@@ -81,9 +72,9 @@ async function request<T>(
 
     // Parse response body
     let data: unknown;
-    const contentType = response.headers.get("content-type");
+    const contentType = response.headers.get('content-type');
 
-    if (contentType?.includes("application/json")) {
+    if (contentType?.includes('application/json')) {
       data = await response.json();
     } else {
       data = await response.text();
@@ -91,38 +82,30 @@ async function request<T>(
 
     // Handle error responses
     if (!response.ok) {
-      const errorData = data as
-        | { message?: string; statusCode?: number }
-        | string;
-      const errorObj = typeof errorData === "object" ? errorData : undefined;
+      const errorData = data as { message?: string; statusCode?: number } | string;
+      const errorObj = typeof errorData === 'object' ? errorData : undefined;
 
       let message = `HTTP ${response.status}`;
       if (response.statusText) {
         message += `: ${response.statusText}`;
       }
 
-      if (typeof errorData === "string" && errorData.length > 0) {
+      if (typeof errorData === 'string' && errorData.length > 0) {
         message = errorData;
       } else if (errorObj?.message) {
         message = errorObj.message;
       }
 
-      throw new ApiClientError(
-        message,
-        errorObj?.statusCode || response.status,
-        data,
-      );
+      throw new ApiClientError(message, errorObj?.statusCode || response.status, data);
     }
 
     // Unwrap API response data if wrapped
     // The API returns { data: T, message: string, statusCode: number, ... }
     const responseData = data as { data?: unknown };
     const unwrappedData =
-      responseData && typeof responseData === "object" && "data" in responseData
-        ? responseData.data
-        : data;
+      responseData && typeof responseData === 'object' && 'data' in responseData ? responseData.data : data;
 
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === 'development') {
       console.log(`[API Response] ${method} ${url}`, unwrappedData);
     }
 
@@ -139,7 +122,7 @@ async function request<T>(
     }
 
     // Handle unknown errors
-    throw new ApiClientError("An unknown error occurred", 0, error);
+    throw new ApiClientError('An unknown error occurred', 0, error);
   }
 }
 
@@ -151,46 +134,34 @@ export const apiClient = {
    * GET request
    */
   get: <T>(endpoint: string, config?: RequestConfig): Promise<T> => {
-    return request<T>("GET", endpoint, undefined, config);
+    return request<T>('GET', endpoint, undefined, config);
   },
 
   /**
    * POST request
    */
-  post: <T>(
-    endpoint: string,
-    body?: unknown,
-    config?: RequestConfig,
-  ): Promise<T> => {
-    return request<T>("POST", endpoint, body, config);
+  post: <T>(endpoint: string, body?: unknown, config?: RequestConfig): Promise<T> => {
+    return request<T>('POST', endpoint, body, config);
   },
 
   /**
    * PUT request
    */
-  put: <T>(
-    endpoint: string,
-    body?: unknown,
-    config?: RequestConfig,
-  ): Promise<T> => {
-    return request<T>("PUT", endpoint, body, config);
+  put: <T>(endpoint: string, body?: unknown, config?: RequestConfig): Promise<T> => {
+    return request<T>('PUT', endpoint, body, config);
   },
 
   /**
    * DELETE request
    */
   delete: <T>(endpoint: string, config?: RequestConfig): Promise<T> => {
-    return request<T>("DELETE", endpoint, config?.body, config);
+    return request<T>('DELETE', endpoint, config?.body, config);
   },
 
   /**
    * PATCH request
    */
-  patch: <T>(
-    endpoint: string,
-    body?: unknown,
-    config?: RequestConfig,
-  ): Promise<T> => {
-    return request<T>("PATCH", endpoint, body, config);
+  patch: <T>(endpoint: string, body?: unknown, config?: RequestConfig): Promise<T> => {
+    return request<T>('PATCH', endpoint, body, config);
   },
 };

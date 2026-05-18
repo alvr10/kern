@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { CONTENT_STATUS_VALUES, ContentStatus, SOCIAL_PLATFORM_VALUES, SocialPlatform } from '@kern/shared';
+import { CONTENT_STATUS_VALUES, ContentStatus, SOCIAL_PLATFORM_VALUES, SocialPlatform } from '@kern/core-backend';
 
 @Schema({ timestamps: true })
 export class Comment {

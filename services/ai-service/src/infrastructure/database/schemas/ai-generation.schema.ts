@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { AI_ACTION_TYPE_VALUES, AiActionType, SOCIAL_PLATFORM_VALUES, SocialPlatform } from '@kern/shared';
+import { AI_ACTION_TYPE_VALUES, AiActionType, SOCIAL_PLATFORM_VALUES, SocialPlatform } from '@kern/core-backend';
 
 @Schema({
   timestamps: { createdAt: true, updatedAt: false },

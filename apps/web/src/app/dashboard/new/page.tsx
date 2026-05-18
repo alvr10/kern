@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import React, { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { useCreateOrganization } from "@/lib/api/organizations-service/hooks";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import styles from "./page.module.css";
+import React, { useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useCreateOrganization } from '@/lib/api/organizations-service/hooks';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import styles from './page.module.css';
 
 /**
  * New Organization Page
@@ -20,33 +20,33 @@ export default function NewOrganizationPage(): React.JSX.Element {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState({
-    name: "",
-    slug: "",
+    name: '',
+    slug: '',
   });
 
   const [formErrors, setFormErrors] = useState({
-    name: "",
-    slug: "",
+    name: '',
+    slug: '',
   });
 
   useGSAP(
     () => {
       const tl = gsap.timeline();
 
-      tl.from(".reveal-header", {
+      tl.from('.reveal-header', {
         y: 20,
         opacity: 0,
         duration: 0.8,
-        ease: "power3.out",
+        ease: 'power3.out',
       }).from(
-        ".reveal-form",
+        '.reveal-form',
         {
           y: 20,
           opacity: 0,
           duration: 0.8,
-          ease: "power3.out",
+          ease: 'power3.out',
         },
-        "-=0.6",
+        '-=0.6',
       );
     },
     { scope: containerRef },
@@ -56,18 +56,18 @@ export default function NewOrganizationPage(): React.JSX.Element {
     const name = e.target.value;
     const slug = name
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
 
     setFormData({ name, slug });
-    setFormErrors((prev) => ({ ...prev, name: "" }));
+    setFormErrors(prev => ({ ...prev, name: '' }));
   };
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, "");
+    const slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, '');
 
-    setFormData((prev) => ({ ...prev, slug }));
-    setFormErrors((prev) => ({ ...prev, slug: "" }));
+    setFormData(prev => ({ ...prev, slug }));
+    setFormErrors(prev => ({ ...prev, slug: '' }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -76,13 +76,13 @@ export default function NewOrganizationPage(): React.JSX.Element {
     // Simple validation
     let hasError = false;
     if (!formData.name.trim()) {
-      setFormErrors((prev) => ({ ...prev, name: "El nombre es obligatorio" }));
+      setFormErrors(prev => ({ ...prev, name: 'El nombre es obligatorio' }));
       hasError = true;
     }
     if (!formData.slug.trim()) {
-      setFormErrors((prev) => ({
+      setFormErrors(prev => ({
         ...prev,
-        slug: "El identificador es obligatorio",
+        slug: 'El identificador es obligatorio',
       }));
       hasError = true;
     }
@@ -91,7 +91,7 @@ export default function NewOrganizationPage(): React.JSX.Element {
 
     createOrg(formData, {
       onSuccess: () => {
-        router.push("/dashboard/organizations");
+        router.push('/dashboard/organizations');
       },
     });
   };
@@ -107,10 +107,7 @@ export default function NewOrganizationPage(): React.JSX.Element {
             </Button>
           </Link>
           <h1 className={styles.title}>Nueva Organización</h1>
-          <p className={styles.subtitle}>
-            Crea un nuevo espacio de trabajo para tu equipo y empieza a
-            colaborar.
-          </p>
+          <p className={styles.subtitle}>Crea un nuevo espacio de trabajo para tu equipo y empieza a colaborar.</p>
         </header>
 
         <form className={`${styles.form} reveal-form`} onSubmit={handleSubmit}>
@@ -127,9 +124,7 @@ export default function NewOrganizationPage(): React.JSX.Element {
               onChange={handleNameChange}
               disabled={isPending}
             />
-            {formErrors.name && (
-              <p className={styles.error}>{formErrors.name}</p>
-            )}
+            {formErrors.name && <p className={styles.error}>{formErrors.name}</p>}
           </div>
 
           <div className={styles.field}>
@@ -146,12 +141,9 @@ export default function NewOrganizationPage(): React.JSX.Element {
               disabled={isPending}
             />
             <p className={styles.slugPreview}>
-              Tu organización estará en:{" "}
-              <span>kern.id/{formData.slug || "..."}</span>
+              Tu organización estará en: <span>kern.id/{formData.slug || '...'}</span>
             </p>
-            {formErrors.slug && (
-              <p className={styles.error}>{formErrors.slug}</p>
-            )}
+            {formErrors.slug && <p className={styles.error}>{formErrors.slug}</p>}
           </div>
 
           <div className={styles.actions}>
@@ -173,10 +165,7 @@ export default function NewOrganizationPage(): React.JSX.Element {
           </div>
 
           {error && (
-            <p
-              className={styles.error}
-              style={{ textAlign: "center", marginTop: "16px" }}
-            >
+            <p className={styles.error} style={{ textAlign: 'center', marginTop: '16px' }}>
               Hubo un error al crear la organización. Inténtalo de nuevo.
             </p>
           )}

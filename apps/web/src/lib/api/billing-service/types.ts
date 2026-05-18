@@ -22,10 +22,10 @@ export interface PlanResponse {
  * Subscription status enum
  */
 export enum SubscriptionStatus {
-  TRIALING = "TRIALING",
-  ACTIVE = "ACTIVE",
-  PAST_DUE = "PAST_DUE",
-  CANCELED = "CANCELED",
+  TRIALING = 'TRIALING',
+  ACTIVE = 'ACTIVE',
+  PAST_DUE = 'PAST_DUE',
+  CANCELED = 'CANCELED',
 }
 
 /**

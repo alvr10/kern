@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
-import { DiscoveryClientModule, MetricsModule } from '@kern/shared';
+import { DiscoveryClientModule, MetricsModule } from '@kern/core-backend';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { NotificationsController } from './presentation/controllers/notifications.controller';
 import { HealthController } from './presentation/controllers/health.controller';
@@ -14,13 +14,7 @@ const CommandHandlers = [CreateNotificationHandler, MarkNotificationAsReadHandle
 const QueryHandlers = [GetUserNotificationsHandler];
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    CqrsModule,
-    DatabaseModule,
-    DiscoveryClientModule,
-    MetricsModule,
-  ],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), CqrsModule, DatabaseModule, DiscoveryClientModule, MetricsModule],
   controllers: [NotificationsController, HealthController, OrganizationEventConsumer],
   providers: [...CommandHandlers, ...QueryHandlers],
 })

@@ -1,22 +1,16 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { aiClient } from "./client";
-import { billingKeys } from "../billing-service/hooks";
-import type {
-  AdaptContentDto,
-  GenerateContentDto,
-  ImproveContentDto,
-  RewriteContentDto,
-} from "./types";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { aiClient } from './client';
+import { billingKeys } from '../billing-service/hooks';
+import type { AdaptContentDto, GenerateContentDto, ImproveContentDto, RewriteContentDto } from './types';
 
 /**
  * Query Keys
  */
 export const aiKeys = {
-  all: ["ai"] as const,
-  generations: (orgId: string) =>
-    [...aiKeys.all, "generations", orgId] as const,
-  tokenUsage: (orgId: string) => [...aiKeys.all, "token-usage", orgId] as const,
-  health: () => [...aiKeys.all, "health"] as const,
+  all: ['ai'] as const,
+  generations: (orgId: string) => [...aiKeys.all, 'generations', orgId] as const,
+  tokenUsage: (orgId: string) => [...aiKeys.all, 'token-usage', orgId] as const,
+  health: () => [...aiKeys.all, 'health'] as const,
 };
 
 /**
@@ -121,10 +115,7 @@ export const useAdaptContent = () => {
 /**
  * useAIGenerations
  */
-export const useAIGenerations = (
-  organizationId: string,
-  params?: { page?: number; limit?: number },
-) => {
+export const useAIGenerations = (organizationId: string, params?: { page?: number; limit?: number }) => {
   return useQuery({
     queryKey: [...aiKeys.generations(organizationId), params],
     queryFn: () => aiClient.listGenerations(organizationId, params),

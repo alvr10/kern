@@ -13,6 +13,6 @@ export class GetUserNotificationsHandler implements IQueryHandler<GetUserNotific
 
   async execute(query: GetUserNotificationsQuery): Promise<NotificationProps[]> {
     const notifications = await this.notificationRepository.findByUserId(query.userId);
-    return notifications.map((n) => n.toJSON());
+    return notifications.map(n => n.toJSON());
   }
 }

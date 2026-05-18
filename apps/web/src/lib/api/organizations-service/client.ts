@@ -1,4 +1,4 @@
-import { apiClient } from "../client";
+import { apiClient } from '../client';
 import type {
   CreateOrganizationDto,
   InvitationResponse,
@@ -8,7 +8,7 @@ import type {
   OrganizationResponse,
   UpdateOrganizationDto,
   TransferOwnershipDto,
-} from "./types";
+} from './types';
 
 /**
  * Organizations Service API Client
@@ -18,16 +18,14 @@ export const organizationsClient = {
    * List organizations the current user belongs to
    */
   listOrganizations: (): Promise<OrganizationResponse[]> => {
-    return apiClient.get<OrganizationResponse[]>("/organizations");
+    return apiClient.get<OrganizationResponse[]>('/organizations');
   },
 
   /**
    * Create a new organization
    */
-  createOrganization: (
-    data: CreateOrganizationDto,
-  ): Promise<OrganizationResponse> => {
-    return apiClient.post<OrganizationResponse>("/organizations", data);
+  createOrganization: (data: CreateOrganizationDto): Promise<OrganizationResponse> => {
+    return apiClient.post<OrganizationResponse>('/organizations', data);
   },
 
   /**
@@ -40,10 +38,7 @@ export const organizationsClient = {
   /**
    * Update an organization
    */
-  updateOrganization: (
-    id: string,
-    data: UpdateOrganizationDto,
-  ): Promise<OrganizationResponse> => {
+  updateOrganization: (id: string, data: UpdateOrganizationDto): Promise<OrganizationResponse> => {
     return apiClient.patch<OrganizationResponse>(`/organizations/${id}`, data);
   },
 
@@ -57,14 +52,8 @@ export const organizationsClient = {
   /**
    * Transfer organization ownership
    */
-  transferOwnership: (
-    id: string,
-    data: TransferOwnershipDto,
-  ): Promise<OrganizationResponse> => {
-    return apiClient.patch<OrganizationResponse>(
-      `/organizations/${id}/owner`,
-      data,
-    );
+  transferOwnership: (id: string, data: TransferOwnershipDto): Promise<OrganizationResponse> => {
+    return apiClient.patch<OrganizationResponse>(`/organizations/${id}/owner`, data);
   },
 
   /**
@@ -77,15 +66,8 @@ export const organizationsClient = {
   /**
    * Update a member's role
    */
-  updateMemberRole: (
-    id: string,
-    memberId: string,
-    role: MemberRole,
-  ): Promise<MembershipResponse> => {
-    return apiClient.patch<MembershipResponse>(
-      `/organizations/${id}/members/${memberId}`,
-      { role },
-    );
+  updateMemberRole: (id: string, memberId: string, role: MemberRole): Promise<MembershipResponse> => {
+    return apiClient.patch<MembershipResponse>(`/organizations/${id}/members/${memberId}`, { role });
   },
 
   /**
@@ -98,14 +80,8 @@ export const organizationsClient = {
   /**
    * Invite a user to an organization
    */
-  inviteUser: (
-    id: string,
-    data: InviteUserDto,
-  ): Promise<InvitationResponse> => {
-    return apiClient.post<InvitationResponse>(
-      `/organizations/${id}/invitations`,
-      data,
-    );
+  inviteUser: (id: string, data: InviteUserDto): Promise<InvitationResponse> => {
+    return apiClient.post<InvitationResponse>(`/organizations/${id}/invitations`, data);
   },
 
   /**

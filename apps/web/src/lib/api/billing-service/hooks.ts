@@ -1,16 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { billingClient } from "./client";
-import type { CreateCheckoutDto } from "./types";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { billingClient } from './client';
+import type { CreateCheckoutDto } from './types';
 
 /**
  * Query Keys
  */
 export const billingKeys = {
-  all: ["billing"] as const,
-  plans: () => [...billingKeys.all, "plans"] as const,
+  all: ['billing'] as const,
+  plans: () => [...billingKeys.all, 'plans'] as const,
   plan: (id: string) => [...billingKeys.plans(), id] as const,
-  subscription: (orgId: string) =>
-    [...billingKeys.all, "subscription", orgId] as const,
+  subscription: (orgId: string) => [...billingKeys.all, 'subscription', orgId] as const,
 };
 
 /**
@@ -50,9 +49,8 @@ export const useSubscription = (organizationId: string) => {
  */
 export const useCreateCheckoutSession = () => {
   return useMutation({
-    mutationFn: (data: CreateCheckoutDto) =>
-      billingClient.createCheckoutSession(data),
-    onSuccess: (data) => {
+    mutationFn: (data: CreateCheckoutDto) => billingClient.createCheckoutSession(data),
+    onSuccess: data => {
       // Redirect to Stripe Checkout
       window.location.href = data.checkoutUrl;
     },
@@ -66,9 +64,8 @@ export const useCancelSubscription = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (organizationId: string) =>
-      billingClient.cancelSubscription(organizationId),
-    onSuccess: (data) => {
+    mutationFn: (organizationId: string) => billingClient.cancelSubscription(organizationId),
+    onSuccess: data => {
       queryClient.invalidateQueries({
         queryKey: billingKeys.subscription(data.organizationId),
       });

@@ -1,13 +1,13 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
-  const code = searchParams.get("code");
+  const code = searchParams.get('code');
 
   // Default to the organizations dashboard after login
-  const next = searchParams.get("next") ?? "/dashboard/organizations";
+  const next = searchParams.get('next') ?? '/dashboard/organizations';
 
   if (code) {
     const cookieStore = await cookies();
@@ -21,9 +21,7 @@ export async function GET(request: Request) {
           },
           setAll(cookiesToSet) {
             try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options),
-              );
+              cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
             } catch {
               // Ignore if called from a Server Component
             }

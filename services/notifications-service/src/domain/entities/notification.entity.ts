@@ -14,7 +14,10 @@ export interface NotificationProps {
 }
 
 export class Notification {
-  private constructor(private readonly props: NotificationProps, private readonly _id?: string) {}
+  private constructor(
+    private readonly props: NotificationProps,
+    private readonly _id?: string,
+  ) {}
 
   public static create(props: Omit<NotificationProps, 'isRead' | 'createdAt'>, id?: string): Notification {
     return new Notification(

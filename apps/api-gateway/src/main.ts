@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { PinoLoggerService, HttpLoggerMiddleware, ConsulService } from '@kern/shared';
+import { PinoLoggerService, HttpLoggerMiddleware, ConsulService } from '@kern/core-backend';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import * as swaggerUi from 'swagger-ui-express';
 import { resolve } from 'path';

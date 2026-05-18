@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@kern/config-typescript/tsconfig.nestjs.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src"

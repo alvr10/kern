@@ -1,20 +1,17 @@
-"use client";
+'use client';
 
-import React, { useRef } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { useOrganizations } from "@/lib/api/organizations-service/hooks";
-import {
-  OrganizationType,
-  OrganizationResponse,
-} from "@/lib/api/organizations-service/types";
-import { useSubscription } from "@/lib/api/billing-service/hooks";
-import { SubscriptionStatus } from "@/lib/api/billing-service/types";
-import { Plus, Building2, ArrowRight, Settings } from "lucide-react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { Button } from "@/components/ui/button";
-import styles from "./page.module.css";
+import React, { useRef } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useOrganizations } from '@/lib/api/organizations-service/hooks';
+import { OrganizationType, OrganizationResponse } from '@/lib/api/organizations-service/types';
+import { useSubscription } from '@/lib/api/billing-service/hooks';
+import { SubscriptionStatus } from '@/lib/api/billing-service/types';
+import { Plus, Building2, ArrowRight, Settings } from 'lucide-react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { Button } from '@/components/ui/button';
+import styles from './page.module.css';
 
 /**
  * Organization Card Component
@@ -32,37 +29,26 @@ const OrganizationCard = ({
   const { data: subscription } = useSubscription(org.id);
 
   const getPlanLabel = () => {
-    if (!subscription) return "Plan Gratuito";
+    if (!subscription) return 'Plan Gratuito';
     switch (subscription.planId) {
-      case "plan_pro":
-        return "Plan Pro";
-      case "plan_team":
-        return "Plan Equipo";
-      case "plan_free":
+      case 'plan_pro':
+        return 'Plan Pro';
+      case 'plan_team':
+        return 'Plan Equipo';
+      case 'plan_free':
       default:
-        return "Plan Gratuito";
+        return 'Plan Gratuito';
     }
   };
 
-  const isPro =
-    subscription?.planId === "plan_pro" || subscription?.planId === "plan_team";
+  const isPro = subscription?.planId === 'plan_pro' || subscription?.planId === 'plan_team';
 
   return (
-    <Link
-      href={`/dashboard/org/${org.slug}`}
-      className={styles.card}
-      ref={innerRef}
-    >
+    <Link href={`/dashboard/org/${org.slug}`} className={styles.card} ref={innerRef}>
       <div className={styles.cardHeader}>
         <div className={styles.logo}>
           {org.logoUrl ? (
-            <Image
-              src={org.logoUrl}
-              alt={org.name}
-              width={48}
-              height={48}
-              className={styles.logoImage}
-            />
+            <Image src={org.logoUrl} alt={org.name} width={48} height={48} className={styles.logoImage} />
           ) : (
             <Building2 size={24} color="#666" />
           )}
@@ -73,7 +59,7 @@ const OrganizationCard = ({
             <span
               className={`${styles.typeBadge} ${org.type === OrganizationType.PERSONAL ? styles.typePersonal : styles.typeTeam}`}
             >
-              {org.type === OrganizationType.PERSONAL ? "Personal" : "Equipo"}
+              {org.type === OrganizationType.PERSONAL ? 'Personal' : 'Equipo'}
             </span>
           </div>
           <p className={styles.orgSlug}>kern.id/{org.slug}</p>
@@ -81,10 +67,8 @@ const OrganizationCard = ({
       </div>
 
       <div className={styles.cardFooter}>
-        <span className={`${styles.badge} ${isPro ? styles.proBadge : ""}`}>
-          {getPlanLabel()}
-        </span>
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        <span className={`${styles.badge} ${isPro ? styles.proBadge : ''}`}>{getPlanLabel()}</span>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <Settings size={16} color="#444" />
           <ArrowRight size={16} color="#444" />
         </div>
@@ -111,15 +95,15 @@ export default function OrganizationsPage(): React.JSX.Element {
           opacity: 0,
           duration: 0.8,
           stagger: 0.1,
-          ease: "power3.out",
+          ease: 'power3.out',
         });
 
         // Title and header reveal
-        gsap.from(".reveal-header", {
+        gsap.from('.reveal-header', {
           y: -10,
           opacity: 0,
           duration: 0.6,
-          ease: "power2.out",
+          ease: 'power2.out',
         });
       }
     },
@@ -138,9 +122,7 @@ export default function OrganizationsPage(): React.JSX.Element {
     return (
       <div className={styles.container}>
         <div className={styles.emptyState}>
-          <p>
-            Error al cargar las organizaciones. Por favor, inténtalo de nuevo.
-          </p>
+          <p>Error al cargar las organizaciones. Por favor, inténtalo de nuevo.</p>
         </div>
       </div>
     );
@@ -151,9 +133,7 @@ export default function OrganizationsPage(): React.JSX.Element {
       <header className={`${styles.header} reveal-header`}>
         <div className={styles.titleSection}>
           <h1 className={styles.title}>Tus Organizaciones</h1>
-          <p className={styles.subtitle}>
-            Gestiona tus equipos y espacios de trabajo.
-          </p>
+          <p className={styles.subtitle}>Gestiona tus equipos y espacios de trabajo.</p>
         </div>
         <div className={styles.actions}>
           <Link href="/dashboard/new">
@@ -172,7 +152,7 @@ export default function OrganizationsPage(): React.JSX.Element {
               key={org.id}
               org={org}
               index={index}
-              innerRef={(el) => {
+              innerRef={el => {
                 cardsRef.current[index] = el;
               }}
             />

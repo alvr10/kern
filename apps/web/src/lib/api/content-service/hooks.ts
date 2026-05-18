@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { SocialPlatform } from "../types";
-import { contentClient } from "./client";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { SocialPlatform } from '../types';
+import { contentClient } from './client';
 import type {
   ContentPieceResponse,
   ContentStatus,
@@ -8,22 +8,20 @@ import type {
   CreateContentDto,
   CreateReviewDto,
   UpdateContentDto,
-} from "./types";
+} from './types';
 
 /**
  * Query Keys
  */
 export const contentKeys = {
-  all: ["content"] as const,
-  lists: (organizationId: string) =>
-    [...contentKeys.all, "list", organizationId] as const,
-  details: () => [...contentKeys.all, "detail"] as const,
+  all: ['content'] as const,
+  lists: (organizationId: string) => [...contentKeys.all, 'list', organizationId] as const,
+  details: () => [...contentKeys.all, 'detail'] as const,
   detail: (id: string) => [...contentKeys.details(), id] as const,
-  kanban: (organizationId: string) =>
-    [...contentKeys.all, "kanban", organizationId] as const,
+  kanban: (organizationId: string) => [...contentKeys.all, 'kanban', organizationId] as const,
   calendar: (organizationId: string, from: string, to: string) =>
-    [...contentKeys.all, "calendar", organizationId, from, to] as const,
-  comments: (id: string) => [...contentKeys.detail(id), "comments"] as const,
+    [...contentKeys.all, 'calendar', organizationId, from, to] as const,
+  comments: (id: string) => [...contentKeys.detail(id), 'comments'] as const,
 };
 
 /**
@@ -68,11 +66,7 @@ export const useKanbanBoard = (organizationId: string) => {
 /**
  * useContentCalendar
  */
-export const useContentCalendar = (
-  organizationId: string,
-  from: string,
-  to: string,
-) => {
+export const useContentCalendar = (organizationId: string, from: string, to: string) => {
   return useQuery({
     queryKey: contentKeys.calendar(organizationId, from, to),
     queryFn: () => contentClient.getCalendar(organizationId, from, to),
@@ -88,7 +82,7 @@ export const useCreateContent = () => {
 
   return useMutation({
     mutationFn: (data: CreateContentDto) => contentClient.createContent(data),
-    onSuccess: (data) => {
+    onSuccess: data => {
       queryClient.invalidateQueries({
         queryKey: contentKeys.lists(data.organizationId),
       });
@@ -106,8 +100,7 @@ export const useUpdateContent = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateContentDto }) =>
-      contentClient.updateContent(id, data),
+    mutationFn: ({ id, data }: { id: string; data: UpdateContentDto }) => contentClient.updateContent(id, data),
     onSuccess: (data: ContentPieceResponse) => {
       queryClient.invalidateQueries({
         queryKey: contentKeys.detail(data.id),
@@ -129,8 +122,7 @@ export const useDeleteContent = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id }: { id: string; organizationId: string }) =>
-      contentClient.deleteContent(id),
+    mutationFn: ({ id }: { id: string; organizationId: string }) => contentClient.deleteContent(id),
     onSuccess: (_, { organizationId }) => {
       queryClient.invalidateQueries({
         queryKey: contentKeys.lists(organizationId),
@@ -149,8 +141,7 @@ export const useUpdateContentStatus = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: ContentStatus }) =>
-      contentClient.updateStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: ContentStatus }) => contentClient.updateStatus(id, status),
     onSuccess: (data: ContentPieceResponse) => {
       queryClient.invalidateQueries({
         queryKey: contentKeys.detail(data.id),
@@ -172,8 +163,7 @@ export const useSubmitReview = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: CreateReviewDto }) =>
-      contentClient.submitReview(id, data),
+    mutationFn: ({ id, data }: { id: string; data: CreateReviewDto }) => contentClient.submitReview(id, data),
     onSuccess: (data: ContentPieceResponse) => {
       queryClient.invalidateQueries({
         queryKey: contentKeys.detail(data.id),
@@ -200,8 +190,7 @@ export const useAddComment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: CreateCommentDto }) =>
-      contentClient.addComment(id, data),
+    mutationFn: ({ id, data }: { id: string; data: CreateCommentDto }) => contentClient.addComment(id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: contentKeys.comments(id) });
     },

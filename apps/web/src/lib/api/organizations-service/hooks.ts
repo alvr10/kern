@@ -1,22 +1,22 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { organizationsClient } from "./client";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { organizationsClient } from './client';
 import type {
   CreateOrganizationDto,
   InviteUserDto,
   MemberRole,
   UpdateOrganizationDto,
   TransferOwnershipDto,
-} from "./types";
+} from './types';
 
 /**
  * Query Keys
  */
 export const organizationKeys = {
-  all: ["organizations"] as const,
-  lists: () => [...organizationKeys.all, "list"] as const,
-  details: () => [...organizationKeys.all, "detail"] as const,
+  all: ['organizations'] as const,
+  lists: () => [...organizationKeys.all, 'list'] as const,
+  details: () => [...organizationKeys.all, 'detail'] as const,
   detail: (id: string) => [...organizationKeys.details(), id] as const,
-  members: (id: string) => [...organizationKeys.detail(id), "members"] as const,
+  members: (id: string) => [...organizationKeys.detail(id), 'members'] as const,
 };
 
 /**
@@ -47,8 +47,7 @@ export const useCreateOrganization = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateOrganizationDto) =>
-      organizationsClient.createOrganization(data),
+    mutationFn: (data: CreateOrganizationDto) => organizationsClient.createOrganization(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: organizationKeys.lists() });
     },
@@ -120,15 +119,8 @@ export const useUpdateMemberRole = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      memberId,
-      role,
-    }: {
-      id: string;
-      memberId: string;
-      role: MemberRole;
-    }) => organizationsClient.updateMemberRole(id, memberId, role),
+    mutationFn: ({ id, memberId, role }: { id: string; memberId: string; role: MemberRole }) =>
+      organizationsClient.updateMemberRole(id, memberId, role),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: organizationKeys.members(id) });
     },
@@ -142,8 +134,7 @@ export const useRemoveMember = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, memberId }: { id: string; memberId: string }) =>
-      organizationsClient.removeMember(id, memberId),
+    mutationFn: ({ id, memberId }: { id: string; memberId: string }) => organizationsClient.removeMember(id, memberId),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: organizationKeys.members(id) });
     },
@@ -155,8 +146,7 @@ export const useRemoveMember = () => {
  */
 export const useInviteUser = () => {
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: InviteUserDto }) =>
-      organizationsClient.inviteUser(id, data),
+    mutationFn: ({ id, data }: { id: string; data: InviteUserDto }) => organizationsClient.inviteUser(id, data),
   });
 };
 

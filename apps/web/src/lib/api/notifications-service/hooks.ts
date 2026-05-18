@@ -1,18 +1,14 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { notificationsClient } from "./client";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { notificationsClient } from './client';
 
 export const notificationKeys = {
-  all: ["notifications"] as const,
-  lists: () => [...notificationKeys.all, "list"] as const,
+  all: ['notifications'] as const,
+  lists: () => [...notificationKeys.all, 'list'] as const,
   list: (params: any) => [...notificationKeys.lists(), params] as const,
-  unreadCount: () => [...notificationKeys.all, "unread-count"] as const,
+  unreadCount: () => [...notificationKeys.all, 'unread-count'] as const,
 };
 
-export const useNotifications = (params?: {
-  read?: boolean;
-  page?: number;
-  limit?: number;
-}) => {
+export const useNotifications = (params?: { read?: boolean; page?: number; limit?: number }) => {
   return useQuery({
     queryKey: notificationKeys.list(params || {}),
     queryFn: () => notificationsClient.listNotifications(params),

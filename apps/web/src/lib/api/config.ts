@@ -8,18 +8,18 @@ export const API_CONFIG = {
    * Base URL for the API
    * Override with environment variable in production
    */
-  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000",
+  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000',
 
   /**
    * Current API version
    * Can be changed to 'v2', 'v3', etc. for future versions
    */
-  version: "v1" as const,
+  version: 'v1' as const,
 
   /**
    * API prefix (e.g., /api)
    */
-  prefix: "api" as const,
+  prefix: 'api' as const,
 } as const;
 
 /**
@@ -36,14 +36,14 @@ export const getApiBaseUrl = (): string => {
  * @returns Full URL with version (e.g., http://localhost:3000/api/v1/users/123)
  */
 export const getEndpointUrl = (endpoint: string): string => {
-  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   return `${getApiBaseUrl()}${cleanEndpoint}`;
 };
 
 /**
  * API version type for future extensibility
  */
-export type ApiVersion = "v1" | "v2" | "v3";
+export type ApiVersion = 'v1' | 'v2' | 'v3';
 
 /**
  * Creates a versioned API configuration

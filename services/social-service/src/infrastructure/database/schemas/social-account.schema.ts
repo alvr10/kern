@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { SOCIAL_PLATFORM_VALUES, SocialPlatform } from '@kern/shared';
+import { SOCIAL_PLATFORM_VALUES, SocialPlatform } from '@kern/core-backend';
 
 @Schema({ timestamps: true, collection: 'social_accounts' })
 export class SocialAccount extends Document {

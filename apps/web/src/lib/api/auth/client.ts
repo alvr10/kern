@@ -1,19 +1,16 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from '@supabase/supabase-js';
 
-export const supabaseUrl =
-  process.env.NEXT_PUBLIC_SUPABASE_URL ||
-  "https://ymfimkdusibsmniwwotj.supabase.co";
+export const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ymfimkdusibsmniwwotj.supabase.co';
 
 const supabaseAnonKey =
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
-  "sb_publishable_GMfWUGn-u6_SBs-vH9tUbg_ERMCZPhk";
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || 'sb_publishable_GMfWUGn-u6_SBs-vH9tUbg_ERMCZPhk';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    flowType: "pkce",
+    flowType: 'pkce',
   },
 });
 

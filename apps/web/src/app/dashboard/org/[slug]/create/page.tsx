@@ -1,19 +1,15 @@
-"use client";
+'use client';
 
-import React, { useRef, useState } from "react";
-import { useParams } from "next/navigation";
-import { useOrganizations } from "@/lib/api/organizations-service/hooks";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  useKanbanBoard,
-  useUpdateContentStatus,
-  contentKeys,
-} from "@/lib/api/content-service/hooks";
-import { contentClient } from "@/lib/api/content-service/client";
-import { useSubscription } from "@/lib/api/billing-service/hooks";
-import { Plus, HandCoins } from "lucide-react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
+import React, { useRef, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { useOrganizations } from '@/lib/api/organizations-service/hooks';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useKanbanBoard, useUpdateContentStatus, contentKeys } from '@/lib/api/content-service/hooks';
+import { contentClient } from '@/lib/api/content-service/client';
+import { useSubscription } from '@/lib/api/billing-service/hooks';
+import { Plus, HandCoins } from 'lucide-react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import {
   DndContext,
   closestCorners,
@@ -25,15 +21,12 @@ import {
   DragStartEvent,
   DragOverEvent,
   DragOverlay,
-} from "@dnd-kit/core";
-import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import styles from "./page.module.css";
-import {
-  ContentPieceResponse,
-  ContentStatus,
-} from "@/lib/api/content-service/types";
-import { KanbanColumn } from "./_components/kanban-column";
-import { CreateIdeaModal } from "./_components/create-idea-modal";
+} from '@dnd-kit/core';
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import styles from './page.module.css';
+import { ContentPieceResponse, ContentStatus } from '@/lib/api/content-service/types';
+import { KanbanColumn } from './_components/kanban-column';
+import { CreateIdeaModal } from './_components/create-idea-modal';
 
 /**
  * Create Content (Kanban) Page
@@ -44,24 +37,18 @@ export default function CreateContentPage(): React.JSX.Element {
 
   // State for Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<ContentStatus>(
-    ContentStatus.DRAFT,
-  );
-  const [editingItem, setEditingItem] = useState<ContentPieceResponse | null>(
-    null,
-  );
+  const [selectedStatus, setSelectedStatus] = useState<ContentStatus>(ContentStatus.DRAFT);
+  const [editingItem, setEditingItem] = useState<ContentPieceResponse | null>(null);
 
   // 1. Get organizations to find the current one by slug
   const { data: organizations } = useOrganizations();
-  const currentOrg = organizations?.find((org) => org.slug === slug);
+  const currentOrg = organizations?.find(org => org.slug === slug);
 
   // 2. Get kanban board for the organization
-  const { data: kanbanData, isLoading: kanbanLoading } = useKanbanBoard(
-    currentOrg?.id || "",
-  );
+  const { data: kanbanData, isLoading: kanbanLoading } = useKanbanBoard(currentOrg?.id || '');
 
   // 3. Get subscription (Source of Truth for tokens)
-  const { data: subscription } = useSubscription(currentOrg?.id || "");
+  const { data: subscription } = useSubscription(currentOrg?.id || '');
 
   const updateStatus = useUpdateContentStatus();
   const queryClient = useQueryClient();
@@ -75,9 +62,7 @@ export default function CreateContentPage(): React.JSX.Element {
   );
 
   // State for drag
-  const [activeItem, setActiveItem] = useState<ContentPieceResponse | null>(
-    null,
-  );
+  const [activeItem, setActiveItem] = useState<ContentPieceResponse | null>(null);
 
   const handleDragStart = (event: DragStartEvent) => {
     const item = event.active.data.current?.item as ContentPieceResponse;
@@ -91,8 +76,7 @@ export default function CreateContentPage(): React.JSX.Element {
 
   const updateContent = useMutation({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
-      contentClient.updateContent(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => contentClient.updateContent(id, data),
     onSuccess: (data: ContentPieceResponse) => {
       queryClient.invalidateQueries({
         queryKey: contentKeys.kanban(data.organizationId),
@@ -115,9 +99,9 @@ export default function CreateContentPage(): React.JSX.Element {
 
     // 1. Handle cross-column drag
     let targetStatus: ContentStatus | null = null;
-    if (overType === "column") {
+    if (overType === 'column') {
       targetStatus = overStatus;
-    } else if (overType === "card" && overItem) {
+    } else if (overType === 'card' && overItem) {
       targetStatus = overItem.status;
     }
 
@@ -130,20 +114,11 @@ export default function CreateContentPage(): React.JSX.Element {
     }
 
     // 2. Handle same-column reordering
-    if (
-      activeId !== overId &&
-      activeItem &&
-      overItem &&
-      activeItem.status === overItem.status
-    ) {
+    if (activeId !== overId && activeItem && overItem && activeItem.status === overItem.status) {
       const status = activeItem.status;
       const columnItems = kanbanData?.[status] || [];
-      const oldIndex = columnItems.findIndex(
-        (i) => (i.id || (i as any)._id) === activeId,
-      );
-      const newIndex = columnItems.findIndex(
-        (i) => (i.id || (i as any)._id) === overId,
-      );
+      const oldIndex = columnItems.findIndex(i => (i.id || (i as any)._id) === activeId);
+      const newIndex = columnItems.findIndex(i => (i.id || (i as any)._id) === overId);
 
       if (oldIndex !== -1 && newIndex !== -1) {
         // We update the position to the new index
@@ -163,12 +138,12 @@ export default function CreateContentPage(): React.JSX.Element {
   useGSAP(
     () => {
       if (kanbanData && !hasAnimated.current) {
-        gsap.from(".column-anim", {
+        gsap.from('.column-anim', {
           x: 30,
           opacity: 0,
           duration: 0.8,
           stagger: 0.1,
-          ease: "power3.out",
+          ease: 'power3.out',
         });
         hasAnimated.current = true;
       }
@@ -202,33 +177,24 @@ export default function CreateContentPage(): React.JSX.Element {
         <div className={styles.titleSection}>
           <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              marginBottom: "8px",
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '8px',
             }}
           >
             <h1 className={styles.title}>Crear Contenido</h1>
             {subscription && (
               <div className={styles.tokenBadge}>
                 <HandCoins size={14} />
-                <span>
-                  {subscription.tokensLimit - subscription.tokensUsed} tokens
-                  disponibles
-                </span>
+                <span>{subscription.tokensLimit - subscription.tokensUsed} tokens disponibles</span>
               </div>
             )}
           </div>
-          <p className={styles.subtitle}>
-            Organiza tus ideas y planifica tus publicaciones para{" "}
-            {currentOrg?.name}.
-          </p>
+          <p className={styles.subtitle}>Organiza tus ideas y planifica tus publicaciones para {currentOrg?.name}.</p>
         </div>
         <div className={styles.actions}>
-          <button
-            className={styles.createButton}
-            onClick={() => openAddModal(ContentStatus.DRAFT)}
-          >
+          <button className={styles.createButton} onClick={() => openAddModal(ContentStatus.DRAFT)}>
             Nueva Idea
           </button>
         </div>
@@ -290,21 +256,21 @@ export default function CreateContentPage(): React.JSX.Element {
           <div
             className={`${styles.column} column-anim`}
             style={{
-              backgroundColor: "transparent",
-              borderStyle: "dashed",
-              justifyContent: "center",
-              alignItems: "center",
-              cursor: "pointer",
-              minWidth: "200px",
-              flex: "0 0 200px",
+              backgroundColor: 'transparent',
+              borderStyle: 'dashed',
+              justifyContent: 'center',
+              alignItems: 'center',
+              cursor: 'pointer',
+              minWidth: '200px',
+              flex: '0 0 200px',
             }}
           >
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                color: "var(--muted-foreground)",
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: 'var(--muted-foreground)',
               }}
             >
               <Plus size={20} />
@@ -314,24 +280,22 @@ export default function CreateContentPage(): React.JSX.Element {
         </div>
 
         {/* Floating card that follows the mouse */}
-        <DragOverlay dropAnimation={{ duration: 200, easing: "ease" }}>
+        <DragOverlay dropAnimation={{ duration: 200, easing: 'ease' }}>
           {activeItem ? (
             <div
               className={styles.card}
               style={{
-                boxShadow: "0 16px 40px rgba(0,0,0,0.25)",
-                transform: "rotate(2deg) scale(1.03)",
+                boxShadow: '0 16px 40px rgba(0,0,0,0.25)',
+                transform: 'rotate(2deg) scale(1.03)',
                 opacity: 0.95,
-                cursor: "grabbing",
-                pointerEvents: "none",
+                cursor: 'grabbing',
+                pointerEvents: 'none',
               }}
             >
               <div className={styles.cardTitle}>{activeItem.title}</div>
               <div className={styles.cardBody}>{activeItem.body}</div>
               <div className={styles.cardFooter}>
-                <span className={styles.platformBadge}>
-                  {activeItem.platform}
-                </span>
+                <span className={styles.platformBadge}>{activeItem.platform}</span>
               </div>
             </div>
           ) : null}
@@ -342,7 +306,7 @@ export default function CreateContentPage(): React.JSX.Element {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         initialStatus={selectedStatus}
-        organizationId={currentOrg?.id || ""}
+        organizationId={currentOrg?.id || ''}
         item={editingItem || undefined}
       />
     </div>

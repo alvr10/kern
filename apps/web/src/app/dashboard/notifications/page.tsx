@@ -1,24 +1,12 @@
-"use client";
+'use client';
 
-import { 
-  useNotifications, 
-  useMarkAsRead, 
-  useMarkAllAsRead 
-} from "@/lib/api/notifications-service/hooks";
-import { NotificationType } from "@/lib/api/notifications-service/client";
-import styles from "./page.module.css";
-import { 
-  Bell, 
-  CheckCircle2, 
-  XCircle, 
-  UserPlus, 
-  AlertTriangle, 
-  TrendingUp,
-  Inbox
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { formatDistanceToNow } from "date-fns";
-import { es } from "date-fns/locale";
+import { useNotifications, useMarkAsRead, useMarkAllAsRead } from '@/lib/api/notifications-service/hooks';
+import { NotificationType } from '@/lib/api/notifications-service/client';
+import styles from './page.module.css';
+import { Bell, CheckCircle2, XCircle, UserPlus, AlertTriangle, TrendingUp, Inbox } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 /**
  * Notifications Page
@@ -61,7 +49,7 @@ export default function NotificationsPage() {
       <header className={styles.header}>
         <h1 className={styles.title}>Notificaciones</h1>
         {hasNotifications && (
-          <button 
+          <button
             className={styles.markAllBtn}
             onClick={() => markAllAsRead.mutate()}
             disabled={markAllAsRead.isPending}
@@ -78,23 +66,21 @@ export default function NotificationsPage() {
         </div>
       ) : (
         <div className={styles.notificationList}>
-          {notifications.data.map((notif) => (
-            <div 
-              key={notif.id} 
+          {notifications.data.map(notif => (
+            <div
+              key={notif.id}
               className={cn(styles.notificationItem, !notif.read && styles.unread)}
               onClick={() => !notif.read && markAsRead.mutate(notif.id)}
             >
               {!notif.read && <div className={styles.unreadDot} />}
-              <div className={styles.iconWrapper}>
-                {getIcon(notif.type)}
-              </div>
+              <div className={styles.iconWrapper}>{getIcon(notif.type)}</div>
               <div className={styles.content}>
                 <h3 className={styles.notifTitle}>{notif.title}</h3>
                 <p className={styles.notifBody}>{notif.body}</p>
                 <span className={styles.notifTime}>
-                  {formatDistanceToNow(new Date(notif.createdAt), { 
+                  {formatDistanceToNow(new Date(notif.createdAt), {
                     addSuffix: true,
-                    locale: es 
+                    locale: es,
                   })}
                 </span>
               </div>

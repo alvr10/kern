@@ -1,4 +1,4 @@
-import { apiClient } from "../client";
+import { apiClient } from '../client';
 import type {
   AdaptContentDto,
   AIGenerationResponse,
@@ -8,7 +8,7 @@ import type {
   RewriteContentDto,
   TokenUsageResponse,
   HealthResponse,
-} from "./types";
+} from './types';
 
 /**
  * AI Service API Client
@@ -18,35 +18,35 @@ export const aiClient = {
    * Health check
    */
   health: (): Promise<HealthResponse> => {
-    return apiClient.get<HealthResponse>("/health");
+    return apiClient.get<HealthResponse>('/health');
   },
 
   /**
    * Generate a social media post with AI
    */
   generate: (data: GenerateContentDto): Promise<AIGenerationResponse> => {
-    return apiClient.post<AIGenerationResponse>("/ai/generate", data);
+    return apiClient.post<AIGenerationResponse>('/ai/generate', data);
   },
 
   /**
    * Rewrite an existing content piece
    */
   rewrite: (data: RewriteContentDto): Promise<AIGenerationResponse> => {
-    return apiClient.post<AIGenerationResponse>("/ai/rewrite", data);
+    return apiClient.post<AIGenerationResponse>('/ai/rewrite', data);
   },
 
   /**
    * Improve an existing draft
    */
   improve: (data: ImproveContentDto): Promise<AIGenerationResponse> => {
-    return apiClient.post<AIGenerationResponse>("/ai/improve", data);
+    return apiClient.post<AIGenerationResponse>('/ai/improve', data);
   },
 
   /**
    * Adapt content for a different social platform
    */
   adapt: (data: AdaptContentDto): Promise<AIGenerationResponse> => {
-    return apiClient.post<AIGenerationResponse>("/ai/adapt", data);
+    return apiClient.post<AIGenerationResponse>('/ai/adapt', data);
   },
 
   /**
@@ -56,7 +56,7 @@ export const aiClient = {
     organizationId: string,
     params?: { page?: number; limit?: number },
   ): Promise<PaginatedGenerationsResponse> => {
-    return apiClient.get<PaginatedGenerationsResponse>("/ai/generations", {
+    return apiClient.get<PaginatedGenerationsResponse>('/ai/generations', {
       params: { ...params, organizationId },
     });
   },
@@ -65,8 +65,6 @@ export const aiClient = {
    * Get token usage summary for an organization
    */
   getTokenUsage: (organizationId: string): Promise<TokenUsageResponse> => {
-    return apiClient.get<TokenUsageResponse>(
-      `/ai/token-usage/${organizationId}`,
-    );
+    return apiClient.get<TokenUsageResponse>(`/ai/token-usage/${organizationId}`);
   },
 };

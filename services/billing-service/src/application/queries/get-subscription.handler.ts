@@ -17,7 +17,7 @@ export class GetSubscriptionHandler implements IQueryHandler<GetSubscriptionQuer
 
   async execute(query: GetSubscriptionQuery): Promise<any> {
     const subscription = await this.subscriptionRepository.findByOrganizationId(query.organizationId);
-    
+
     if (subscription) {
       return subscription;
     }

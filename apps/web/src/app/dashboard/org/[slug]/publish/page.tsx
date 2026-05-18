@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { useParams } from "next/navigation";
+import React, { useState } from 'react';
+import { useParams } from 'next/navigation';
 import {
   LayoutGrid,
   List,
@@ -14,12 +14,12 @@ import {
   Tag,
   Layers,
   MessageSquare,
-} from "lucide-react";
-import styles from "./page.module.css";
-import { cn } from "@/lib/utils";
-import { useOrganizations } from "@/lib/api/organizations-service/hooks";
-import { useContentCalendar } from "@/lib/api/content-service/hooks";
-import { AnimatePresence, motion } from "framer-motion";
+} from 'lucide-react';
+import styles from './page.module.css';
+import { cn } from '@/lib/utils';
+import { useOrganizations } from '@/lib/api/organizations-service/hooks';
+import { useContentCalendar } from '@/lib/api/content-service/hooks';
+import { AnimatePresence, motion } from 'framer-motion';
 
 /**
  * Schedule / Publish Page
@@ -27,12 +27,12 @@ import { AnimatePresence, motion } from "framer-motion";
 export default function PublishPage() {
   const params = useParams();
   const slug = params.slug as string;
-  const [view, setView] = useState<"list" | "calendar">("calendar");
+  const [view, setView] = useState<'list' | 'calendar'>('calendar');
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   // Auto-scroll to current time on mount
   React.useEffect(() => {
-    if (scrollContainerRef.current && view === "calendar") {
+    if (scrollContainerRef.current && view === 'calendar') {
       const now = new Date();
       const hour = now.getHours();
       // Each hour is 80px high
@@ -43,13 +43,13 @@ export default function PublishPage() {
 
   // 1. Get organizations to find the current one by slug
   const { data: organizations } = useOrganizations();
-  const currentOrg = organizations?.find((org) => org.slug === slug);
+  const currentOrg = organizations?.find(org => org.slug === slug);
 
   // 2. Get calendar data
   const { data: calendarData } = useContentCalendar(
-    currentOrg?.id || "",
-    "2026-04-26T00:00:00Z",
-    "2026-05-02T23:59:59Z",
+    currentOrg?.id || '',
+    '2026-04-26T00:00:00Z',
+    '2026-05-02T23:59:59Z',
   );
 
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -73,15 +73,7 @@ export default function PublishPage() {
   // Generate 7 days: 3 past, reference, 3 future
   const generateDays = () => {
     const result = [];
-    const dayNames = [
-      "Domingo",
-      "Lunes",
-      "Martes",
-      "Miércoles",
-      "Jueves",
-      "Viernes",
-      "Sábado",
-    ];
+    const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
     for (let i = -3; i <= 3; i++) {
       const date = new Date(currentDate);
@@ -129,7 +121,7 @@ export default function PublishPage() {
   // 24 hours for the grid
   const hours = Array.from({ length: 24 }).map((_, i) => {
     const hour = i % 12 || 12;
-    const ampm = i < 12 ? "AM" : "PM";
+    const ampm = i < 12 ? 'AM' : 'PM';
     return {
       value: i,
       label: `${hour} ${ampm}`,
@@ -140,18 +132,18 @@ export default function PublishPage() {
   // Format current month range for the header
   const getMonthRange = () => {
     const months = [
-      "Enero",
-      "Febrero",
-      "Marzo",
-      "Abril",
-      "Mayo",
-      "Junio",
-      "Julio",
-      "Agosto",
-      "Septiembre",
-      "Octubre",
-      "Noviembre",
-      "Diciembre",
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre',
     ];
     const startMonth = months[days[0].fullDate.getMonth()];
     const endMonth = months[days[days.length - 1].fullDate.getMonth()];
@@ -176,21 +168,15 @@ export default function PublishPage() {
         <div className={styles.headerRight}>
           <div className={styles.viewToggle}>
             <button
-              className={cn(
-                styles.toggleBtn,
-                view === "list" && styles.toggleBtnActive,
-              )}
-              onClick={() => setView("list")}
+              className={cn(styles.toggleBtn, view === 'list' && styles.toggleBtnActive)}
+              onClick={() => setView('list')}
             >
               <List size={16} />
               Lista
             </button>
             <button
-              className={cn(
-                styles.toggleBtn,
-                view === "calendar" && styles.toggleBtnActive,
-              )}
-              onClick={() => setView("calendar")}
+              className={cn(styles.toggleBtn, view === 'calendar' && styles.toggleBtnActive)}
+              onClick={() => setView('calendar')}
             >
               <CalendarIcon size={16} />
               Calendario
@@ -224,8 +210,7 @@ export default function PublishPage() {
         </div>
         <div className={styles.controlsRight}>
           <button className={styles.filterBtn}>
-            <MessageSquare size={16} /> Todos los Posts{" "}
-            <ChevronDown size={14} />
+            <MessageSquare size={16} /> Todos los Posts <ChevronDown size={14} />
           </button>
           <button className={styles.filterBtn}>
             <Layers size={16} /> Canales <ChevronDown size={14} />
@@ -249,19 +234,13 @@ export default function PublishPage() {
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ duration: 0.2, ease: "easeInOut" }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
             className={styles.calendarInner}
           >
             <div className={styles.gridHeader}>
               <div className={styles.timeHeader} />
-              {days.map((day) => (
-                <div
-                  key={day.name}
-                  className={cn(
-                    styles.dayLabel,
-                    day.active && styles.dayLabelActive,
-                  )}
-                >
+              {days.map(day => (
+                <div key={day.name} className={cn(styles.dayLabel, day.active && styles.dayLabelActive)}>
                   <span className={styles.dayName}>{day.name}</span>
                   <span className={styles.dayNum}>{day.date}</span>
                 </div>
@@ -269,12 +248,10 @@ export default function PublishPage() {
             </div>
 
             <div className={styles.gridBody} ref={scrollContainerRef}>
-              {hours.map((h) => (
+              {hours.map(h => (
                 <React.Fragment key={h.value}>
                   <div className={styles.hourMarker}>
-                    {h.showLabel && (
-                      <span className={styles.timeLabel}>{h.label}</span>
-                    )}
+                    {h.showLabel && <span className={styles.timeLabel}>{h.label}</span>}
                   </div>
                   {days.map((_, dayIndex) => (
                     <div key={`${h.value}-${dayIndex}`} className={styles.cell}>
@@ -282,9 +259,7 @@ export default function PublishPage() {
                         <Plus size={16} />
                       </div>
                       {/* Mock event */}
-                      {h.value === 20 && dayIndex === 3 && (
-                        <div className={styles.event}>Post Mock Idea</div>
-                      )}
+                      {h.value === 20 && dayIndex === 3 && <div className={styles.event}>Post Mock Idea</div>}
                     </div>
                   ))}
                 </React.Fragment>

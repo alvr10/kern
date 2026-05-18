@@ -7,11 +7,11 @@
  * Supported social platforms
  */
 export enum SocialPlatform {
-  TWITTER = "TWITTER",
-  LINKEDIN = "LINKEDIN",
-  INSTAGRAM = "INSTAGRAM",
-  FACEBOOK = "FACEBOOK",
-  TIKTOK = "TIKTOK",
+  TWITTER = 'TWITTER',
+  LINKEDIN = 'LINKEDIN',
+  INSTAGRAM = 'INSTAGRAM',
+  FACEBOOK = 'FACEBOOK',
+  TIKTOK = 'TIKTOK',
 }
 
 /**
@@ -42,7 +42,7 @@ export interface PaginationParams {
 /**
  * HTTP methods supported by the API client
  */
-export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 /**
  * Request configuration options
@@ -64,6 +64,6 @@ export class ApiClientError extends Error {
     public details?: unknown,
   ) {
     super(message);
-    this.name = "ApiClientError";
+    this.name = 'ApiClientError';
   }
 }

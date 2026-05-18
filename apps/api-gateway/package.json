@@ -4,10 +4,14 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/main.js",
-    "start:dev": "ts-node-dev --respawn --transpile-only src/main.ts"
+    "start:dev": "ts-node-dev --respawn --transpile-only src/main.ts",
+    "lint": "eslint \"src/**/*.ts\" --fix",
+    "lint:check": "eslint \"src/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\""
   },
   "dependencies": {
-    "@kern/shared": "workspace:*",
+    "@kern/core-backend": "workspace:*",
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.0",
@@ -19,6 +23,8 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
+    "@kern/config-typescript": "workspace:*",
+    "@kern/config-eslint": "workspace:*",
     "@types/express": "^5.0.6",
     "@types/node": "^20.0.0",
     "@types/swagger-ui-express": "^4.1.8",
