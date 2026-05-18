@@ -1,0 +1,491 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.sidebar {
+  width: 250px;
+  background-color: var(--card); /* Themed background */
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  transition: background-color 0.3s ease;
+}
+
+.sidebarTop {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.orgHeader {
+  padding: 0 4px;
+}
+
+.logo {
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  color: var(--foreground);
+}
+
+.sideNav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.navGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--muted-foreground);
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  position: relative;
+}
+
+.navItem:hover {
+  background-color: var(--secondary);
+  color: var(--foreground);
+}
+
+.activeNavItem {
+  background-color: var(--secondary);
+  color: var(--foreground);
+}
+
+.disabledNavItem {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+
+.navIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge {
+  margin-left: auto;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.badgeNew {
+  background-color: oklch(0.6 0.1 340);
+  color: #fff;
+}
+
+.badgeComingSoon {
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sectionDivider {
+  height: 1px;
+  background-color: var(--border);
+  margin: 12px 0;
+}
+
+.channelsSection {
+  margin-top: 12px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px 12px;
+  font-size: 13px;
+  color: var(--muted-foreground);
+  font-weight: 500;
+  opacity: 0.6;
+}
+
+.sectionActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.channelList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.channelItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--foreground);
+  font-size: 14px;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.channelItem:hover {
+  background-color: var(--secondary);
+}
+
+.channelIconWrapper {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background-color: var(--secondary);
+}
+
+.plusOverlay {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px;
+  display: flex;
+}
+
+.moreChannels {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.plusIcon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+}
+
+/* Bottom Sidebar */
+.sidebarBottom {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.promoCard {
+  background-color: var(--secondary);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid var(--border);
+}
+
+.promoContent {
+  background-color: #fce7aa; /* Pale yellow stays as it's a specific promo color */
+  border-radius: 10px;
+  padding: 16px;
+  color: #333;
+}
+
+.promoHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: #4ade80;
+  border-radius: 50%;
+  margin-left: auto;
+}
+
+.promoIcons {
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 6px;
+  border-radius: 99px;
+  width: fit-content;
+  gap: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.promoIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.promoFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.sidebarFooter {
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.userProfile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.planName {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+
+.collapseButton {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Main Content area */
+.contentWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.footerActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 12px 8px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.sidebarIconButton {
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebarIconButton:hover {
+  background-color: var(--secondary);
+  color: var(--foreground);
+}
+
+.main {
+  flex: 1;
+  padding: 24px;
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* Organization Popup Menu */
+.orgPopup {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 260px;
+  padding: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.popupHeader {
+  padding: 12px;
+}
+
+.userEmail {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-bottom: 4px;
+}
+
+.orgName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.planDetails {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-bottom: 12px;
+}
+
+.upgradeButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 8px;
+  background-color: var(--secondary);
+  color: var(--foreground);
+  border: 1.5px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.upgradeButton:hover {
+  background-color: var(--accent);
+}
+
+.popupDivider {
+  height: 1px;
+  background-color: var(--border);
+  margin: 4px 8px;
+}
+
+.popupNav {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0;
+}
+
+.popupItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.popupItem:hover {
+  background-color: var(--secondary);
+}
+
+.betaBadge {
+  margin-left: auto;
+  font-size: 10px;
+  background-color: #334155;
+  color: #94a3b8;
+  padding: 1px 6px;
+  border-radius: 99px;
+  font-weight: 600;
+}
+
+/* Sub-menus */
+.subMenu {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 240px;
+  padding: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.popupSectionTitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  padding: 8px 12px 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  background-color: #10b981;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.disabledItem {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.comingSoonBadge {
+  margin-left: auto;
+  font-size: 9px;
+  background-color: var(--secondary);
+  color: var(--muted-foreground);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}

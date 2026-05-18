@@ -1,0 +1,105 @@
+.header {
+  position: fixed;
+  top: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100; /* Stays above video and grid */
+}
+
+.navBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3rem;
+  padding: 0.75rem 1.5rem 0.75rem 2rem;
+  background: rgba(255, 255, 255, 0.4); /* Stronger white tint for contrast */
+  backdrop-filter: blur(2px); /* Increased blur */
+  border-radius: 9999px; /* Fully rounded corners */
+  
+  /* Bevel effect: shinier top edges, darker bottom edges */
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.8), /* Top inner shine */
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1),      /* Bottom inner shadow */
+    0 4px 24px -8px rgba(0, 0, 0, 0.3);       /* Subtle drop shadow */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  width: 90vw; /* Initial large width for GSAP to manipulate */
+  max-width: 1200px;
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #000000;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.link {
+  position: relative;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #000000;
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.link:hover, .link:focus {
+  opacity: 1;
+}
+
+.authLinks {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-left: 1rem;
+}
+
+.loginButton {
+  position: relative;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #000000;
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.loginButton:hover, .loginButton:focus {
+  opacity: 1;
+}
+
+.signupButton {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #000000;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.signupButton:hover {
+  transform: scale(1.05);
+}
+
+/* Make it responsive */
+@media (max-width: 767px) {
+  .navBar {
+    gap: 1.5rem;
+    padding: 0.5rem 1.25rem;
+  }
+  .links {
+    display: none; /* Hide standard links to make space for auth */
+  }
+  .authLinks {
+    margin-left: 0;
+  }
+}

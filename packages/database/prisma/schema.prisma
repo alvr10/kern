@@ -1,0 +1,195 @@
+// ============================================================
+// Kern — PostgreSQL Schema (Supabase)
+// Handles: Users, Orgs, Billing, Access Control
+//
+// MongoDB handles: Content, Comments, Reviews, AI logs,
+//                  Notifications (see mongoose-schemas.ts)
+//
+// Setup:
+//   1. Paste the trigger SQL at the bottom into Supabase SQL editor
+//   2. Set DATABASE_URL (pooler port 6543) and
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum MemberRole {
+  ADMIN   // Manage org, members, billing
+  EDITOR  // Create/edit content, use AI
+  VIEWER  // Review and approve only
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+enum OrganizationType {
+  PERSONAL
+  TEAM
+}
+
+// ============================================================
+// PROFILES
+// Mirrors auth.users — auto-created by the trigger below.
+// `id` = Supabase Auth UUID. Never insert manually.
+// ============================================================
+
+model Profile {
+  id        String  @id       // Supabase Auth UUID — set by trigger
+  email     String  @unique
+  name      String
+  avatarUrl         String?  @map("avatar_url")
+  timezone          String   @default("UTC")
+
+  notifyTokenAlerts Boolean  @default(true) @map("notify_token_alerts")
+  notifyApprovals   Boolean  @default(true) @map("notify_approvals")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  // Relations (all within PostgreSQL)
+  memberships        Membership[]
+  ownedOrganizations Organization[] @relation("OwnedOrganizations")
+  sentInvitations    Invitation[]   @relation("InvitedBy")
+
+  // Note: contentPieces, aiGenerations, notifications live in MongoDB.
+  // Reference this profile by its `id` (UUID string) from those collections.
+
+  @@map("profiles")
+}
+
+// ============================================================
+// PLANS & SUBSCRIPTIONS
+// ============================================================
+
+model Plan {
+  id                   String   @id @default(cuid())
+  name                 String   @unique   // "Free" | "Starter" | "Pro"
+  slug                 String   @unique
+  monthlyTokenLimit    Int      @map("monthly_token_limit")
+  memberLimit          Int      @map("member_limit")
+  priceMonthlyUsd      Decimal  @db.Decimal(10, 2) @map("price_monthly_usd")
+  stripePriceIdMonthly String?  @map("stripe_price_id_monthly")
+  stripePriceIdYearly  String?  @map("stripe_price_id_yearly")
+  features             Json     @default("[]")
+  isActive             Boolean  @default(true) @map("is_active")
+
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id             String             @id @default(cuid())
+  organizationId String             @unique @map("organization_id")
+  planId         String             @map("plan_id")
+  status         SubscriptionStatus @default(TRIALING)
+
+  // Stripe fields — updated via webhook
+  stripeCustomerId        String?   @unique @map("stripe_customer_id")
+  stripeSubscriptionId    String?   @unique @map("stripe_subscription_id")
+  stripeCurrentPeriodEnd  DateTime? @map("stripe_current_period_end")
+  stripeCancelAtPeriodEnd Boolean   @default(false) @map("stripe_cancel_at_period_end")
+
+  // Token tracking — reset on each billing period via Stripe webhook
+  tokensUsed         Int     @default(0) @map("tokens_used")
+  tokensLimit        Int     @default(0) @map("tokens_limit") // snapshot of plan limit at subscription time
+  tokensAlertSent80  Boolean @default(false) @map("tokens_alert_sent_80")
+  tokensAlertSent100 Boolean @default(false) @map("tokens_alert_sent_100")
+
+  trialEndsAt DateTime? @map("trial_ends_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt      @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan         Plan         @relation(fields: [planId], references: [id])
+
+  @@index([planId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+// ============================================================
+// ORGANIZATIONS, MEMBERSHIP & INVITATIONS
+// ============================================================
+
+model Organization {
+  id         String           @id @default(cuid())
+  type       OrganizationType @default(TEAM)
+  ownerId    String           @map("owner_id")
+  name       String
+  slug       String           @unique
+  logoUrl    String?          @map("logo_url")
+  // { tone, style, keywords: string[], avoidWords: string[] }
+  brandVoice Json?            @map("brand_voice")
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt      @map("updated_at")
+  deletedAt  DateTime?        @map("deleted_at") // soft delete
+
+  owner        Profile       @relation("OwnedOrganizations", fields: [ownerId], references: [id])
+  subscription Subscription?
+  memberships  Membership[]
+  invitations  Invitation[]
+
+  // Note: notifications for this org live in MongoDB (organizationId field).
+
+  @@index([slug])
+  @@map("organizations")
+}
+
+model Membership {
+  id             String     @id @default(cuid())
+  profileId      String     @map("profile_id")
+  organizationId String     @map("organization_id")
+  role           MemberRole @default(EDITOR)
+  joinedAt       DateTime   @default(now()) @map("joined_at")
+  updatedAt      DateTime   @updatedAt      @map("updated_at")
+
+  profile      Profile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, organizationId])
+  @@index([organizationId])
+  @@index([role])
+  @@map("memberships")
+}
+
+model Invitation {
+  id             String           @id @default(cuid())
+  organizationId String           @map("organization_id")
+  invitedById    String           @map("invited_by_id")
+  email          String
+  role           MemberRole       @default(EDITOR)
+  token          String           @unique @default(cuid())
+  status         InvitationStatus @default(PENDING)
+  expiresAt      DateTime         @map("expires_at")
+  acceptedAt     DateTime?        @map("accepted_at")
+  createdAt      DateTime         @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy    Profile      @relation("InvitedBy", fields: [invitedById], references: [id])
+
+  @@index([organizationId])
+  @@index([email])
+  @@index([token])
+  @@map("invitations")
+}

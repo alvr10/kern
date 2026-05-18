@@ -1,0 +1,341 @@
+openapi: 3.0.0
+info:
+  title: KERN Admin Service
+  version: 1.0.0
+  description: Internal admin panel for platform management. All endpoints require an ADMIN_SECRET header.
+
+tags:
+  - name: Users
+  - name: Organizations
+  - name: Analytics
+  - name: System
+  - name: Health
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      operationId: adminHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /admin/users:
+    get:
+      tags: [Users]
+      summary: List all user profiles
+      operationId: adminListUsers
+      security:
+        - adminSecret: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by name or email
+      responses:
+        '200':
+          description: Paginated user list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUsersResponse'
+
+  /admin/users/{id}:
+    get:
+      tags: [Users]
+      summary: Get user profile with memberships
+      operationId: adminGetUser
+      security:
+        - adminSecret: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: User detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserDetailResponse'
+        '404':
+          description: Not found
+
+  /admin/users/{id}/ban:
+    patch:
+      tags: [Users]
+      summary: Ban or unban a user
+      operationId: adminBanUser
+      security:
+        - adminSecret: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [banned]
+              properties:
+                banned:
+                  type: boolean
+      responses:
+        '200':
+          description: User ban status updated
+
+  /admin/organizations:
+    get:
+      tags: [Organizations]
+      summary: List all organizations with stats
+      operationId: adminListOrganizations
+      security:
+        - adminSecret: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Paginated organization list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOrgsResponse'
+
+  /admin/organizations/{id}:
+    delete:
+      tags: [Organizations]
+      summary: Hard-delete an organization
+      operationId: adminDeleteOrganization
+      security:
+        - adminSecret: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Organization deleted
+
+  /admin/analytics/overview:
+    get:
+      tags: [Analytics]
+      summary: Platform-wide KPIs
+      operationId: adminOverview
+      security:
+        - adminSecret: []
+      responses:
+        '200':
+          description: Platform analytics overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsOverviewResponse'
+
+  /admin/analytics/tokens:
+    get:
+      tags: [Analytics]
+      summary: Token usage breakdown per organization
+      operationId: adminTokenUsage
+      security:
+        - adminSecret: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Token usage per org
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrgTokenUsageResponse'
+
+  /admin/system/health:
+    get:
+      tags: [System]
+      summary: Aggregate health status of all services
+      operationId: adminSystemHealth
+      security:
+        - adminSecret: []
+      responses:
+        '200':
+          description: All service health statuses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemHealthResponse'
+
+components:
+  securitySchemes:
+    adminSecret:
+      type: apiKey
+      in: header
+      name: x-admin-secret
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    AdminUserDetailResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+        avatarUrl:
+          type: string
+          nullable: true
+        memberships:
+          type: array
+          items:
+            type: object
+            properties:
+              organizationId:
+                type: string
+              organizationName:
+                type: string
+              role:
+                type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    PaginatedUsersResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminUserDetailResponse'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    PaginatedOrgsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              slug:
+                type: string
+              memberCount:
+                type: integer
+              subscriptionStatus:
+                type: string
+              createdAt:
+                type: string
+                format: date-time
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    AnalyticsOverviewResponse:
+      type: object
+      properties:
+        totalUsers:
+          type: integer
+        totalOrganizations:
+          type: integer
+        totalContentPieces:
+          type: integer
+        totalAIGenerations:
+          type: integer
+        totalTokensConsumed:
+          type: integer
+        activeSubscriptions:
+          type: integer
+
+    OrgTokenUsageResponse:
+      type: object
+      properties:
+        organizationId:
+          type: string
+        organizationName:
+          type: string
+        tokensUsed:
+          type: integer
+        tokensLimit:
+          type: integer
+        percentUsed:
+          type: number
+          format: float
+
+    SystemHealthResponse:
+      type: object
+      properties:
+        services:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              status:
+                type: string
+                enum: [healthy, unhealthy, unknown]
+              respondedAt:
+                type: string
+                format: date-time

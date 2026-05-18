@@ -1,0 +1,523 @@
+openapi: 3.0.0
+info:
+  title: KERN Content Service
+  version: 1.0.0
+  description: |
+    Manages content pieces (social media posts) across their full lifecycle.
+    Supports Kanban board views, scheduling, reviews, and comments.
+
+tags:
+  - name: Content
+  - name: Reviews
+  - name: Comments
+  - name: Health
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      operationId: contentHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /content:
+    get:
+      tags: [Content]
+      summary: List content pieces
+      operationId: listContent
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: organizationId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ContentStatus'
+        - name: platform
+          in: query
+          schema:
+            $ref: '#/components/schemas/SocialPlatform'
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Paginated list of content pieces
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedContentResponse'
+
+    post:
+      tags: [Content]
+      summary: Create a new content piece
+      operationId: createContent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContentDto'
+      responses:
+        '201':
+          description: Content piece created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentPieceResponse'
+
+  /content/kanban:
+    get:
+      tags: [Content]
+      summary: Get content pieces grouped by status for Kanban view
+      operationId: getKanban
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: organizationId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Kanban board grouped by status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KanbanResponse'
+
+  /content/calendar:
+    get:
+      tags: [Content]
+      summary: Get scheduled content pieces for a date range
+      operationId: getCalendar
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: organizationId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Scheduled content pieces within date range
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContentPieceResponse'
+
+  /content/{id}:
+    get:
+      tags: [Content]
+      summary: Get a content piece by ID
+      operationId: getContent
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Content piece detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentPieceResponse'
+        '404':
+          description: Not found
+
+    patch:
+      tags: [Content]
+      summary: Update a content piece
+      operationId: updateContent
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContentDto'
+      responses:
+        '200':
+          description: Updated content piece
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentPieceResponse'
+
+    delete:
+      tags: [Content]
+      summary: Soft-delete a content piece
+      operationId: deleteContent
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Content piece deleted
+
+  /content/{id}/status:
+    patch:
+      tags: [Content]
+      summary: Transition content piece status
+      operationId: updateContentStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  $ref: '#/components/schemas/ContentStatus'
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentPieceResponse'
+
+  /content/{id}/reviews:
+    post:
+      tags: [Reviews]
+      summary: Submit a review for a content piece
+      operationId: submitReview
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReviewDto'
+      responses:
+        '201':
+          description: Review submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentPieceResponse'
+
+  /content/{id}/comments:
+    get:
+      tags: [Comments]
+      summary: List comments on a content piece
+      operationId: listComments
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: List of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentResponse'
+
+    post:
+      tags: [Comments]
+      summary: Add a comment to a content piece
+      operationId: addComment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentDto'
+      responses:
+        '201':
+          description: Comment added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    ContentStatus:
+      type: string
+      enum: [DRAFT, IN_REVIEW, APPROVED, PUBLISHED, ARCHIVED]
+
+    SocialPlatform:
+      type: string
+      enum: [TWITTER, LINKEDIN, INSTAGRAM, FACEBOOK, TIKTOK]
+
+    CreateContentDto:
+      type: object
+      required: [organizationId, title, body, platform]
+      properties:
+        organizationId:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        draftId:
+          type: string
+          nullable: true
+          description: Client-side session ID used to link AI generations.
+        platform:
+          $ref: '#/components/schemas/SocialPlatform'
+        hashtags:
+          type: array
+          items:
+            type: string
+          default: []
+        mediaUrls:
+          type: array
+          items:
+            type: string
+          default: []
+        scheduledAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    UpdateContentDto:
+      type: object
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+        hashtags:
+          type: array
+          items:
+            type: string
+        mediaUrls:
+          type: array
+          items:
+            type: string
+        scheduledAt:
+          type: string
+          format: date-time
+          nullable: true
+        kanbanPosition:
+          type: integer
+
+    ContentPieceResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        organizationId:
+          type: string
+        authorId:
+          type: string
+        draftId:
+          type: string
+          nullable: true
+        title:
+          type: string
+        body:
+          type: string
+        status:
+          $ref: '#/components/schemas/ContentStatus'
+        platform:
+          $ref: '#/components/schemas/SocialPlatform'
+        hashtags:
+          type: array
+          items:
+            type: string
+        mediaUrls:
+          type: array
+          items:
+            type: string
+        kanbanPosition:
+          type: integer
+        scheduledAt:
+          type: string
+          format: date-time
+          nullable: true
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        reviews:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewResponse'
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentResponse'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PaginatedContentResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentPieceResponse'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    KanbanResponse:
+      type: object
+      properties:
+        DRAFT:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentPieceResponse'
+        IN_REVIEW:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentPieceResponse'
+        APPROVED:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentPieceResponse'
+        PUBLISHED:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentPieceResponse'
+        ARCHIVED:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentPieceResponse'
+
+    CreateReviewDto:
+      type: object
+      required: [approved]
+      properties:
+        approved:
+          type: boolean
+        comment:
+          type: string
+          nullable: true
+
+    ReviewResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        reviewerId:
+          type: string
+        approved:
+          type: boolean
+        comment:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateCommentDto:
+      type: object
+      required: [body]
+      properties:
+        body:
+          type: string
+        parentId:
+          type: string
+          nullable: true
+          description: Parent comment ID for threaded replies
+
+    CommentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        authorId:
+          type: string
+        body:
+          type: string
+        parentId:
+          type: string
+          nullable: true
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time

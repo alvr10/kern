@@ -1,0 +1,17 @@
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { ListSocialAccountsQuery } from './list-social-accounts.query';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { SocialAccount as MongoAccount } from '../../infrastructure/database/schemas/social-account.schema';
+
+@QueryHandler(ListSocialAccountsQuery)
+export class ListSocialAccountsHandler implements IQueryHandler<ListSocialAccountsQuery> {
+  constructor(
+    @InjectModel(MongoAccount.name)
+    private readonly accountModel: Model<MongoAccount>,
+  ) {}
+
+  async execute(query: ListSocialAccountsQuery): Promise<any[]> {
+    return this.accountModel.find({ organizationId: query.organizationId }).exec();
+  }
+}

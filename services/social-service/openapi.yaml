@@ -1,0 +1,198 @@
+openapi: 3.0.0
+info:
+  title: KERN Social Service
+  version: 1.0.0
+  description: Manages connected social media accounts (OAuth tokens) and scheduled post publishing.
+
+tags:
+  - name: Social Accounts
+  - name: Publishing
+  - name: Health
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      operationId: socialHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /social/accounts:
+    get:
+      tags: [Social Accounts]
+      summary: List connected social accounts for an organization
+      operationId: listSocialAccounts
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: organizationId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of connected social accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SocialAccountResponse'
+
+    post:
+      tags: [Social Accounts]
+      summary: Connect a new social media account (store OAuth token)
+      operationId: connectSocialAccount
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectSocialAccountDto'
+      responses:
+        '201':
+          description: Social account connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialAccountResponse'
+        '409':
+          description: Account for this platform already connected
+
+  /social/accounts/{id}:
+    delete:
+      tags: [Social Accounts]
+      summary: Disconnect a social media account
+      operationId: disconnectSocialAccount
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Account disconnected
+
+  /social/publish/{contentPieceId}:
+    post:
+      tags: [Publishing]
+      summary: Publish a content piece immediately to its platform
+      operationId: publishNow
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contentPieceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Published successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublishResultResponse'
+        '404':
+          description: Content piece not found
+        '422':
+          description: Content is not in APPROVED state or platform account not connected
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    SocialPlatform:
+      type: string
+      enum: [TWITTER, LINKEDIN, INSTAGRAM, FACEBOOK, TIKTOK]
+
+    ConnectSocialAccountDto:
+      type: object
+      required: [organizationId, platform, accessToken, platformUserId]
+      properties:
+        organizationId:
+          type: string
+        platform:
+          $ref: '#/components/schemas/SocialPlatform'
+        platformUserId:
+          type: string
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+          nullable: true
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    SocialAccountResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        organizationId:
+          type: string
+        platform:
+          $ref: '#/components/schemas/SocialPlatform'
+        platformUserId:
+          type: string
+        profileData:
+          type: object
+          description: Platform-specific profile info (name, avatar, handle)
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    PublishResultResponse:
+      type: object
+      properties:
+        contentPieceId:
+          type: string
+        platform:
+          $ref: '#/components/schemas/SocialPlatform'
+        platformPostId:
+          type: string
+          description: The ID of the post on the social platform
+        publishedAt:
+          type: string
+          format: date-time
+        url:
+          type: string
+          description: Direct URL to the live post

@@ -1,0 +1,14 @@
+{
+  "name": "@kern/config-eslint",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shared ESLint configurations for KERN monorepo",
+  "main": "nestjs.mjs",
+  "dependencies": {
+    "@eslint/js": "^9.16.0",
+    "eslint-config-next": "16.1.6",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "typescript-eslint": "^8.24.1"
+  }
+}
