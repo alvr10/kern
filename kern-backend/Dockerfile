@@ -54,11 +54,14 @@ RUN pnpm --filter @kern/${SERVICE_NAME} build
 # =============================================================================
 FROM builder AS deployer
 
-# Force a flat node_modules for the deployed output.
+# Force a flat node_modules for the deployed output if the service uses Prisma.
 # The isolated (symlink) linker causes @prisma/client to resolve from inside
 # .pnpm/... where it cannot find the generated .prisma/client folder.
-RUN echo "node-linker=hoisted" >> .npmrc && \
-    pnpm --filter @kern/${SERVICE_NAME} --prod deploy --legacy /app/out
+RUN if grep -q '"@prisma/client"' "./services/${SERVICE_NAME}/package.json"; then \
+      echo "node-linker=hoisted" >> .npmrc; \
+    fi && \
+    echo "inject-workspace-packages=true" >> .npmrc && \
+    pnpm --filter @kern/${SERVICE_NAME} --prod deploy /app/out
 
 # Robustly find and copy the generated Prisma client into the deploy output.
 # With pnpm's isolated linker, prisma generate may write .prisma into
