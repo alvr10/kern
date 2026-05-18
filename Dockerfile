@@ -14,8 +14,10 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
-COPY .npmrc ./
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages/config-typescript/package.json ./packages/config-typescript/
+COPY packages/config-eslint/package.json ./packages/config-eslint/
+COPY packages/config-prettier/package.json ./packages/config-prettier/
 COPY packages/core-backend/package.json ./packages/core-backend/
 COPY packages/database/package.json ./packages/database/
 COPY apps/api-gateway/package.json ./apps/api-gateway/
@@ -28,7 +30,7 @@ COPY services/billing-service/package.json ./services/billing-service/
 COPY services/notifications-service/package.json ./services/notifications-service/
 COPY services/admin-service/package.json ./services/admin-service/
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # =============================================================================
 # STAGE 2: builder — Compile TypeScript
@@ -38,10 +40,14 @@ FROM deps AS builder
 ARG SERVICE_NAME
 ARG SERVICE_PATH
 
-COPY tsconfig.base.json ./
+COPY packages/config-typescript/ ./packages/config-typescript/
+COPY packages/config-eslint/ ./packages/config-eslint/
+COPY packages/config-prettier/ ./packages/config-prettier/
 COPY packages/core-backend/ ./packages/core-backend/
 COPY packages/database/ ./packages/database/
 COPY ${SERVICE_PATH}/ ./${SERVICE_PATH}/
+
+RUN pnpm install --frozen-lockfile
 
 # Generate Prisma client in the builder so TypeScript has access to the generated types.
 RUN if grep -q '"@prisma/client"' "./${SERVICE_PATH}/package.json"; then \

@@ -26,7 +26,7 @@ This project operates under strict software engineering patterns:
 ## 📁 Repository Layout
 
 ```text
-practica-kern/
+kern/
 ├── apps/
 │   ├── web/                    # Next.js 16 Web Portal (Dashboard, Onboarding)
 │   └── api-gateway/            # NestJS API Gateway (Public Entry, Rate Limiting)
@@ -51,17 +51,17 @@ practica-kern/
 
 ## 🗺️ Service Ports Map
 
-| Target | Location | Port | Database | Primary Responsibility |
-| :--- | :--- | :--- | :--- | :--- |
-| `web` | `apps/web` | **3001** (Prod) | Supabase API | Frontend Dashboard User Interface |
-| `api-gateway` | `apps/api-gateway` | **3000** | — | Single public gateway, HTTP proxy, Rate Limiting |
-| `organizations-service` | `services/organizations-service` | 3002 | PostgreSQL (Prisma) | Teams, Members, Roles, Workspaces |
-| `content-service` | `services/content-service` | 3004 | MongoDB (Mongoose) | Content curation, Kanban boards, schedules |
-| `social-service` | `services/social-service` | 3005 | MongoDB (Mongoose) | API integration to social networks |
-| `ai-service` | `services/ai-service` | 3006 | MongoDB (Mongoose) | Gemini 1.5 prompt validation, usage auditing |
-| `billing-service` | `services/billing-service` | 3007 | PostgreSQL (Prisma) | Stripe Plans, Subscriptions & Invoicing |
-| `notifications-service` | `services/notifications-service` | 3008 | MongoDB (Mongoose) | In-app, Email & Push notification engine |
-| `admin-service` | `services/admin-service` | 3009 | PostgreSQL + Mongo | Administrative panel metrics, system override |
+| Target                  | Location                         | Port            | Database            | Primary Responsibility                           |
+| :---------------------- | :------------------------------- | :-------------- | :------------------ | :----------------------------------------------- |
+| `web`                   | `apps/web`                       | **3001** (Prod) | Supabase API        | Frontend Dashboard User Interface                |
+| `api-gateway`           | `apps/api-gateway`               | **3000**        | —                   | Single public gateway, HTTP proxy, Rate Limiting |
+| `organizations-service` | `services/organizations-service` | 3002            | PostgreSQL (Prisma) | Teams, Members, Roles, Workspaces                |
+| `content-service`       | `services/content-service`       | 3004            | MongoDB (Mongoose)  | Content curation, Kanban boards, schedules       |
+| `social-service`        | `services/social-service`        | 3005            | MongoDB (Mongoose)  | API integration to social networks               |
+| `ai-service`            | `services/ai-service`            | 3006            | MongoDB (Mongoose)  | Gemini 1.5 prompt validation, usage auditing     |
+| `billing-service`       | `services/billing-service`       | 3007            | PostgreSQL (Prisma) | Stripe Plans, Subscriptions & Invoicing          |
+| `notifications-service` | `services/notifications-service` | 3008            | MongoDB (Mongoose)  | In-app, Email & Push notification engine         |
+| `admin-service`         | `services/admin-service`         | 3009            | PostgreSQL + Mongo  | Administrative panel metrics, system override    |
 
 ---
 
@@ -93,7 +93,9 @@ cp apps/web/.env.example apps/web/.env.local
 To balance rapid development and comprehensive deployment, we use **Docker Compose Profiles** to easily control the Next.js frontend build.
 
 ### Option A: Standard Dev Mode (Recommended) ⚡
+
 Run all backend microservices, gateways, service meshes, and databases inside Docker, while running the Next.js frontend locally (which features fast, sub-second hot-reloads):
+
 ```bash
 # Start all backend microservices & databases
 docker-compose up -d
@@ -103,7 +105,9 @@ pnpm --filter @kern/web dev
 ```
 
 ### Option B: Full-Stack Container Build (All-In-One) 📦
+
 Build and spin up the entire platform—including the Next.js container—inside Docker:
+
 ```bash
 # Force Docker to build and run EVERYTHING including the Next.js container
 docker-compose --profile frontend up --build -d

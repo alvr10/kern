@@ -11,6 +11,15 @@ importers:
       '@eslint/js':
         specifier: ^9.16.0
         version: 9.39.4
+      '@kern/config-eslint':
+        specifier: workspace:*
+        version: link:packages/config-eslint
+      '@kern/config-prettier':
+        specifier: workspace:*
+        version: link:packages/config-prettier
+      '@kern/config-typescript':
+        specifier: workspace:*
+        version: link:packages/config-typescript
       eslint:
         specifier: ^9.16.0
         version: 9.39.4(jiti@2.7.0)

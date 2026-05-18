@@ -1,1 +1,1 @@
-"@kern/config-prettier"
+"./packages/config-prettier/index.json"
