@@ -1,7 +1,7 @@
 'use client';
 
 import { useNotifications, useMarkAsRead, useMarkAllAsRead } from '@/lib/api/notifications-service/hooks';
-import { NotificationType } from '@/lib/api/notifications-service/client';
+import { NotificationType, NotificationResponse } from '@/lib/api/notifications-service/client';
 import styles from './page.module.css';
 import { Bell, CheckCircle2, XCircle, UserPlus, AlertTriangle, TrendingUp, Inbox } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -42,7 +42,9 @@ export default function NotificationsPage() {
     );
   }
 
-  const notificationsList = Array.isArray(notifications) ? notifications : (notifications as any)?.data || [];
+  const notificationsList: NotificationResponse[] = Array.isArray(notifications)
+    ? notifications
+    : ((notifications as { data?: NotificationResponse[] } | null)?.data ?? []);
   const hasNotifications = notificationsList.length > 0;
 
   return (
@@ -67,7 +69,7 @@ export default function NotificationsPage() {
         </div>
       ) : (
         <div className={styles.notificationList}>
-          {notificationsList.map((notif: any) => (
+          {notificationsList.map(notif => (
             <div
               key={notif.id}
               className={cn(styles.notificationItem, !notif.read && styles.unread)}
@@ -78,7 +80,7 @@ export default function NotificationsPage() {
               <div className={styles.content}>
                 <div className={styles.titleRow}>
                   <h3 className={styles.notifTitle}>{notif.title}</h3>
-                  {notif.type === NotificationType.INVITATION && notif.metadata?.role && (
+                  {notif.type === NotificationType.INVITATION && typeof notif.metadata?.role === 'string' && (
                     <span className={cn(styles.roleBadge, styles[`role${notif.metadata.role}`])}>
                       {notif.metadata.role}
                     </span>

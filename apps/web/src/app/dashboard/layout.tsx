@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
 import styles from './layout.module.css';
 import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
@@ -35,6 +36,7 @@ import { useOrganizations } from '@/lib/api/organizations-service/hooks';
 import { useSubscription } from '@/lib/api/billing-service/hooks';
 import { useAuth } from '@/lib/api/auth/hooks';
 import { useSocialAccounts, useConnectSocialAccount, useDisconnectSocialAccount } from '@/lib/api/social-service/hooks';
+import { SocialAccountResponse } from '@/lib/api/social-service/types';
 import { SocialPlatform } from '@/lib/api/types';
 import { cn } from '@/lib/utils';
 
@@ -87,14 +89,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { data: subscription } = useSubscription(currentOrg?.id || '');
 
   const { data: connectedAccounts = [] } = useSocialAccounts(currentOrg?.id || '');
+  const typedAccounts = connectedAccounts as SocialAccountResponse[];
   const connectMutation = useConnectSocialAccount();
   const disconnectMutation = useDisconnectSocialAccount();
 
   const handleConnectPlatform = async (platform: string) => {
     if (!currentOrg?.id) return;
     try {
-      const generatedId = `mock_user_${Math.random().toString(36).substring(7)}`;
-      const generatedToken = `mock_token_${Math.random().toString(36).substring(7)}`;
+      const generatedId = `mock_user_${crypto.randomUUID().replace(/-/g, '').substring(0, 8)}`;
+      const generatedToken = `mock_token_${crypto.randomUUID().replace(/-/g, '').substring(0, 8)}`;
 
       await connectMutation.mutateAsync({
         organizationId: currentOrg.id,
@@ -113,8 +116,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setIsConnectingCustom(true);
     try {
       const platformKey = customPlatformName.trim().toUpperCase().replace(/\s+/g, '_');
-      const generatedId = `mock_user_${Math.random().toString(36).substring(7)}`;
-      const generatedToken = `mock_token_${Math.random().toString(36).substring(7)}`;
+      const generatedId = `mock_user_${crypto.randomUUID().replace(/-/g, '').substring(0, 8)}`;
+      const generatedToken = `mock_token_${crypto.randomUUID().replace(/-/g, '').substring(0, 8)}`;
 
       await connectMutation.mutateAsync({
         organizationId: currentOrg.id,
@@ -277,14 +280,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <div className={styles.channelsSection}>
                     <div className={styles.channelsSectionTitle}>Canales conectados</div>
                     <div className={styles.channelList}>
-                      {connectedAccounts.slice(0, 2).map(account => (
-                        <div key={account.id || (account as any)._id} className={styles.connectedChannelItem}>
-                          <img
+                      {typedAccounts.slice(0, 2).map(account => (
+                        <div key={account.id} className={styles.connectedChannelItem}>
+                          <Image
                             src={
-                              (account.profileData?.avatar as string) ||
+                              (account.profileData?.avatar as string) ??
                               `https://api.dicebear.com/7.x/bottts/svg?seed=${account.platform}`
                             }
                             alt={account.platform}
+                            width={36}
+                            height={36}
                             className={styles.connectedChannelAvatar}
                           />
                           <div className={styles.channelBadge}>{getPlatformIcon(account.platform, 10)}</div>
@@ -297,7 +302,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             </span>
                           </div>
                           <button
-                            onClick={e => handleDisconnectPlatform(account.id || (account as any)._id, e)}
+                            onClick={e => handleDisconnectPlatform(account.id, e)}
                             className={styles.disconnectButton}
                             title="Desconectar canal"
                             disabled={disconnectMutation.isPending}
@@ -313,7 +318,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           style={{ marginTop: '4px', textDecoration: 'none', padding: '6px 12px' }}
                         >
                           <span style={{ fontSize: '12px', opacity: 0.8 }}>
-                            Ver los {connectedAccounts.length} canales conectados...
+                            Ver los {typedAccounts.length} canales conectados...
                           </span>
                         </Link>
                       )}

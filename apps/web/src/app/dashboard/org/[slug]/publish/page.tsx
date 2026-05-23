@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import {
   LayoutGrid,
@@ -28,6 +29,8 @@ import { ContentStatus } from '@/lib/api/content-service/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { ContentPieceResponse } from '@/lib/api/content-service/types';
+import { SocialAccountResponse } from '@/lib/api/social-service/types';
 
 /**
  * Schedule / Publish Page
@@ -46,7 +49,7 @@ export default function PublishPage() {
   // Modal & Publishing States
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
-  const [activePost, setActivePost] = useState<any>(null);
+  const [activePost, setActivePost] = useState<ContentPieceResponse | null>(null);
   const [publishingPlatformId, setPublishingPlatformId] = useState<string | null>(null);
   const [publishStatus, setPublishStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
@@ -73,10 +76,13 @@ export default function PublishPage() {
     organizationId: currentOrg?.id || '',
     limit: 100,
   });
-  const realPosts = Array.isArray(contentList) ? contentList : (contentList as any)?.data || [];
+  const realPosts: ContentPieceResponse[] = Array.isArray(contentList)
+    ? contentList
+    : ((contentList as { data?: ContentPieceResponse[] } | null)?.data ?? []);
 
   // 3. Get all connected social accounts for the publish selection
   const { data: connectedAccounts = [] } = useSocialAccounts(currentOrg?.id || '');
+  const typedAccounts = connectedAccounts as SocialAccountResponse[];
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [direction, setDirection] = useState(0); // -1 for past, 1 for future
@@ -124,7 +130,7 @@ export default function PublishPage() {
 
   const days = generateDays();
 
-  const filteredPosts = realPosts.filter((post: any) => {
+  const filteredPosts = realPosts.filter(post => {
     if (!post.scheduledAt) return false;
     const matchPlatform = !selectedPlatform || post.platform === selectedPlatform;
     const matchTag = !selectedTag || post.hashtags?.includes(selectedTag);
@@ -132,7 +138,7 @@ export default function PublishPage() {
   });
 
   // Dynamically extract all unique hashtags from real posts to populate the tags filter!
-  const allHashtags = Array.from(new Set(realPosts.flatMap((post: any) => post.hashtags || []))) as string[];
+  const allHashtags = Array.from(new Set(realPosts.flatMap(post => post.hashtags ?? []))) as string[];
 
   const handlePrevWeek = () => {
     setDirection(-1);
@@ -190,21 +196,19 @@ export default function PublishPage() {
   };
 
   // Pre-select a connected account when opening the publish modal for a post
-  const handleSelectPost = (post: any) => {
+  const handleSelectPost = (post: ContentPieceResponse) => {
     setActivePost(post);
     setIsPublishModalOpen(true);
     setPublishStatus('idle');
 
     // Find if we have a connected account matching the target platform
-    const matchingAccount = connectedAccounts.find(
-      (acc: any) => acc.platform.toUpperCase() === post.platform.toUpperCase(),
-    );
+    const matchingAccount = typedAccounts.find(acc => acc.platform.toUpperCase() === post.platform.toUpperCase());
 
     if (matchingAccount) {
-      setPublishingPlatformId(matchingAccount.id || (matchingAccount as any)._id);
-    } else if (connectedAccounts.length > 0) {
+      setPublishingPlatformId(matchingAccount.id);
+    } else if (typedAccounts.length > 0) {
       // Fallback to the first connected account
-      setPublishingPlatformId(connectedAccounts[0].id || (connectedAccounts[0] as any)._id);
+      setPublishingPlatformId(typedAccounts[0].id);
     } else {
       setPublishingPlatformId(null);
     }
@@ -217,7 +221,7 @@ export default function PublishPage() {
     try {
       // Set Post Status to PUBLISHED in content-service Database
       await updateStatusMutation.mutateAsync({
-        id: activePost.id || activePost._id,
+        id: activePost.id,
         status: ContentStatus.PUBLISHED,
       });
 
@@ -437,7 +441,7 @@ export default function PublishPage() {
                       </div>
                       {/* Render dynamic filtered posts */}
                       {filteredPosts
-                        .filter((post: any) => {
+                        .filter(post => {
                           if (!post.scheduledAt) return false;
                           const postDate = new Date(post.scheduledAt);
                           const dayDate = days[dayIndex].fullDate;
@@ -448,7 +452,7 @@ export default function PublishPage() {
                             postDate.getFullYear() === dayDate.getFullYear()
                           );
                         })
-                        .map((post: any) => (
+                        .map(post => (
                           <div
                             key={post.id || post._id}
                             onClick={() => handleSelectPost(post)}
@@ -561,8 +565,8 @@ export default function PublishPage() {
 
                 {connectedAccounts.length > 0 ? (
                   <div className={styles.channelSelectGroup}>
-                    {connectedAccounts.map((account: any) => {
-                      const accountId = account.id || account._id;
+                    {typedAccounts.map(account => {
+                      const accountId = account.id;
                       const isActive = publishingPlatformId === accountId;
                       return (
                         <button
@@ -575,12 +579,14 @@ export default function PublishPage() {
                           className={cn(styles.channelOption, isActive && styles.channelOptionActive)}
                           disabled={activePost.status === 'PUBLISHED'}
                         >
-                          <img
+                          <Image
                             src={
-                              (account.profileData?.avatar as string) ||
+                              (account.profileData?.avatar as string) ??
                               `https://api.dicebear.com/7.x/bottts/svg?seed=${account.platform}`
                             }
                             alt={account.platform}
+                            width={40}
+                            height={40}
                             className={styles.channelOptionAvatar}
                           />
                           <div className={styles.channelOptionInfo}>
@@ -623,8 +629,7 @@ export default function PublishPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
                 {publishStatus === 'success' && (
                   <div className={styles.publishStatusSuccess}>
-                    ✓ ¡Publicado con éxito en{' '}
-                    {connectedAccounts.find((a: any) => (a.id || a._id) === publishingPlatformId)?.platform}!
+                    ✓ ¡Publicado con éxito en {typedAccounts.find(a => a.id === publishingPlatformId)?.platform}!
                   </div>
                 )}
                 {publishStatus === 'error' && (

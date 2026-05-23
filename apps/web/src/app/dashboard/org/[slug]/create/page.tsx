@@ -7,7 +7,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useKanbanBoard, useUpdateContentStatus, contentKeys } from '@/lib/api/content-service/hooks';
 import { contentClient } from '@/lib/api/content-service/client';
 import { useSubscription } from '@/lib/api/billing-service/hooks';
-import { Plus, HandCoins } from 'lucide-react';
+import { HandCoins } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import {

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import {
   useOrganizations,
   useUpdateOrganization,
@@ -49,21 +50,14 @@ export default function SettingsPage() {
   // 5. Members
   const { data: members, isLoading: isMembersLoading } = useOrganizationMembers(organizationId || '');
 
-  // 6. Active Tab State
-  const [activeTab, setActiveTab] = useState<'general' | 'members' | 'channels'>('general');
-
-  // Listen to url search params on load
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const queryParams = new URLSearchParams(window.location.search);
-      const tab = queryParams.get('tab');
-      if (tab === 'channels') {
-        setActiveTab('channels');
-      } else if (tab === 'members') {
-        setActiveTab('members');
-      }
-    }
-  }, []);
+  // 6. Active Tab State — derive initial value from URL search params (no setState in effect)
+  const searchParams = useSearchParams();
+  const initialTab = (() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'channels' || tab === 'members') return tab;
+    return 'general';
+  })() as 'general' | 'members' | 'channels';
+  const [activeTab, setActiveTab] = useState<'general' | 'members' | 'channels'>(initialTab);
 
   const handleTabChange = (tab: 'general' | 'members' | 'channels') => {
     setActiveTab(tab);
@@ -85,8 +79,8 @@ export default function SettingsPage() {
   const handleConnectPlatform = async (platform: string) => {
     if (!organizationId) return;
     try {
-      const generatedId = `mock_user_${Math.random().toString(36).substring(7)}`;
-      const generatedToken = `mock_token_${Math.random().toString(36).substring(7)}`;
+      const generatedId = `mock_user_${crypto.randomUUID().replace(/-/g, '').substring(0, 8)}`;
+      const generatedToken = `mock_token_${crypto.randomUUID().replace(/-/g, '').substring(0, 8)}`;
 
       await connectMutation.mutateAsync({
         organizationId,
@@ -105,8 +99,8 @@ export default function SettingsPage() {
     setIsConnectingCustom(true);
     try {
       const platformKey = customPlatformName.trim().toUpperCase().replace(/\s+/g, '_');
-      const generatedId = `mock_user_${Math.random().toString(36).substring(7)}`;
-      const generatedToken = `mock_token_${Math.random().toString(36).substring(7)}`;
+      const generatedId = `mock_user_${crypto.randomUUID().replace(/-/g, '').substring(0, 8)}`;
+      const generatedToken = `mock_token_${crypto.randomUUID().replace(/-/g, '').substring(0, 8)}`;
 
       await connectMutation.mutateAsync({
         organizationId,
@@ -464,9 +458,16 @@ export default function SettingsPage() {
 
             {connectedAccounts.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {connectedAccounts.map((account: any) => (
+                {(
+                  connectedAccounts as Array<{
+                    id?: string;
+                    _id?: string;
+                    platform: string;
+                    profileData?: { avatar?: string; name?: string; handle?: string };
+                  }>
+                ).map(account => (
                   <div
-                    key={account.id || account._id}
+                    key={account.id ?? account._id}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -478,22 +479,22 @@ export default function SettingsPage() {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <img
+                      <Image
                         src={
-                          (account.profileData?.avatar as string) ||
+                          account.profileData?.avatar ??
                           `https://api.dicebear.com/7.x/bottts/svg?seed=${account.platform}`
                         }
                         alt={account.platform}
+                        width={40}
+                        height={40}
                         style={{
-                          width: '40px',
-                          height: '40px',
                           borderRadius: '50%',
                           border: '1px solid var(--border)',
                         }}
                       />
                       <div>
                         <div style={{ fontWeight: 600, fontSize: '15px' }}>
-                          {(account.profileData?.name as string) || account.platform}
+                          {account.profileData?.name || account.platform}
                         </div>
                         <div
                           style={{
@@ -505,12 +506,12 @@ export default function SettingsPage() {
                           }}
                         >
                           {getPlatformIcon(account.platform, 14)}
-                          <span>{(account.profileData?.handle as string) || `@${account.platform.toLowerCase()}`}</span>
+                          <span>{account.profileData?.handle || `@${account.platform.toLowerCase()}`}</span>
                         </div>
                       </div>
                     </div>
                     <button
-                      onClick={() => handleDisconnectPlatform(account.id || account._id)}
+                      onClick={() => handleDisconnectPlatform((account.id ?? account._id) as string)}
                       className={styles.deleteButton}
                       style={{
                         padding: '8px 16px',
@@ -557,7 +558,12 @@ export default function SettingsPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px' }}>
               {defaultChannels
-                .filter(ch => !connectedAccounts?.some((acc: any) => acc.platform.toUpperCase() === ch.key))
+                .filter(
+                  ch =>
+                    !(connectedAccounts as Array<{ platform: string }>)?.some(
+                      acc => acc.platform.toUpperCase() === ch.key,
+                    ),
+                )
                 .map(channel => (
                   <button
                     key={channel.key}
