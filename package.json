@@ -2,7 +2,7 @@
   "name": "kern-monorepo",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@10.33.2",
+  "packageManager": "pnpm@11.2.2",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
@@ -11,7 +11,6 @@
     "format": "turbo run format",
     "format:check": "turbo run format:check"
   },
-  "dependencies": {},
   "devDependencies": {
     "@eslint/js": "^9.16.0",
     "@kern/config-eslint": "workspace:*",

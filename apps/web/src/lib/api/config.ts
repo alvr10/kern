@@ -8,7 +8,7 @@ export const API_CONFIG = {
    * Base URL for the API
    * Override with environment variable in production
    */
-  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000',
+  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000',
 
   /**
    * Current API version
@@ -24,7 +24,7 @@ export const API_CONFIG = {
 
 /**
  * Constructs the full API base URL with version
- * @returns Full API base URL (e.g., http://localhost:3000/api/v1)
+ * @returns Full API base URL (e.g., http://localhost:8000/api/v1)
  */
 export const getApiBaseUrl = (): string => {
   return `${API_CONFIG.baseUrl}/${API_CONFIG.prefix}/${API_CONFIG.version}`;
@@ -33,7 +33,7 @@ export const getApiBaseUrl = (): string => {
 /**
  * Constructs a versioned endpoint URL
  * @param endpoint - The endpoint path (e.g., '/users/123')
- * @returns Full URL with version (e.g., http://localhost:3000/api/v1/users/123)
+ * @returns Full URL with version (e.g., http://localhost:8000/api/v1/users/123)
  */
 export const getEndpointUrl = (endpoint: string): string => {
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;

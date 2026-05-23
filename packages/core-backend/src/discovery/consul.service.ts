@@ -20,7 +20,7 @@ export class ConsulService implements OnModuleInit, OnModuleDestroy {
     });
 
     this.serviceName = this.config.get<string>('SERVICE_NAME', 'unknown');
-    this.servicePort = Number(this.config.get<number>('PORT', 3000));
+    this.servicePort = Number(this.config.get<number>('PORT', 8000));
     this.serviceId = `${this.serviceName}-${process.pid}`;
   }
 

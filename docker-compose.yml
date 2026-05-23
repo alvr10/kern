@@ -5,14 +5,14 @@ services:
     container_name: kern-consul
     restart: unless-stopped
     ports:
-      - "8500:8500" # UI + API
+      - '8500:8500' # UI + API
     command: agent -dev -client=0.0.0.0 -ui
     volumes:
       - consul_data:/consul/data
     networks:
       - kern-network
     healthcheck:
-      test: [ "CMD", "consul", "members" ]
+      test: ['CMD', 'consul', 'members']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -24,7 +24,7 @@ services:
     # Port mapping kept for dev database access if needed,
     # but in production, this would be internal only.
     ports:
-      - "27017:27017"
+      - '27017:27017'
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-kern}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASS:-kernpass}
@@ -34,7 +34,7 @@ services:
     networks:
       - kern-network
     healthcheck:
-      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -45,8 +45,8 @@ services:
     container_name: kern-rabbitmq
     restart: unless-stopped
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - '5672:5672'
+      - '15672:15672'
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-kern}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-kernpass}
@@ -55,7 +55,7 @@ services:
     networks:
       - kern-network
     healthcheck:
-      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -69,23 +69,23 @@ services:
       args:
         SERVICE_NAME: api-gateway
         SERVICE_PATH: apps/api-gateway
-        PORT: 3000
+        PORT: 8000
     container_name: kern-api-gateway
     restart: unless-stopped
     ports:
-      - "${GATEWAY_PORT:-3000}:3000"
+      - '${GATEWAY_PORT:-8000}:8000'
     environment:
-      GATEWAY_PORT: 3000
+      GATEWAY_PORT: 8000
       CONSUL_URL: http://consul:8500
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
-      OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
-      OTEL_TRACES_SAMPLER_ARG: "0.1"
-      OTEL_BSP_MAX_QUEUE_SIZE: "4096"
-      OTEL_BSP_EXPORT_TIMEOUT: "10000"
-      OTEL_SERVICE_NAME: "api-gateway"
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'http://alloy:4318'
+      OTEL_TRACES_SAMPLER: 'parentbased_traceidratio'
+      OTEL_TRACES_SAMPLER_ARG: '0.1'
+      OTEL_BSP_MAX_QUEUE_SIZE: '4096'
+      OTEL_BSP_EXPORT_TIMEOUT: '10000'
+      OTEL_SERVICE_NAME: 'api-gateway'
       SUPABASE_URL: ${SUPABASE_URL}
       SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
-      OTEL_RESOURCE_ATTRIBUTES: "service.namespace=kern,deployment.environment=${NODE_ENV}"
+      OTEL_RESOURCE_ATTRIBUTES: 'service.namespace=kern,deployment.environment=${NODE_ENV}'
     depends_on:
       consul:
         condition: service_healthy
@@ -102,21 +102,21 @@ services:
       args:
         SERVICE_NAME: organizations-service
         SERVICE_PATH: services/organizations-service
-        PORT: 3000
+        PORT: 8000
     container_name: kern-organizations-service
     restart: unless-stopped
     environment:
-      PORT: 3000
+      PORT: 8000
       SERVICE_NAME: organizations-service
       CONSUL_URL: http://consul:8500
       DATABASE_URL: ${DATABASE_URL}
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
-      OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
-      OTEL_TRACES_SAMPLER_ARG: "0.1"
-      OTEL_BSP_MAX_QUEUE_SIZE: "4096"
-      OTEL_BSP_EXPORT_TIMEOUT: "10000"
-      OTEL_SERVICE_NAME: "organizations-service"
-      OTEL_RESOURCE_ATTRIBUTES: "service.namespace=kern,deployment.environment=${NODE_ENV}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'http://alloy:4318'
+      OTEL_TRACES_SAMPLER: 'parentbased_traceidratio'
+      OTEL_TRACES_SAMPLER_ARG: '0.1'
+      OTEL_BSP_MAX_QUEUE_SIZE: '4096'
+      OTEL_BSP_EXPORT_TIMEOUT: '10000'
+      OTEL_SERVICE_NAME: 'organizations-service'
+      OTEL_RESOURCE_ATTRIBUTES: 'service.namespace=kern,deployment.environment=${NODE_ENV}'
     networks:
       - kern-network
     depends_on:
@@ -133,21 +133,21 @@ services:
       args:
         SERVICE_NAME: content-service
         SERVICE_PATH: services/content-service
-        PORT: 3000
+        PORT: 8000
     container_name: kern-content-service
     restart: unless-stopped
     environment:
-      PORT: 3000
+      PORT: 8000
       SERVICE_NAME: content-service
       CONSUL_URL: http://consul:8500
       MONGODB_URI: ${MONGODB_URI}
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
-      OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
-      OTEL_TRACES_SAMPLER_ARG: "0.1"
-      OTEL_BSP_MAX_QUEUE_SIZE: "4096"
-      OTEL_BSP_EXPORT_TIMEOUT: "10000"
-      OTEL_SERVICE_NAME: "content-service"
-      OTEL_RESOURCE_ATTRIBUTES: "service.namespace=kern,deployment.environment=${NODE_ENV}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'http://alloy:4318'
+      OTEL_TRACES_SAMPLER: 'parentbased_traceidratio'
+      OTEL_TRACES_SAMPLER_ARG: '0.1'
+      OTEL_BSP_MAX_QUEUE_SIZE: '4096'
+      OTEL_BSP_EXPORT_TIMEOUT: '10000'
+      OTEL_SERVICE_NAME: 'content-service'
+      OTEL_RESOURCE_ATTRIBUTES: 'service.namespace=kern,deployment.environment=${NODE_ENV}'
     networks:
       - kern-network
     depends_on:
@@ -166,21 +166,21 @@ services:
       args:
         SERVICE_NAME: social-service
         SERVICE_PATH: services/social-service
-        PORT: 3000
+        PORT: 8000
     container_name: kern-social-service
     restart: unless-stopped
     environment:
-      PORT: 3000
+      PORT: 8000
       SERVICE_NAME: social-service
       CONSUL_URL: http://consul:8500
       MONGODB_URI: ${MONGODB_URI}
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
-      OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
-      OTEL_TRACES_SAMPLER_ARG: "0.1"
-      OTEL_BSP_MAX_QUEUE_SIZE: "4096"
-      OTEL_BSP_EXPORT_TIMEOUT: "10000"
-      OTEL_SERVICE_NAME: "social-service"
-      OTEL_RESOURCE_ATTRIBUTES: "service.namespace=kern,deployment.environment=${NODE_ENV}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'http://alloy:4318'
+      OTEL_TRACES_SAMPLER: 'parentbased_traceidratio'
+      OTEL_TRACES_SAMPLER_ARG: '0.1'
+      OTEL_BSP_MAX_QUEUE_SIZE: '4096'
+      OTEL_BSP_EXPORT_TIMEOUT: '10000'
+      OTEL_SERVICE_NAME: 'social-service'
+      OTEL_RESOURCE_ATTRIBUTES: 'service.namespace=kern,deployment.environment=${NODE_ENV}'
     networks:
       - kern-network
     depends_on:
@@ -199,21 +199,21 @@ services:
       args:
         SERVICE_NAME: notifications-service
         SERVICE_PATH: services/notifications-service
-        PORT: 3000
+        PORT: 8000
     container_name: kern-notifications-service
     restart: unless-stopped
     environment:
-      PORT: 3000
+      PORT: 8000
       SERVICE_NAME: notifications-service
       CONSUL_URL: http://consul:8500
       MONGODB_URI: ${MONGODB_URI}
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
-      OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
-      OTEL_TRACES_SAMPLER_ARG: "0.1"
-      OTEL_BSP_MAX_QUEUE_SIZE: "4096"
-      OTEL_BSP_EXPORT_TIMEOUT: "10000"
-      OTEL_SERVICE_NAME: "notifications-service"
-      OTEL_RESOURCE_ATTRIBUTES: "service.namespace=kern,deployment.environment=${NODE_ENV}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'http://alloy:4318'
+      OTEL_TRACES_SAMPLER: 'parentbased_traceidratio'
+      OTEL_TRACES_SAMPLER_ARG: '0.1'
+      OTEL_BSP_MAX_QUEUE_SIZE: '4096'
+      OTEL_BSP_EXPORT_TIMEOUT: '10000'
+      OTEL_SERVICE_NAME: 'notifications-service'
+      OTEL_RESOURCE_ATTRIBUTES: 'service.namespace=kern,deployment.environment=${NODE_ENV}'
     networks:
       - kern-network
     depends_on:
@@ -234,23 +234,23 @@ services:
       args:
         SERVICE_NAME: billing-service
         SERVICE_PATH: services/billing-service
-        PORT: 3000
+        PORT: 8000
     container_name: kern-billing-service
     restart: unless-stopped
     environment:
-      PORT: 3000
+      PORT: 8000
       SERVICE_NAME: billing-service
       CONSUL_URL: http://consul:8500
       DATABASE_URL: ${DATABASE_URL}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
-      OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
-      OTEL_TRACES_SAMPLER_ARG: "0.1"
-      OTEL_BSP_MAX_QUEUE_SIZE: "4096"
-      OTEL_BSP_EXPORT_TIMEOUT: "10000"
-      OTEL_SERVICE_NAME: "billing-service"
-      OTEL_RESOURCE_ATTRIBUTES: "service.namespace=kern,deployment.environment=${NODE_ENV}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'http://alloy:4318'
+      OTEL_TRACES_SAMPLER: 'parentbased_traceidratio'
+      OTEL_TRACES_SAMPLER_ARG: '0.1'
+      OTEL_BSP_MAX_QUEUE_SIZE: '4096'
+      OTEL_BSP_EXPORT_TIMEOUT: '10000'
+      OTEL_SERVICE_NAME: 'billing-service'
+      OTEL_RESOURCE_ATTRIBUTES: 'service.namespace=kern,deployment.environment=${NODE_ENV}'
     networks:
       - kern-network
     depends_on:
@@ -267,22 +267,22 @@ services:
       args:
         SERVICE_NAME: ai-service
         SERVICE_PATH: services/ai-service
-        PORT: 3000
+        PORT: 8000
     container_name: kern-ai-service
     restart: unless-stopped
     environment:
-      PORT: 3000
+      PORT: 8000
       SERVICE_NAME: ai-service
       CONSUL_URL: http://consul:8500
       MONGODB_URI: ${MONGODB_URI}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
-      OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
-      OTEL_TRACES_SAMPLER_ARG: "0.1"
-      OTEL_BSP_MAX_QUEUE_SIZE: "4096"
-      OTEL_BSP_EXPORT_TIMEOUT: "10000"
-      OTEL_SERVICE_NAME: "ai-service"
-      OTEL_RESOURCE_ATTRIBUTES: "service.namespace=kern,deployment.environment=${NODE_ENV}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'http://alloy:4318'
+      OTEL_TRACES_SAMPLER: 'parentbased_traceidratio'
+      OTEL_TRACES_SAMPLER_ARG: '0.1'
+      OTEL_BSP_MAX_QUEUE_SIZE: '4096'
+      OTEL_BSP_EXPORT_TIMEOUT: '10000'
+      OTEL_SERVICE_NAME: 'ai-service'
+      OTEL_RESOURCE_ATTRIBUTES: 'service.namespace=kern,deployment.environment=${NODE_ENV}'
     networks:
       - kern-network
     depends_on:
@@ -301,25 +301,25 @@ services:
       args:
         SERVICE_NAME: admin-service
         SERVICE_PATH: services/admin-service
-        PORT: 3000
+        PORT: 8000
     container_name: kern-admin-service
     restart: unless-stopped
     ports:
-      - "${ADMIN_PORT:-3009}:3000"
+      - '${ADMIN_PORT:-8009}:8000'
     environment:
-      ADMIN_PORT: 3000
+      ADMIN_PORT: 8000
       SERVICE_NAME: admin-service
       CONSUL_URL: http://consul:8500
       DATABASE_URL: ${DATABASE_URL}
       MONGODB_URI: ${MONGODB_URI}
       ADMIN_SECRET: ${ADMIN_SECRET:-change-me-in-production}
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
-      OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
-      OTEL_TRACES_SAMPLER_ARG: "0.1"
-      OTEL_BSP_MAX_QUEUE_SIZE: "4096"
-      OTEL_BSP_EXPORT_TIMEOUT: "10000"
-      OTEL_SERVICE_NAME: "admin-service"
-      OTEL_RESOURCE_ATTRIBUTES: "service.namespace=kern,deployment.environment=${NODE_ENV}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'http://alloy:4318'
+      OTEL_TRACES_SAMPLER: 'parentbased_traceidratio'
+      OTEL_TRACES_SAMPLER_ARG: '0.1'
+      OTEL_BSP_MAX_QUEUE_SIZE: '4096'
+      OTEL_BSP_EXPORT_TIMEOUT: '10000'
+      OTEL_SERVICE_NAME: 'admin-service'
+      OTEL_RESOURCE_ATTRIBUTES: 'service.namespace=kern,deployment.environment=${NODE_ENV}'
     networks:
       - kern-network
     depends_on:
@@ -338,11 +338,11 @@ services:
       args:
         SERVICE_NAME: web
         SERVICE_PATH: apps/web
-        PORT: 3000
+        PORT: 8000
     container_name: kern-web
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - '8001:8000'
     environment:
       NODE_ENV: production
       NEXT_PUBLIC_SUPABASE_URL: ${SUPABASE_URL}
@@ -358,9 +358,9 @@ services:
     container_name: kern-alloy
     restart: unless-stopped
     ports:
-      - "12345:12345" # UI
-      - "4317:4317" # OTLP gRPC
-      - "4318:4318" # OTLP HTTP
+      - '12345:12345' # UI
+      - '4317:4317' # OTLP gRPC
+      - '4318:4318' # OTLP HTTP
     volumes:
       - ./infra/alloy/config.alloy:/etc/alloy/config.alloy
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -374,7 +374,7 @@ services:
     container_name: kern-mimir
     restart: unless-stopped
     ports:
-      - "9009:9009"
+      - '9009:9009'
     volumes:
       - ./infra/mimir/mimir-config.yml:/etc/mimir/mimir.yaml
       - mimir_data:/data
@@ -390,7 +390,7 @@ services:
     container_name: kern-tempo
     restart: unless-stopped
     ports:
-      - "3200:3200" # Search / UI
+      - '3200:3200' # Search / UI
     volumes:
       - ./infra/tempo/tempo-config.yml:/etc/tempo.yaml
       - tempo_data:/var/tempo
@@ -403,7 +403,7 @@ services:
     container_name: kern-loki
     restart: unless-stopped
     ports:
-      - "3101:3100"
+      - '3101:3100'
     volumes:
       - ./infra/loki/loki-config.yml:/etc/loki/local-config.yaml
       - loki_data:/loki
@@ -415,10 +415,10 @@ services:
     container_name: kern-grafana
     restart: unless-stopped
     ports:
-      - "3100:3000"
+      - '3100:8000'
     environment:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
-      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_USERS_ALLOW_SIGN_UP: 'false'
     volumes:
       - ./infra/grafana/provisioning:/etc/grafana/provisioning
       - grafana_data:/var/lib/grafana
@@ -434,8 +434,8 @@ services:
     container_name: kern-minio
     restart: unless-stopped
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - '9000:9000'
+      - '9001:9001'
     environment:
       MINIO_ROOT_USER: mimir
       MINIO_ROOT_PASSWORD: mimirpass
@@ -445,7 +445,7 @@ services:
     networks:
       - kern-network
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
       interval: 10s
       timeout: 5s
       retries: 5

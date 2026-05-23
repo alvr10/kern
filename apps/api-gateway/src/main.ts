@@ -101,7 +101,7 @@ async function bootstrap() {
     }
   });
 
-  const port = process.env.GATEWAY_PORT || 3000;
+  const port = process.env.GATEWAY_PORT || 8000;
   await app.listen(port);
   console.log(`██╗  ██╗███████╗██████╗ ███╗   ██╗
 ██║ ██╔╝██╔════╝██╔══██╗████╗  ██║
@@ -110,7 +110,7 @@ async function bootstrap() {
 ██║  ██╗███████╗██║  ██║██║ ╚████║
 ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
                                   `);
-  console.log('[api-gateway] 🚀  Listening on http://localhost:3000');
-  console.log('[api-gateway] 📄  API Docs available at http://localhost:3000/api/docs');
+  console.log('[api-gateway] 🚀  Listening on http://localhost:8000');
+  console.log('[api-gateway] 📄  API Docs available at http://localhost:8000/api/docs');
 }
 bootstrap();

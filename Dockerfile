@@ -147,4 +147,4 @@ ENV SERVICE_NAME=${SERVICE_NAME}
 
 USER node
 
-CMD ["sh", "-c", "if [ \"$SERVICE_NAME\" = \"web\" ]; then pnpm --filter @kern/web start --port 3000; else node ${SERVICE_PATH}/dist/main.js; fi"]
+CMD ["sh", "-c", "if [ \"$SERVICE_NAME\" = \"web\" ]; then pnpm --filter @kern/web start --port 8000; else node ${SERVICE_PATH}/dist/main.js; fi"]
