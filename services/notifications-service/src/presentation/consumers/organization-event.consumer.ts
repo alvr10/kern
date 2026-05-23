@@ -15,7 +15,7 @@ export class OrganizationEventConsumer {
     this.logger.log(`Received organization invitation event: ${JSON.stringify(data)}`);
 
     // The event from organization-service contains email, organizationName, etc.
-    const { email, userId, organizationName, inviterName, inviterId } = data;
+    const { email, userId, organizationId, organizationName, inviterName, inviterId, role, token } = data;
     const targetUserId = userId || email;
 
     if (!targetUserId) {
@@ -24,14 +24,15 @@ export class OrganizationEventConsumer {
     }
 
     const sender = inviterName || 'Someone';
+    const roleName = role || 'MEMBER';
 
     await this.commandBus.execute(
       new CreateNotificationCommand(
         targetUserId,
         NotificationType.INVITATION,
         'New Organization Invitation',
-        `You have been invited to join ${organizationName} by ${sender}.`,
-        { organizationName, inviterName: sender, inviterId },
+        `You have been invited to join ${organizationName} as ${roleName} by ${sender}.`,
+        { organizationName, inviterName: sender, inviterId, role: roleName, token, organizationId },
       ),
     );
   }

@@ -56,6 +56,7 @@ export class InviteUserHandler implements ICommandHandler<InviteUserCommand> {
       organizationName: organization.name,
       inviterId: command.invitedById,
       role: command.role,
+      token,
     });
 
     return id;

@@ -42,7 +42,8 @@ export default function NotificationsPage() {
     );
   }
 
-  const hasNotifications = notifications?.data && notifications.data.length > 0;
+  const notificationsList = Array.isArray(notifications) ? notifications : (notifications as any)?.data || [];
+  const hasNotifications = notificationsList.length > 0;
 
   return (
     <div className={styles.container}>
@@ -66,7 +67,7 @@ export default function NotificationsPage() {
         </div>
       ) : (
         <div className={styles.notificationList}>
-          {notifications.data.map(notif => (
+          {notificationsList.map((notif: any) => (
             <div
               key={notif.id}
               className={cn(styles.notificationItem, !notif.read && styles.unread)}
@@ -75,7 +76,14 @@ export default function NotificationsPage() {
               {!notif.read && <div className={styles.unreadDot} />}
               <div className={styles.iconWrapper}>{getIcon(notif.type)}</div>
               <div className={styles.content}>
-                <h3 className={styles.notifTitle}>{notif.title}</h3>
+                <div className={styles.titleRow}>
+                  <h3 className={styles.notifTitle}>{notif.title}</h3>
+                  {notif.type === NotificationType.INVITATION && notif.metadata?.role && (
+                    <span className={cn(styles.roleBadge, styles[`role${notif.metadata.role}`])}>
+                      {notif.metadata.role}
+                    </span>
+                  )}
+                </div>
                 <p className={styles.notifBody}>{notif.body}</p>
                 <span className={styles.notifTime}>
                   {formatDistanceToNow(new Date(notif.createdAt), {

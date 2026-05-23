@@ -8,7 +8,6 @@ import { useTheme } from 'next-themes';
 import {
   Building2,
   Bell,
-  Search,
   Lightbulb,
   Calendar,
   MessageSquare,
@@ -96,7 +95,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     try {
       const generatedId = `mock_user_${Math.random().toString(36).substring(7)}`;
       const generatedToken = `mock_token_${Math.random().toString(36).substring(7)}`;
-      
+
       await connectMutation.mutateAsync({
         organizationId: currentOrg.id,
         platform: platform as SocialPlatform,
@@ -123,7 +122,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         platformUserId: generatedId,
         accessToken: generatedToken,
       });
-      
+
       setCustomPlatformName('');
       setIsCustomModalOpen(false);
     } catch (err) {
@@ -276,20 +275,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 {/* Canales Conectados Section */}
                 {connectedAccounts && connectedAccounts.length > 0 && (
                   <div className={styles.channelsSection}>
-                    <div className={styles.channelsSectionTitle}>
-                      Canales conectados
-                    </div>
+                    <div className={styles.channelsSectionTitle}>Canales conectados</div>
                     <div className={styles.channelList}>
-                      {connectedAccounts.map((account) => (
+                      {connectedAccounts.slice(0, 2).map(account => (
                         <div key={account.id || (account as any)._id} className={styles.connectedChannelItem}>
                           <img
-                            src={(account.profileData?.avatar as string) || `https://api.dicebear.com/7.x/bottts/svg?seed=${account.platform}`}
+                            src={
+                              (account.profileData?.avatar as string) ||
+                              `https://api.dicebear.com/7.x/bottts/svg?seed=${account.platform}`
+                            }
                             alt={account.platform}
                             className={styles.connectedChannelAvatar}
                           />
-                          <div className={styles.channelBadge}>
-                            {getPlatformIcon(account.platform, 10)}
-                          </div>
+                          <div className={styles.channelBadge}>{getPlatformIcon(account.platform, 10)}</div>
                           <div className={styles.connectedChannelInfo}>
                             <span className={styles.connectedChannelName}>
                               {(account.profileData?.name as string) || account.platform}
@@ -299,7 +297,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             </span>
                           </div>
                           <button
-                            onClick={(e) => handleDisconnectPlatform(account.id || (account as any)._id, e)}
+                            onClick={e => handleDisconnectPlatform(account.id || (account as any)._id, e)}
                             className={styles.disconnectButton}
                             title="Desconectar canal"
                             disabled={disconnectMutation.isPending}
@@ -308,6 +306,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           </button>
                         </div>
                       ))}
+                      {connectedAccounts.length > 2 && (
+                        <Link
+                          href={`/dashboard/org/${slug}/settings?tab=channels`}
+                          className={styles.moreChannels}
+                          style={{ marginTop: '4px', textDecoration: 'none', padding: '6px 12px' }}
+                        >
+                          <span style={{ fontSize: '12px', opacity: 0.8 }}>
+                            Ver los {connectedAccounts.length} canales conectados...
+                          </span>
+                        </Link>
+                      )}
                     </div>
                   </div>
                 )}
@@ -322,18 +331,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </div>
                   <div className={styles.channelList}>
                     {defaultChannels
-                      .filter(
-                        (ch) =>
-                          !connectedAccounts?.some(
-                            (acc) => acc.platform.toUpperCase() === ch.key
-                          )
-                      )
-                      .map((channel) => (
+                      .filter(ch => !connectedAccounts?.some(acc => acc.platform.toUpperCase() === ch.key))
+                      .slice(0, 2)
+                      .map(channel => (
                         <button
                           key={channel.key}
                           onClick={() => handleConnectPlatform(channel.key)}
                           className={styles.channelItem}
-                          style={{ background: 'none', border: 'none', width: '100%', cursor: 'pointer', textAlign: 'left' }}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            width: '100%',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                          }}
                           disabled={connectMutation.isPending}
                         >
                           <div className={styles.channelIconWrapper}>
@@ -345,15 +356,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           <span>{channel.label}</span>
                         </button>
                       ))}
-                    <button
-                      onClick={() => setIsCustomModalOpen(true)}
+                    <Link
+                      href={`/dashboard/org/${slug}/settings?tab=channels`}
                       className={styles.moreChannels}
+                      style={{ textDecoration: 'none' }}
                     >
                       <div className={styles.plusIcon}>
                         <Plus size={16} />
                       </div>
-                      <span>Más canales</span>
-                    </button>
+                      <span>Gestionar canales</span>
+                    </Link>
                   </div>
                 </div>
               </>
@@ -489,10 +501,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <Settings size={16} />
                         <span>Ajustes</span>
                       </Link>
-                      <div className={styles.popupItem}>
+                      <Link
+                        href={`/dashboard/org/${slug}/settings?tab=channels`}
+                        className={styles.popupItem}
+                        onClick={() => setIsProfileMenuOpen(false)}
+                      >
                         <LayoutGrid size={16} />
                         <span>Canales</span>
-                      </div>
+                      </Link>
                       <Link
                         href={`/dashboard/org/${slug}/billing`}
                         className={styles.popupItem}
@@ -628,10 +644,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         mounted &&
         createPortal(
           <div className={styles.modalOverlay} onClick={() => setIsCustomModalOpen(false)}>
-            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-              <button 
-                onClick={() => setIsCustomModalOpen(false)} 
-                style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: 'var(--muted-foreground)', cursor: 'pointer' }}
+            <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+              <button
+                onClick={() => setIsCustomModalOpen(false)}
+                style={{
+                  position: 'absolute',
+                  top: 16,
+                  right: 16,
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--muted-foreground)',
+                  cursor: 'pointer',
+                }}
               >
                 <X size={18} />
               </button>
@@ -649,17 +673,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     required
                     placeholder="Ej. YouTube, Bluesky, Mastodon..."
                     value={customPlatformName}
-                    onChange={(e) => setCustomPlatformName(e.target.value)}
+                    onChange={e => setCustomPlatformName(e.target.value)}
                     className={styles.textInput}
                     autoFocus
                   />
                 </div>
                 <div className={styles.modalActions}>
-                  <button
-                    type="button"
-                    onClick={() => setIsCustomModalOpen(false)}
-                    className={styles.modalButton}
-                  >
+                  <button type="button" onClick={() => setIsCustomModalOpen(false)} className={styles.modalButton}>
                     Cancelar
                   </button>
                   <button
@@ -673,7 +693,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </form>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
     </div>
   );

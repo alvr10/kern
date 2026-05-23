@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, IsISO8601 } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsISO8601 } from 'class-validator';
 import { SocialPlatform } from '../../domain/value-objects/social-platform.vo';
 
 export class ConnectSocialAccountDto {

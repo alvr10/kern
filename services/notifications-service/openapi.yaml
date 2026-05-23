@@ -161,7 +161,26 @@ components:
         metadata:
           type: object
           nullable: true
-          description: Additional context (e.g. contentPieceId, invitationToken)
+          description: Additional context containing invitation or content details
+          properties:
+            organizationName:
+              type: string
+              description: The name of the organization the user is invited to.
+            organizationId:
+              type: string
+              description: The ID of the organization the user is invited to.
+            role:
+              type: string
+              description: The role the user is invited as.
+            inviterName:
+              type: string
+              description: The name of the person who sent the invitation.
+            inviterId:
+              type: string
+              description: The ID of the inviter.
+            token:
+              type: string
+              description: The unique token to accept the invitation.
         createdAt:
           type: string
           format: date-time

@@ -3,6 +3,7 @@ import { ListSocialAccountsQuery } from './list-social-accounts.query';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { SocialAccount as MongoAccount } from '../../infrastructure/database/schemas/social-account.schema';
+import { SocialAccountResponseDto } from '../dtos/social-account-response.dto';
 
 @QueryHandler(ListSocialAccountsQuery)
 export class ListSocialAccountsHandler implements IQueryHandler<ListSocialAccountsQuery> {
@@ -11,7 +12,8 @@ export class ListSocialAccountsHandler implements IQueryHandler<ListSocialAccoun
     private readonly accountModel: Model<MongoAccount>,
   ) {}
 
-  async execute(query: ListSocialAccountsQuery): Promise<any[]> {
-    return this.accountModel.find({ organizationId: query.organizationId }).exec();
+  async execute(query: ListSocialAccountsQuery): Promise<SocialAccountResponseDto[]> {
+    const documents = await this.accountModel.find({ organizationId: query.organizationId }).exec();
+    return documents.map(SocialAccountResponseDto.fromPersistence);
   }
 }
