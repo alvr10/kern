@@ -1,0 +1,24 @@
+# Ignore node_modules in all directories
+node_modules
+**/node_modules
+
+# Ignore build outputs
+dist
+**/dist
+.next
+**/.next
+.turbo
+**/.turbo
+tsconfig.tsbuildinfo
+**/tsconfig.tsbuildinfo
+
+# Ignore version control and IDE files
+.git
+.gitignore
+.vscode
+.idea
+.env
+.env.local
+.env.*.local
+*.log
+docker-compose.override.yml

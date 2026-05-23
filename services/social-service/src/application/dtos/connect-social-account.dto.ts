@@ -6,7 +6,8 @@ export class ConnectSocialAccountDto {
   @IsNotEmpty()
   organizationId: string;
 
-  @IsEnum(SocialPlatform)
+  @IsString()
+  @IsNotEmpty()
   platform: SocialPlatform;
 
   @IsString()

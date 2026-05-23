@@ -7,7 +7,7 @@ export class SocialAccount extends Document {
   @Prop({ required: true, index: true })
   organizationId: string;
 
-  @Prop({ type: String, enum: SOCIAL_PLATFORM_VALUES, required: true })
+  @Prop({ type: String, required: true })
   platform: SocialPlatform;
 
   @Prop({ required: true })

@@ -59,7 +59,7 @@ kern/
 | `organizations-service` | `services/organizations-service` | 8002            | PostgreSQL (Prisma) | Equipos, miembros, roles, espacios de trabajo                       |
 | `content-service`       | `services/content-service`       | 8004            | MongoDB (Mongoose)  | Curación de contenido, tableros Kanban, agendas                     |
 | `social-service`        | `services/social-service`        | 8005            | MongoDB (Mongoose)  | Integración de API con redes sociales                               |
-| `ai-service`            | `services/ai-service`            | 8006            | MongoDB (Mongoose)  | Validación de prompts de Gemini 1.5, auditoría de uso               |
+| `ai-service`            | `services/ai-service`            | 8006            | MongoDB (Mongoose)  | Validación de prompts de Gemini 3.1 Flash Lite, auditoría de uso    |
 | `billing-service`       | `services/billing-service`       | 8007            | PostgreSQL (Prisma) | Planes de Stripe, suscripciones y facturación                       |
 | `notifications-service` | `services/notifications-service` | 8008            | MongoDB (Mongoose)  | Motor de notificaciones en la aplicación, correo electrónico y push |
 | `admin-service`         | `services/admin-service`         | 8009            | PostgreSQL + Mongo  | Métricas del panel administrativo, anulación del sistema            |

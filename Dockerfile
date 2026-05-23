@@ -70,7 +70,9 @@ RUN if grep -q '"@prisma/client"' "./${SERVICE_PATH}/package.json"; then \
       echo "node-linker=hoisted" >> .npmrc; \
     fi && \
     echo "inject-workspace-packages=true" >> .npmrc && \
-    pnpm --filter @kern/${SERVICE_NAME} --prod deploy /app/out
+    echo "force-legacy-deploy=true" >> .npmrc && \
+    pnpm --filter @kern/${SERVICE_NAME} --prod deploy /app/out --legacy
+
 
 # Robustly find and copy the generated Prisma client into the deploy output.
 RUN if grep -q '"@prisma/client"' "./${SERVICE_PATH}/package.json"; then \

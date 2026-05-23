@@ -10,15 +10,13 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
-  Globe,
   Tag,
   Layers,
-  MessageSquare,
 } from 'lucide-react';
 import styles from './page.module.css';
 import { cn } from '@/lib/utils';
 import { useOrganizations } from '@/lib/api/organizations-service/hooks';
-import { useContentCalendar } from '@/lib/api/content-service/hooks';
+import { useContentList } from '@/lib/api/content-service/hooks';
 import { AnimatePresence, motion } from 'framer-motion';
 
 /**
@@ -29,6 +27,11 @@ export default function PublishPage() {
   const slug = params.slug as string;
   const [view, setView] = useState<'list' | 'calendar'>('calendar');
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
+  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [isPlatformOpen, setIsPlatformOpen] = useState(false);
+  const [isTagOpen, setIsTagOpen] = useState(false);
 
   // Auto-scroll to current time on mount
   React.useEffect(() => {
@@ -45,8 +48,12 @@ export default function PublishPage() {
   const { data: organizations } = useOrganizations();
   const currentOrg = organizations?.find(org => org.slug === slug);
 
-  // 2. Get calendar data
-  useContentCalendar(currentOrg?.id || '', '2026-04-26T00:00:00Z', '2026-05-02T23:59:59Z');
+  // 2. Get all content pieces for this organization
+  const { data: contentList } = useContentList({
+    organizationId: currentOrg?.id || '',
+    limit: 100,
+  });
+  const realPosts = Array.isArray(contentList) ? contentList : (contentList as any)?.data || [];
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [direction, setDirection] = useState(0); // -1 for past, 1 for future
@@ -93,6 +100,16 @@ export default function PublishPage() {
   };
 
   const days = generateDays();
+
+  const filteredPosts = realPosts.filter((post: any) => {
+    if (!post.scheduledAt) return false;
+    const matchPlatform = !selectedPlatform || post.platform === selectedPlatform;
+    const matchTag = !selectedTag || post.hashtags?.includes(selectedTag);
+    return matchPlatform && matchTag;
+  });
+
+  // Dynamically extract all unique hashtags from real posts to populate the tags filter!
+  const allHashtags = Array.from(new Set(realPosts.flatMap((post: any) => post.hashtags || []))) as string[];
 
   const handlePrevWeek = () => {
     setDirection(-1);
@@ -200,23 +217,101 @@ export default function PublishPage() {
           <button className={styles.todayBtn} onClick={handleToday}>
             Hoy
           </button>
-          <div className={styles.weekSelector}>
-            Semana <ChevronDown size={14} />
-          </div>
         </div>
         <div className={styles.controlsRight}>
-          <button className={styles.filterBtn}>
-            <MessageSquare size={16} /> Todos los Posts <ChevronDown size={14} />
-          </button>
-          <button className={styles.filterBtn}>
-            <Layers size={16} /> Canales <ChevronDown size={14} />
-          </button>
-          <button className={styles.filterBtn}>
-            <Tag size={16} /> Etiquetas <ChevronDown size={14} />
-          </button>
-          <button className={styles.filterBtn}>
-            <Globe size={16} /> Madrid <ChevronDown size={14} />
-          </button>
+          <div style={{ position: 'relative' }}>
+            <button
+              className={styles.filterBtn}
+              onClick={() => {
+                setIsPlatformOpen(!isPlatformOpen);
+                setIsTagOpen(false);
+              }}
+            >
+              <Layers size={16} /> {selectedPlatform ? `Canal: ${selectedPlatform}` : 'Canales'}{' '}
+              <ChevronDown size={14} />
+            </button>
+            {isPlatformOpen && (
+              <div className={styles.filterDropdown}>
+                <div
+                  className={styles.dropdownItem}
+                  onClick={() => {
+                    setSelectedPlatform(null);
+                    setIsPlatformOpen(false);
+                  }}
+                >
+                  Todos los Canales
+                </div>
+                <div
+                  className={styles.dropdownItem}
+                  onClick={() => {
+                    setSelectedPlatform('INSTAGRAM');
+                    setIsPlatformOpen(false);
+                  }}
+                >
+                  Instagram
+                </div>
+                <div
+                  className={styles.dropdownItem}
+                  onClick={() => {
+                    setSelectedPlatform('THREADS');
+                    setIsPlatformOpen(false);
+                  }}
+                >
+                  Threads
+                </div>
+                <div
+                  className={styles.dropdownItem}
+                  onClick={() => {
+                    setSelectedPlatform('LINKEDIN');
+                    setIsPlatformOpen(false);
+                  }}
+                >
+                  LinkedIn
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            <button
+              className={styles.filterBtn}
+              onClick={() => {
+                setIsTagOpen(!isTagOpen);
+                setIsPlatformOpen(false);
+              }}
+            >
+              <Tag size={16} /> {selectedTag ? `Etiqueta: ${selectedTag}` : 'Etiquetas'} <ChevronDown size={14} />
+            </button>
+            {isTagOpen && (
+              <div className={styles.filterDropdown}>
+                <div
+                  className={styles.dropdownItem}
+                  onClick={() => {
+                    setSelectedTag(null);
+                    setIsTagOpen(false);
+                  }}
+                >
+                  Todas las Etiquetas
+                </div>
+                {allHashtags.length > 0 ? (
+                  allHashtags.map(tag => (
+                    <div
+                      key={tag}
+                      className={styles.dropdownItem}
+                      onClick={() => {
+                        setSelectedTag(tag);
+                        setIsTagOpen(false);
+                      }}
+                    >
+                      {tag}
+                    </div>
+                  ))
+                ) : (
+                  <div className={cn(styles.dropdownItem, 'opacity-50 pointer-events-none')}>Sin etiquetas</div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -254,8 +349,40 @@ export default function PublishPage() {
                       <div className={styles.cellPlus}>
                         <Plus size={16} />
                       </div>
-                      {/* Mock event */}
-                      {h.value === 20 && dayIndex === 3 && <div className={styles.event}>Post Mock Idea</div>}
+                      {/* Render dynamic filtered posts */}
+                      {filteredPosts
+                        .filter((post: any) => {
+                          if (!post.scheduledAt) return false;
+                          const postDate = new Date(post.scheduledAt);
+                          const dayDate = days[dayIndex].fullDate;
+                          return (
+                            postDate.getHours() === h.value &&
+                            postDate.getDate() === dayDate.getDate() &&
+                            postDate.getMonth() === dayDate.getMonth() &&
+                            postDate.getFullYear() === dayDate.getFullYear()
+                          );
+                        })
+                        .map((post: any) => (
+                          <div
+                            key={post.id}
+                            className={cn(
+                              styles.event,
+                              styles[`event_${post.platform.toLowerCase()}`],
+                              post.status === 'PUBLISHED' && styles.event_published,
+                            )}
+                            title={`${post.title} | Estado: ${post.status} | Plataforma: ${post.platform} | Etiquetas: ${post.hashtags?.join(', ') || ''}`}
+                          >
+                            <span className={styles.eventTitle}>{post.title}</span>
+                            <div className={styles.eventMeta}>
+                              <span className={styles.eventPlatform}>{post.platform}</span>
+                            </div>
+                            {post.status === 'PUBLISHED' && (
+                              <div className={styles.publishedBadge} title="Publicado con éxito">
+                                ✓
+                              </div>
+                            )}
+                          </div>
+                        ))}
                     </div>
                   ))}
                 </React.Fragment>

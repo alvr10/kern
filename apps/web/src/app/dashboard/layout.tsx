@@ -28,11 +28,15 @@ import {
   ChevronRight,
   Sparkles,
   Keyboard,
+  Trash2,
+  X,
 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useOrganizations } from '@/lib/api/organizations-service/hooks';
 import { useSubscription } from '@/lib/api/billing-service/hooks';
 import { useAuth } from '@/lib/api/auth/hooks';
+import { useSocialAccounts, useConnectSocialAccount, useDisconnectSocialAccount } from '@/lib/api/social-service/hooks';
+import { SocialPlatform } from '@/lib/api/types';
 import { cn } from '@/lib/utils';
 
 /**
@@ -75,9 +79,86 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       setActiveSubMenu(null);
     }, 150); // Grace period to move mouse to sub-menu
   };
+  const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
+  const [customPlatformName, setCustomPlatformName] = useState('');
+  const [isConnectingCustom, setIsConnectingCustom] = useState(false);
+
   const { data: organizations } = useOrganizations();
   const currentOrg = organizations?.find(org => org.slug === slug);
   const { data: subscription } = useSubscription(currentOrg?.id || '');
+
+  const { data: connectedAccounts = [] } = useSocialAccounts(currentOrg?.id || '');
+  const connectMutation = useConnectSocialAccount();
+  const disconnectMutation = useDisconnectSocialAccount();
+
+  const handleConnectPlatform = async (platform: string) => {
+    if (!currentOrg?.id) return;
+    try {
+      const generatedId = `mock_user_${Math.random().toString(36).substring(7)}`;
+      const generatedToken = `mock_token_${Math.random().toString(36).substring(7)}`;
+      
+      await connectMutation.mutateAsync({
+        organizationId: currentOrg.id,
+        platform: platform as SocialPlatform,
+        platformUserId: generatedId,
+        accessToken: generatedToken,
+      });
+    } catch (err) {
+      console.error('Failed to connect channel:', err);
+    }
+  };
+
+  const handleConnectCustomPlatform = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentOrg?.id || !customPlatformName.trim()) return;
+    setIsConnectingCustom(true);
+    try {
+      const platformKey = customPlatformName.trim().toUpperCase().replace(/\s+/g, '_');
+      const generatedId = `mock_user_${Math.random().toString(36).substring(7)}`;
+      const generatedToken = `mock_token_${Math.random().toString(36).substring(7)}`;
+
+      await connectMutation.mutateAsync({
+        organizationId: currentOrg.id,
+        platform: platformKey as SocialPlatform,
+        platformUserId: generatedId,
+        accessToken: generatedToken,
+      });
+      
+      setCustomPlatformName('');
+      setIsCustomModalOpen(false);
+    } catch (err) {
+      console.error('Failed to connect custom platform:', err);
+    } finally {
+      setIsConnectingCustom(false);
+    }
+  };
+
+  const handleDisconnectPlatform = async (id: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!currentOrg?.id) return;
+    try {
+      await disconnectMutation.mutateAsync({
+        id,
+        organizationId: currentOrg.id,
+      });
+    } catch (err) {
+      console.error('Failed to disconnect channel:', err);
+    }
+  };
+
+  const getPlatformIcon = (platform: string, size = 18) => {
+    const clean = platform.toUpperCase();
+    if (clean.includes('INSTAGRAM')) {
+      return <Camera size={size} className="text-pink-500" />;
+    } else if (clean.includes('THREADS')) {
+      return <AtSign size={size} className={cn(theme === 'dark' ? 'text-white' : 'text-black')} />;
+    } else if (clean.includes('LINKEDIN')) {
+      return <Briefcase size={size} className="text-blue-600" />;
+    } else {
+      return <Sparkles size={size} className="text-amber-500" />;
+    }
+  };
 
   const getPlanLabel = () => {
     if (!subscription) return 'Plan Gratuito';
@@ -135,21 +216,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     },
   ];
 
-  const channels = [
+  const defaultChannels = [
     {
+      key: 'INSTAGRAM',
       label: 'Instagram',
       icon: <Camera size={18} className="text-pink-500" />,
-      href: '#',
     },
     {
+      key: 'THREADS',
       label: 'Threads',
       icon: <AtSign size={18} className={cn(theme === 'dark' ? 'text-white' : 'text-black')} />,
-      href: '#',
     },
     {
+      key: 'LINKEDIN',
       label: 'LinkedIn',
       icon: <Briefcase size={18} className="text-blue-600" />,
-      href: '#',
     },
   ];
 
@@ -192,28 +273,82 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                 <div className={styles.sectionDivider} />
 
+                {/* Canales Conectados Section */}
+                {connectedAccounts && connectedAccounts.length > 0 && (
+                  <div className={styles.channelsSection}>
+                    <div className={styles.channelsSectionTitle}>
+                      Canales conectados
+                    </div>
+                    <div className={styles.channelList}>
+                      {connectedAccounts.map((account) => (
+                        <div key={account.id || (account as any)._id} className={styles.connectedChannelItem}>
+                          <img
+                            src={(account.profileData?.avatar as string) || `https://api.dicebear.com/7.x/bottts/svg?seed=${account.platform}`}
+                            alt={account.platform}
+                            className={styles.connectedChannelAvatar}
+                          />
+                          <div className={styles.channelBadge}>
+                            {getPlatformIcon(account.platform, 10)}
+                          </div>
+                          <div className={styles.connectedChannelInfo}>
+                            <span className={styles.connectedChannelName}>
+                              {(account.profileData?.name as string) || account.platform}
+                            </span>
+                            <span className={styles.connectedChannelHandle}>
+                              {(account.profileData?.handle as string) || `@${account.platform.toLowerCase()}`}
+                            </span>
+                          </div>
+                          <button
+                            onClick={(e) => handleDisconnectPlatform(account.id || (account as any)._id, e)}
+                            className={styles.disconnectButton}
+                            title="Desconectar canal"
+                            disabled={disconnectMutation.isPending}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Conectar Canales Section */}
                 <div className={styles.channelsSection}>
                   <div className={styles.sectionHeader}>
                     <span>Conectar canales</span>
                     <div className={styles.sectionActions}>
-                      <Search size={14} />
-                      <Settings size={14} />
                       <Plus size={14} />
                     </div>
                   </div>
                   <div className={styles.channelList}>
-                    {channels.map(channel => (
-                      <Link key={channel.label} href={channel.href} className={styles.channelItem}>
-                        <div className={styles.channelIconWrapper}>
-                          {channel.icon}
-                          <div className={styles.plusOverlay}>
-                            <Plus size={8} />
+                    {defaultChannels
+                      .filter(
+                        (ch) =>
+                          !connectedAccounts?.some(
+                            (acc) => acc.platform.toUpperCase() === ch.key
+                          )
+                      )
+                      .map((channel) => (
+                        <button
+                          key={channel.key}
+                          onClick={() => handleConnectPlatform(channel.key)}
+                          className={styles.channelItem}
+                          style={{ background: 'none', border: 'none', width: '100%', cursor: 'pointer', textAlign: 'left' }}
+                          disabled={connectMutation.isPending}
+                        >
+                          <div className={styles.channelIconWrapper}>
+                            {channel.icon}
+                            <div className={styles.plusOverlay}>
+                              <Plus size={8} />
+                            </div>
                           </div>
-                        </div>
-                        <span>{channel.label}</span>
-                      </Link>
-                    ))}
-                    <button className={styles.moreChannels}>
+                          <span>{channel.label}</span>
+                        </button>
+                      ))}
+                    <button
+                      onClick={() => setIsCustomModalOpen(true)}
+                      className={styles.moreChannels}
+                    >
                       <div className={styles.plusIcon}>
                         <Plus size={16} />
                       </div>
@@ -488,6 +623,58 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className={styles.contentWrapper}>
         <main className={styles.main}>{children}</main>
       </div>
+
+      {isCustomModalOpen &&
+        mounted &&
+        createPortal(
+          <div className={styles.modalOverlay} onClick={() => setIsCustomModalOpen(false)}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <button 
+                onClick={() => setIsCustomModalOpen(false)} 
+                style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: 'var(--muted-foreground)', cursor: 'pointer' }}
+              >
+                <X size={18} />
+              </button>
+              <div className={styles.modalHeader}>
+                <h3 className={styles.modalTitle}>Conectar canal personalizado</h3>
+                <p className={styles.modalDescription}>
+                  Introduce el nombre de la plataforma para establecer una conexión de prueba.
+                </p>
+              </div>
+              <form onSubmit={handleConnectCustomPlatform} className={styles.modalForm}>
+                <div className={styles.inputGroup}>
+                  <label className={styles.inputLabel}>Nombre de la Plataforma</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ej. YouTube, Bluesky, Mastodon..."
+                    value={customPlatformName}
+                    onChange={(e) => setCustomPlatformName(e.target.value)}
+                    className={styles.textInput}
+                    autoFocus
+                  />
+                </div>
+                <div className={styles.modalActions}>
+                  <button
+                    type="button"
+                    onClick={() => setIsCustomModalOpen(false)}
+                    className={styles.modalButton}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isConnectingCustom || !customPlatformName.trim()}
+                    className={cn(styles.modalButton, styles.modalButtonPrimary)}
+                  >
+                    {isConnectingCustom ? 'Conectando...' : 'Conectar Canal'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

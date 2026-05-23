@@ -252,31 +252,6 @@ export default function CreateContentPage(): React.JSX.Element {
               onEditIdea={openEditModal}
             />
           </div>
-
-          <div
-            className={`${styles.column} column-anim`}
-            style={{
-              backgroundColor: 'transparent',
-              borderStyle: 'dashed',
-              justifyContent: 'center',
-              alignItems: 'center',
-              cursor: 'pointer',
-              minWidth: '200px',
-              flex: '0 0 200px',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: 'var(--muted-foreground)',
-              }}
-            >
-              <Plus size={20} />
-              <span style={{ fontWeight: 500 }}>Nuevo Grupo</span>
-            </div>
-          </div>
         </div>
 
         {/* Floating card that follows the mouse */}
