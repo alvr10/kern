@@ -27,9 +27,20 @@ export class MongooseNotificationRepository implements INotificationRepository {
     return document ? NotificationMapper.toDomain(document) : null;
   }
 
-  async findByUserId(userId: string): Promise<Notification[]> {
-    const documents = await this.notificationModel.find({ userId }).sort({ createdAt: -1 }).exec();
+  async findByUserId(userId: string, userEmail?: string): Promise<Notification[]> {
+    const query = userEmail ? { $or: [{ userId }, { userId: userEmail }] } : { userId };
+    const documents = await this.notificationModel.find(query).sort({ createdAt: -1 }).exec();
     return documents.map(NotificationMapper.toDomain);
+  }
+
+  async countUnreadByUserId(userId: string, userEmail?: string): Promise<number> {
+    const query = userEmail ? { $or: [{ userId }, { userId: userEmail }], isRead: false } : { userId, isRead: false };
+    return this.notificationModel.countDocuments(query).exec();
+  }
+
+  async markAllAsRead(userId: string, userEmail?: string): Promise<void> {
+    const query = userEmail ? { $or: [{ userId }, { userId: userEmail }], isRead: false } : { userId, isRead: false };
+    await this.notificationModel.updateMany(query, { isRead: true }).exec();
   }
 
   async markAsRead(id: string): Promise<void> {

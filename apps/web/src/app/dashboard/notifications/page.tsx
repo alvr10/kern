@@ -1,7 +1,7 @@
 'use client';
 
 import { useNotifications, useMarkAsRead, useMarkAllAsRead } from '@/lib/api/notifications-service/hooks';
-import { NotificationType } from '@/lib/api/notifications-service/client';
+import { NotificationType, NotificationResponse } from '@/lib/api/notifications-service/client';
 import styles from './page.module.css';
 import { Bell, CheckCircle2, XCircle, UserPlus, AlertTriangle, TrendingUp, Inbox } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -42,7 +42,10 @@ export default function NotificationsPage() {
     );
   }
 
-  const hasNotifications = notifications?.data && notifications.data.length > 0;
+  const notificationsList: NotificationResponse[] = Array.isArray(notifications)
+    ? notifications
+    : ((notifications as { data?: NotificationResponse[] } | null)?.data ?? []);
+  const hasNotifications = notificationsList.length > 0;
 
   return (
     <div className={styles.container}>
@@ -66,7 +69,7 @@ export default function NotificationsPage() {
         </div>
       ) : (
         <div className={styles.notificationList}>
-          {notifications.data.map(notif => (
+          {notificationsList.map(notif => (
             <div
               key={notif.id}
               className={cn(styles.notificationItem, !notif.read && styles.unread)}
@@ -75,7 +78,14 @@ export default function NotificationsPage() {
               {!notif.read && <div className={styles.unreadDot} />}
               <div className={styles.iconWrapper}>{getIcon(notif.type)}</div>
               <div className={styles.content}>
-                <h3 className={styles.notifTitle}>{notif.title}</h3>
+                <div className={styles.titleRow}>
+                  <h3 className={styles.notifTitle}>{notif.title}</h3>
+                  {notif.type === NotificationType.INVITATION && typeof notif.metadata?.role === 'string' && (
+                    <span className={cn(styles.roleBadge, styles[`role${notif.metadata.role}`])}>
+                      {notif.metadata.role}
+                    </span>
+                  )}
+                </div>
                 <p className={styles.notifBody}>{notif.body}</p>
                 <span className={styles.notifTime}>
                   {formatDistanceToNow(new Date(notif.createdAt), {

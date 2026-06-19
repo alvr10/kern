@@ -47,7 +47,10 @@
   max-width: 1000px;
 }
 
-.card {
+.card,
+.card:visited {
+  color: var(--foreground);
+  text-decoration: none;
   background-color: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -60,10 +63,12 @@
   cursor: pointer;
 }
 
-.card:hover {
+.card:hover,
+.card:visited:hover {
   border-color: var(--ring);
   transform: translateX(4px);
   background-color: var(--secondary);
+  color: var(--foreground);
 }
 
 .cardHeader {
@@ -191,5 +196,7 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

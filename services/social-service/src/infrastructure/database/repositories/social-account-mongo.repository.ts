@@ -36,7 +36,8 @@ export class SocialAccountMongoRepository implements SocialAccountRepository {
       await this.accountModel.findByIdAndUpdate(account.id, data, { upsert: true }).exec();
     } else {
       const created = new this.accountModel(data);
-      await created.save();
+      const saved = await created.save();
+      account.id = saved._id.toString();
     }
   }
 

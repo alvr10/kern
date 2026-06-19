@@ -86,6 +86,7 @@
   transition: border-color 0.3s ease;
   outline: none;
   background: transparent;
+  color: #000;
 }
 
 .input:focus {

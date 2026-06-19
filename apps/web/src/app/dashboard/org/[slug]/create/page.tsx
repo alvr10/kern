@@ -7,7 +7,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useKanbanBoard, useUpdateContentStatus, contentKeys } from '@/lib/api/content-service/hooks';
 import { contentClient } from '@/lib/api/content-service/client';
 import { useSubscription } from '@/lib/api/billing-service/hooks';
-import { Plus, HandCoins } from 'lucide-react';
+import { HandCoins } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import {
@@ -251,31 +251,6 @@ export default function CreateContentPage(): React.JSX.Element {
               onAddIdea={openAddModal}
               onEditIdea={openEditModal}
             />
-          </div>
-
-          <div
-            className={`${styles.column} column-anim`}
-            style={{
-              backgroundColor: 'transparent',
-              borderStyle: 'dashed',
-              justifyContent: 'center',
-              alignItems: 'center',
-              cursor: 'pointer',
-              minWidth: '200px',
-              flex: '0 0 200px',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: 'var(--muted-foreground)',
-              }}
-            >
-              <Plus size={20} />
-              <span style={{ fontWeight: 500 }}>Nuevo Grupo</span>
-            </div>
           </div>
         </div>
 

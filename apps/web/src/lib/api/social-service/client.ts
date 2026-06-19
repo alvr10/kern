@@ -1,5 +1,5 @@
 import { apiClient } from '../client';
-import type { ConnectSocialAccountDto, PublishResultResponse, SocialAccountResponse } from './types';
+import type { ConnectSocialAccountDto, SocialAccountResponse } from './types';
 
 /**
  * Social Service API Client
@@ -26,12 +26,5 @@ export const socialClient = {
    */
   disconnectAccount: (id: string): Promise<void> => {
     return apiClient.delete<void>(`/social/accounts/${id}`);
-  },
-
-  /**
-   * Publish a content piece immediately to its platform
-   */
-  publishNow: (contentPieceId: string): Promise<PublishResultResponse> => {
-    return apiClient.post<PublishResultResponse>(`/social/publish/${contentPieceId}`);
   },
 };

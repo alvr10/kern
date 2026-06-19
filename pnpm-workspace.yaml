@@ -2,3 +2,12 @@ packages:
   - 'apps/*'
   - 'services/*'
   - 'packages/*'
+
+allowBuilds:
+  '@nestjs/core': true
+  '@prisma/engines': true
+  '@scarf/scarf': true
+  prisma: true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true

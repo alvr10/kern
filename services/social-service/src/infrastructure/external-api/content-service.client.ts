@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, timeout, retry } from 'rxjs';
 
 @Injectable()
 export class ContentServiceClient {
@@ -17,7 +17,12 @@ export class ContentServiceClient {
 
   async getContentPiece(id: string): Promise<any> {
     try {
-      const { data } = await firstValueFrom(this.httpService.get(`${this.baseUrl}/content/${id}`));
+      const { data } = await firstValueFrom(
+        this.httpService.get(`${this.baseUrl}/content/${id}`).pipe(
+          timeout(5000),
+          retry({ count: 2, delay: 1000 }),
+        ),
+      );
       return data;
     } catch (error) {
       throw new Error(`Failed to fetch content piece ${id}: ${error.message}`, { cause: error });

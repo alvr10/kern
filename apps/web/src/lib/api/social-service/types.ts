@@ -24,14 +24,3 @@ export interface SocialAccountResponse {
   expiresAt: string | null;
   createdAt: string;
 }
-
-/**
- * Publishing result response model
- */
-export interface PublishResultResponse {
-  contentPieceId: string;
-  platform: SocialPlatform;
-  platformPostId: string;
-  publishedAt: string;
-  url: string;
-}

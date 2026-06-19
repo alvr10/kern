@@ -54,21 +54,23 @@ const OrganizationCard = ({
         <div className={styles.orgInfo}>
           <div className={styles.nameRow}>
             <h3 className={styles.orgName}>{org.name}</h3>
-            <span
-              className={`${styles.typeBadge} ${org.type === OrganizationType.PERSONAL ? styles.typePersonal : styles.typeTeam}`}
-            >
-              {org.type === OrganizationType.PERSONAL ? 'Personal' : 'Equipo'}
-            </span>
           </div>
           <p className={styles.orgSlug}>kern.id/{org.slug}</p>
         </div>
       </div>
 
       <div className={styles.cardFooter}>
-        <span className={`${styles.badge} ${isPro ? styles.proBadge : ''}`}>{getPlanLabel()}</span>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <span
+            className={`${styles.typeBadge} ${org.type === OrganizationType.PERSONAL ? styles.typePersonal : styles.typeTeam}`}
+          >
+            {org.type === OrganizationType.PERSONAL ? 'Personal' : 'Equipo'}
+          </span>
+          <span className={`${styles.badge} ${isPro ? styles.proBadge : ''}`}>{getPlanLabel()}</span>
+        </div>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <Settings size={16} color="#444" />
-          <ArrowRight size={16} color="#444" />
+          <Settings size={16} color="#888" />
+          <ArrowRight size={16} color="#888" />
         </div>
       </div>
     </Link>
@@ -87,22 +89,36 @@ export default function OrganizationsPage(): React.JSX.Element {
   useGSAP(
     () => {
       if (organizations && organizations.length > 0) {
-        // Staggered entrance for cards
-        gsap.from(cardsRef.current, {
-          y: 20,
-          opacity: 0,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: 'power3.out',
-        });
+        // Filter out any null elements to ensure we only animate fully mounted DOM nodes
+        const validCards = cardsRef.current.filter(Boolean);
+
+        if (validCards.length > 0) {
+          // Use fromTo to explicitly define starting and ending values,
+          // preventing the legendary GSAP double-trigger / double-render opacity stuck gotcha!
+          gsap.fromTo(
+            validCards,
+            { y: 20, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.8,
+              stagger: 0.1,
+              ease: 'power3.out',
+            },
+          );
+        }
 
         // Title and header reveal
-        gsap.from('.reveal-header', {
-          y: -10,
-          opacity: 0,
-          duration: 0.6,
-          ease: 'power2.out',
-        });
+        gsap.fromTo(
+          '.reveal-header',
+          { y: -10, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            ease: 'power2.out',
+          },
+        );
       }
     },
     { scope: containerRef, dependencies: [organizations] },

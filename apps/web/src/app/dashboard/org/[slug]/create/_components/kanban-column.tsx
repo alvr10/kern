@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { Plus, MoreHorizontal, PlusCircle } from 'lucide-react';
+import { Plus, PlusCircle } from 'lucide-react';
 import { ContentPieceResponse, ContentStatus } from '@/lib/api/content-service/types';
 import { SortableCard } from './sortable-card';
 import styles from '../page.module.css';
@@ -40,9 +40,6 @@ export function KanbanColumn({
         <div className={styles.columnActions}>
           <button className={styles.iconButton} onClick={() => onAddIdea(status)}>
             <Plus size={16} />
-          </button>
-          <button className={styles.iconButton}>
-            <MoreHorizontal size={16} />
           </button>
         </div>
       </div>

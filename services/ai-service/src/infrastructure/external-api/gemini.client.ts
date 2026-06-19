@@ -15,7 +15,7 @@ export class GeminiClient implements OnModuleInit {
       throw new Error('GEMINI_API_KEY is required');
     }
     this.genAI = new GoogleGenerativeAI(apiKey);
-    this.model = this.genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite-preview' });
+    this.model = this.genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite' });
   }
 
   async generateText(prompt: string, systemInstruction?: string): Promise<{ text: string; tokensUsed: number }> {

@@ -52,12 +52,3 @@ export const useDisconnectSocialAccount = () => {
     },
   });
 };
-
-/**
- * usePublishNow
- */
-export const usePublishNow = () => {
-  return useMutation({
-    mutationFn: (contentPieceId: string) => socialClient.publishNow(contentPieceId),
-  });
-};

@@ -2,7 +2,7 @@
   "name": "kern-monorepo",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@10.33.2",
+  "packageManager": "pnpm@11.7.0",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
@@ -11,18 +11,19 @@
     "format": "turbo run format",
     "format:check": "turbo run format:check"
   },
-  "dependencies": {},
   "devDependencies": {
     "@eslint/js": "^9.16.0",
     "@kern/config-eslint": "workspace:*",
     "@kern/config-prettier": "workspace:*",
     "@kern/config-typescript": "workspace:*",
+    "dotenv": "^17.4.2",
     "eslint": "^9.16.0",
     "eslint-config-next": "16.1.6",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "prettier": "^3.8.3",
-    "turbo": "^2.1.2",
+    "prisma": "^7.8.0",
+    "turbo": "^2.9.18",
     "typescript-eslint": "^8.24.1"
   }
 }

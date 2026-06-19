@@ -222,6 +222,7 @@
   color: var(--foreground);
   display: -webkit-box;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -232,6 +233,7 @@
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 5; /* Increased from 3 */
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
   flex: 1;

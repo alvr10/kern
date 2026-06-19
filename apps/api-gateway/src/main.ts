@@ -6,6 +6,7 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 import * as swaggerUi from 'swagger-ui-express';
 import { resolve } from 'path';
 import { jwtAuthMiddleware } from './middleware/jwt-auth.middleware';
+import { redisRateLimiter } from './middleware/redis-rate-limiter.middleware';
 
 const SERVICES = [
   'organizations-service',
@@ -31,6 +32,9 @@ async function bootstrap() {
 
   // Verify Supabase JWT on every protected route; inject x-user-id header
   express.use(jwtAuthMiddleware);
+
+  // Apply Redis distributed rate limiting (resolves limit based on user ID or IP)
+  express.use(redisRateLimiter);
 
   // Serve each service's openapi.yaml as a static file
   SERVICES.forEach(service => {
@@ -101,7 +105,7 @@ async function bootstrap() {
     }
   });
 
-  const port = process.env.GATEWAY_PORT || 3000;
+  const port = process.env.GATEWAY_PORT || 8000;
   await app.listen(port);
   console.log(`██╗  ██╗███████╗██████╗ ███╗   ██╗
 ██║ ██╔╝██╔════╝██╔══██╗████╗  ██║
@@ -110,7 +114,7 @@ async function bootstrap() {
 ██║  ██╗███████╗██║  ██║██║ ╚████║
 ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
                                   `);
-  console.log('[api-gateway] 🚀  Listening on http://localhost:3000');
-  console.log('[api-gateway] 📄  API Docs available at http://localhost:3000/api/docs');
+  console.log('[api-gateway] 🚀  Listening on http://localhost:8000');
+  console.log('[api-gateway] 📄  API Docs available at http://localhost:8000/api/docs');
 }
 bootstrap();

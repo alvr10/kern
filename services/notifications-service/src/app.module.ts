@@ -8,10 +8,12 @@ import { HealthController } from './presentation/controllers/health.controller';
 import { OrganizationEventConsumer } from './presentation/consumers/organization-event.consumer';
 import { CreateNotificationHandler } from './application/commands/create-notification.handler';
 import { MarkNotificationAsReadHandler } from './application/commands/mark-notification-as-read.handler';
+import { MarkAllNotificationsAsReadHandler } from './application/commands/mark-all-notifications-as-read.handler';
 import { GetUserNotificationsHandler } from './application/queries/get-user-notifications.handler';
+import { GetUnreadCountHandler } from './application/queries/get-unread-count.handler';
 
-const CommandHandlers = [CreateNotificationHandler, MarkNotificationAsReadHandler];
-const QueryHandlers = [GetUserNotificationsHandler];
+const CommandHandlers = [CreateNotificationHandler, MarkNotificationAsReadHandler, MarkAllNotificationsAsReadHandler];
+const QueryHandlers = [GetUserNotificationsHandler, GetUnreadCountHandler];
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true }), CqrsModule, DatabaseModule, DiscoveryClientModule, MetricsModule],

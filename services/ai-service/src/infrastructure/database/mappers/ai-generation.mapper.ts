@@ -32,7 +32,7 @@ export class AIGenerationMapper {
       tokensTotal: domain.tokensUsed,
       tokensInput: Math.floor(domain.tokensUsed * 0.3), // Mock split
       tokensOutput: Math.ceil(domain.tokensUsed * 0.7),
-      modelUsed: 'gemini-1.5-flash',
+      modelUsed: 'gemini-3.1-flash-lite',
       estimatedCostUsd: domain.estimatedCostUsd,
       profileId: 'dummy', // Schema requires it
     };

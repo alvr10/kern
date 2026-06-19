@@ -2,7 +2,7 @@ import { SocialPlatform } from '../value-objects/social-platform.vo';
 
 export class SocialAccount {
   constructor(
-    public readonly id: string,
+    public id: string,
     public readonly organizationId: string,
     public readonly platform: SocialPlatform,
     public readonly platformUserId: string,

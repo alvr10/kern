@@ -1,13 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { SOCIAL_PLATFORM_VALUES, SocialPlatform } from '@kern/core-backend';
+import { SocialPlatform } from '@kern/core-backend';
 
 @Schema({ timestamps: true, collection: 'social_accounts' })
 export class SocialAccount extends Document {
   @Prop({ required: true, index: true })
   organizationId: string;
 
-  @Prop({ type: String, enum: SOCIAL_PLATFORM_VALUES, required: true })
+  @Prop({ type: String, required: true })
   platform: SocialPlatform;
 
   @Prop({ required: true })

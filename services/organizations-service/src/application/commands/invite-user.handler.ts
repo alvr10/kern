@@ -6,6 +6,7 @@ import { Invitation } from '../../domain/entities/invitation.entity';
 import { InvitationStatus } from '../../domain/value-objects/invitation-status.vo';
 import { Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { PrismaService } from '../../infrastructure/database/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
 
 @CommandHandler(InviteUserCommand)
@@ -17,6 +18,7 @@ export class InviteUserHandler implements ICommandHandler<InviteUserCommand> {
     private readonly orgRepository: OrganizationRepository,
     @Inject('NOTIFICATIONS_SERVICE')
     private readonly notificationsClient: ClientProxy,
+    private readonly prisma: PrismaService,
   ) {}
 
   async execute(command: InviteUserCommand): Promise<string> {
@@ -29,8 +31,37 @@ export class InviteUserHandler implements ICommandHandler<InviteUserCommand> {
       throw new Error('Invitations are not allowed for personal organizations.');
     }
 
+    // Check if inviting own self (by comparing inviter's email to command.email)
+    const inviterProfile = await this.prisma.profile.findUnique({
+      where: { id: command.invitedById },
+    });
+    if (inviterProfile && inviterProfile.email.toLowerCase() === command.email.toLowerCase()) {
+      throw new Error('You cannot invite yourself');
+    }
+
+    // Check if invited user is already a member of the organization
+    const invitedProfile = await this.prisma.profile.findUnique({
+      where: { email: command.email },
+    });
+    if (invitedProfile) {
+      if (invitedProfile.id === command.invitedById) {
+        throw new Error('You cannot invite yourself');
+      }
+      const existingMembership = await this.prisma.membership.findUnique({
+        where: {
+          profileId_organizationId: {
+            profileId: invitedProfile.id,
+            organizationId: command.organizationId,
+          },
+        },
+      });
+      if (existingMembership) {
+        throw new Error('User is already a member of this organization');
+      }
+    }
+
     const id = uuidv4();
-    const token = uuidv4(); // in reality, maybe a secure random string
+    const token = uuidv4();
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
 
@@ -56,6 +87,7 @@ export class InviteUserHandler implements ICommandHandler<InviteUserCommand> {
       organizationName: organization.name,
       inviterId: command.invitedById,
       role: command.role,
+      token,
     });
 
     return id;
