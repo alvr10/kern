@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import styles from './layout.module.css';
 import Link from 'next/link';
-import { usePathname, useParams } from 'next/navigation';
+import { usePathname, useParams, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import {
   Building2,
@@ -34,7 +34,7 @@ import {
 import { createPortal } from 'react-dom';
 import { useOrganizations } from '@/lib/api/organizations-service/hooks';
 import { useSubscription } from '@/lib/api/billing-service/hooks';
-import { useAuth } from '@/lib/api/auth/hooks';
+import { useAuth, useSignOut } from '@/lib/api/auth/hooks';
 import { useSocialAccounts, useConnectSocialAccount, useDisconnectSocialAccount } from '@/lib/api/social-service/hooks';
 import { SocialAccountResponse } from '@/lib/api/social-service/types';
 import { SocialPlatform } from '@/lib/api/types';
@@ -64,6 +64,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const closeTimer = useRef<NodeJS.Timeout | null>(null);
 
   const { user } = useAuth();
+  const router = useRouter();
+  const signOutMutation = useSignOut();
+
+  const handleLogout = async (): Promise<void> => {
+    try {
+      await signOutMutation.mutateAsync();
+      router.push('/login');
+    } catch (err) {
+      console.error('Failed to sign out:', err);
+    }
+  };
 
   const handleSubMenuEnter = (type: 'help' | 'apps', rect: DOMRect) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -554,7 +565,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                     <div className={styles.popupDivider} />
 
-                    <div className={styles.popupItem} style={{ color: '#ef4444' }}>
+                    <div
+                      className={styles.popupItem}
+                      style={{ color: '#ef4444', cursor: 'pointer' }}
+                      onClick={handleLogout}
+                    >
                       <LogOut size={16} />
                       <span>Cerrar sesión</span>
                     </div>

@@ -16,6 +16,8 @@ export class StripeClient implements OnModuleInit {
     }
     this.stripe = new Stripe(apiKey, {
       apiVersion: '2025-01-27.acacia' as any,
+      maxNetworkRetries: 3,
+      timeout: 10000,
     });
   }
 
