@@ -437,7 +437,7 @@ services:
     container_name: kern-grafana
     restart: unless-stopped
     ports:
-      - '3100:8000'
+      - '3100:3000'
     environment:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
       GF_USERS_ALLOW_SIGN_UP: 'false'
