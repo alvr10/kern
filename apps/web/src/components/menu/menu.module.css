@@ -15,6 +15,7 @@
   background: rgba(255, 255, 255, 0.4); /* Stronger white tint for contrast */
   backdrop-filter: blur(2px); /* Increased blur */
   border-radius: 9999px; /* Fully rounded corners */
+  white-space: nowrap;
   
   /* Bevel effect: shinier top edges, darker bottom edges */
   box-shadow: 
@@ -32,12 +33,14 @@
   color: #000000;
   text-decoration: none;
   letter-spacing: -0.02em;
+  flex-shrink: 0;
 }
 
 .links {
   display: flex;
   align-items: center;
   gap: 2rem;
+  flex-shrink: 0;
 }
 
 .link {
@@ -48,6 +51,8 @@
   text-decoration: none;
   opacity: 0.85;
   transition: opacity 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .link:hover, .link:focus {
@@ -59,6 +64,7 @@
   align-items: center;
   gap: 1.5rem;
   margin-left: 1rem;
+  flex-shrink: 0;
 }
 
 .loginButton {

@@ -10,10 +10,9 @@ export abstract class BaseInternalClient {
   protected async get<T>(path: string, params?: any): Promise<T> {
     try {
       const { data } = await firstValueFrom(
-        this.httpService.get(`${this.baseUrl}${path}`, { params }).pipe(
-          timeout(5000),
-          retry({ count: 2, delay: 1000 }),
-        ),
+        this.httpService
+          .get(`${this.baseUrl}${path}`, { params })
+          .pipe(timeout(5000), retry({ count: 2, delay: 1000 })),
       );
       return data;
     } catch (error) {
@@ -24,10 +23,7 @@ export abstract class BaseInternalClient {
   protected async post<T>(path: string, body?: any): Promise<T> {
     try {
       const { data } = await firstValueFrom(
-        this.httpService.post(`${this.baseUrl}${path}`, body).pipe(
-          timeout(5000),
-          retry({ count: 2, delay: 1000 }),
-        ),
+        this.httpService.post(`${this.baseUrl}${path}`, body).pipe(timeout(5000), retry({ count: 2, delay: 1000 })),
       );
       return data;
     } catch (error) {
@@ -38,10 +34,7 @@ export abstract class BaseInternalClient {
   protected async patch<T>(path: string, body?: any): Promise<T> {
     try {
       const { data } = await firstValueFrom(
-        this.httpService.patch(`${this.baseUrl}${path}`, body).pipe(
-          timeout(5000),
-          retry({ count: 2, delay: 1000 }),
-        ),
+        this.httpService.patch(`${this.baseUrl}${path}`, body).pipe(timeout(5000), retry({ count: 2, delay: 1000 })),
       );
       return data;
     } catch (error) {
@@ -52,10 +45,7 @@ export abstract class BaseInternalClient {
   protected async delete<T>(path: string): Promise<T> {
     try {
       const { data } = await firstValueFrom(
-        this.httpService.delete(`${this.baseUrl}${path}`).pipe(
-          timeout(5000),
-          retry({ count: 2, delay: 1000 }),
-        ),
+        this.httpService.delete(`${this.baseUrl}${path}`).pipe(timeout(5000), retry({ count: 2, delay: 1000 })),
       );
       return data;
     } catch (error) {

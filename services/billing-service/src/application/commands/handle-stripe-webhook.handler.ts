@@ -77,8 +77,9 @@ export class HandleStripeWebhookHandler implements ICommandHandler<HandleStripeW
   private async handleSubscriptionUpdated(stripeSub: any) {
     const subscription = await this.subscriptionRepository.findByStripeSubscriptionId(stripeSub.id);
     if (subscription) {
-      subscription.stripeCurrentPeriodEnd = new Date(stripeSub.current_period_end * 1000);
-      subscription.stripeCancelAtPeriodEnd = stripeSub.cancel_at_period_end;
+      const periodEnd = Number(stripeSub.current_period_end);
+      subscription.stripeCurrentPeriodEnd = !isNaN(periodEnd) && periodEnd > 0 ? new Date(periodEnd * 1000) : null;
+      subscription.stripeCancelAtPeriodEnd = stripeSub.cancel_at_period_end ?? false;
 
       // Handle status mapping
       const statusMap: Record<string, SubscriptionStatus> = {

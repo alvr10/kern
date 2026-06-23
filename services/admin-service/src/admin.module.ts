@@ -8,16 +8,16 @@ import { HealthController } from './presentation/controllers/health.controller';
 
 import { GetPlatformOverviewHandler } from './application/queries/get-platform-overview.handler';
 
-import { OrganizationsClient } from './infrastructure/external-api/organizations.client';
 import { ContentClient } from './infrastructure/external-api/content.client';
 import { AIClient } from './infrastructure/external-api/ai.client';
 import { AdminSecretGuard } from './infrastructure/guards/admin-secret.guard';
+import { DatabaseModule } from './infrastructure/database/database.module';
 
 const Handlers = [GetPlatformOverviewHandler];
 
 @Module({
-  imports: [CqrsModule, HttpModule],
+  imports: [CqrsModule, HttpModule, DatabaseModule],
   controllers: [AdminAnalyticsController, AdminUsersController, AdminOrgsController, HealthController],
-  providers: [...Handlers, OrganizationsClient, ContentClient, AIClient, AdminSecretGuard],
+  providers: [...Handlers, ContentClient, AIClient, AdminSecretGuard],
 })
 export class AdminModule {}

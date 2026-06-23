@@ -11,7 +11,7 @@ export class ContentPiece {
     public title: string,
     public body: string,
     public status: ContentStatus,
-    public readonly platform: SocialPlatform,
+    public platform: SocialPlatform,
     public hashtags: string[],
     public mediaUrls: string[],
     public kanbanPosition: number,
@@ -26,6 +26,7 @@ export class ContentPiece {
   public update(data: {
     title?: string;
     body?: string;
+    platform?: SocialPlatform;
     hashtags?: string[];
     mediaUrls?: string[];
     scheduledAt?: Date | null;
@@ -33,6 +34,7 @@ export class ContentPiece {
   }): void {
     if (data.title) this.title = data.title;
     if (data.body) this.body = data.body;
+    if (data.platform) this.platform = data.platform;
     if (data.hashtags) this.hashtags = data.hashtags;
     if (data.mediaUrls) this.mediaUrls = data.mediaUrls;
     if (data.scheduledAt !== undefined) this.scheduledAt = data.scheduledAt;

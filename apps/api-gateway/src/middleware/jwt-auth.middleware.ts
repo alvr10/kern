@@ -52,6 +52,7 @@ export async function jwtAuthMiddleware(req: Request, res: Response, next: NextF
       const user = JSON.parse(cachedUser);
       req.headers['x-user-id'] = user.id;
       req.headers['x-user-email'] = user.email;
+      req.headers['x-user-role'] = user.role || '';
       next();
       return;
     }
@@ -69,6 +70,7 @@ export async function jwtAuthMiddleware(req: Request, res: Response, next: NextF
   const userData = {
     id: data.user.id,
     email: data.user.email ?? '',
+    role: data.user.app_metadata?.role || '',
   };
 
   try {
@@ -81,6 +83,7 @@ export async function jwtAuthMiddleware(req: Request, res: Response, next: NextF
   // Inject verified identity as headers for downstream services to consume
   req.headers['x-user-id'] = userData.id;
   req.headers['x-user-email'] = userData.email;
+  req.headers['x-user-role'] = userData.role;
 
   next();
 }

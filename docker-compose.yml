@@ -332,6 +332,9 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       MONGODB_URI: ${MONGODB_URI}
       ADMIN_SECRET: ${ADMIN_SECRET:-change-me-in-production}
+      ORGANIZATIONS_SERVICE_URL: http://organizations-service:8000
+      CONTENT_SERVICE_URL: http://content-service:8000
+      AI_SERVICE_URL: http://ai-service:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: 'http://alloy:4318'
       OTEL_TRACES_SAMPLER: 'parentbased_traceidratio'
       OTEL_TRACES_SAMPLER_ARG: '0.1'

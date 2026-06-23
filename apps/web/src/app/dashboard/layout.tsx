@@ -34,7 +34,8 @@ import {
 import { createPortal } from 'react-dom';
 import { useOrganizations } from '@/lib/api/organizations-service/hooks';
 import { useSubscription } from '@/lib/api/billing-service/hooks';
-import { useAuth, useSignOut } from '@/lib/api/auth/hooks';
+import { useAuth } from '@/lib/api/auth/hooks';
+import { supabase } from '@/lib/api/auth/client';
 import { useSocialAccounts, useConnectSocialAccount, useDisconnectSocialAccount } from '@/lib/api/social-service/hooks';
 import { SocialAccountResponse } from '@/lib/api/social-service/types';
 import { SocialPlatform } from '@/lib/api/types';
@@ -62,17 +63,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   } | null>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const closeTimer = useRef<NodeJS.Timeout | null>(null);
+  const isLoggingOut = useRef(false);
 
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
-  const signOutMutation = useSignOut();
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated && !isLoggingOut.current) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, authLoading, router]);
 
   const handleLogout = async (): Promise<void> => {
+    isLoggingOut.current = true;
     try {
-      await signOutMutation.mutateAsync();
-      router.push('/login');
+      await supabase.auth.signOut();
     } catch (err) {
       console.error('Failed to sign out:', err);
+    } finally {
+      window.location.href = '/login';
     }
   };
 
@@ -197,11 +206,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setIsProfileMenuOpen(!isProfileMenuOpen);
   };
 
-  // Prevent hydration mismatch
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
+
+  if (authLoading || !isAuthenticated || !mounted) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          minHeight: '100vh',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#09090b',
+          color: '#fafafa',
+        }}
+      >
+        <p>Cargando...</p>
+      </div>
+    );
+  }
 
   const isOrgPage = pathname.includes('/dashboard/org/');
 
@@ -400,13 +425,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 >
                   <Bell size={20} />
                   <span>Notificaciones</span>
-                </Link>
-                <Link
-                  href="/dashboard/settings"
-                  className={cn(styles.navItem, pathname === '/dashboard/settings' && styles.activeNavItem)}
-                >
-                  <Settings size={20} />
-                  <span>Ajustes</span>
                 </Link>
               </div>
             )}

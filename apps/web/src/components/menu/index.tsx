@@ -94,7 +94,7 @@ export function Menu(): React.JSX.Element {
 
       // Cache the original style so we can measure auto width
       navBar.style.width = 'max-content';
-      const compactWidth = navBar.getBoundingClientRect().width + 50;
+      const compactWidth = navBar.getBoundingClientRect().width + 100;
       navBar.style.width = '90vw';
 
       let isCompact = false;
@@ -156,16 +156,16 @@ export function Menu(): React.JSX.Element {
           KERN
         </Link>
         <div className={`${styles.links} link`}>
-          <HoverScrambleLink text="How it works" href="#how-it-works" />
-          <HoverScrambleLink text="Pricing" href="#pricing" />
-          <HoverScrambleLink text="Use Cases" href="#use-cases" />
+          <HoverScrambleLink text="Cómo funciona" href="#how-it-works" />
+          <HoverScrambleLink text="Precios" href="#pricing" />
+          <HoverScrambleLink text="Casos de uso" href="#use-cases" />
         </div>
         <div className={`${styles.authLinks} link`}>
           <Link href="/login" className={styles.loginButton} onClick={handleLoginClick}>
-            Log In
+            Iniciar Sesión
           </Link>
           <Link href="/signup" className={styles.signupButton} onClick={handleSignupClick}>
-            Sign Up
+            Registrarse
           </Link>
         </div>
       </nav>

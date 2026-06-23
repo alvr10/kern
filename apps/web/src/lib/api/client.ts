@@ -4,27 +4,38 @@
  */
 
 import { useAuthStore } from '../../core/stores/auth-store';
+import { supabase } from './auth/client';
 import { getEndpointUrl } from './config';
 import { ApiClientError, type HttpMethod, type RequestConfig } from './types';
 
 /**
- * Get auth token from store
+ * Get auth token — always prefer a live Supabase session to avoid stale tokens.
  */
-const getAuthToken = (): string | null => {
+const getAuthToken = async (): Promise<string | null> => {
+  try {
+    const { data } = await supabase.auth.getSession();
+    if (data.session?.access_token) {
+      // Keep Zustand in sync with the latest token
+      useAuthStore.getState().setAuth(data.session.access_token, data.session.user);
+      return data.session.access_token;
+    }
+  } catch {
+    // fall through to cached token
+  }
   return useAuthStore.getState().token;
 };
 
 /**
  * Build headers with auth token
  */
-const buildHeaders = (customHeaders?: Record<string, string>): Record<string, string> => {
+const buildHeaders = async (customHeaders?: Record<string, string>): Promise<Record<string, string>> => {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
   };
 
   // Add auth token if available
-  const token = getAuthToken();
+  const token = await getAuthToken();
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
@@ -56,7 +67,7 @@ const buildQueryString = (params?: Record<string, string | number | boolean | un
 async function request<T>(method: HttpMethod, endpoint: string, body?: unknown, config?: RequestConfig): Promise<T> {
   const url = getEndpointUrl(endpoint) + buildQueryString(config?.params);
 
-  const headers = buildHeaders(config?.headers);
+  const headers = await buildHeaders(config?.headers);
 
   if (process.env.NODE_ENV === 'development') {
     console.log(`[API Request] ${method} ${url}`, body);

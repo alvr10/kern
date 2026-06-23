@@ -133,13 +133,15 @@ export default function BillingPage(): React.JSX.Element {
               </p>
             )}
           </div>
-          {subscription.status !== 'CANCELED' && !subscription.stripeCancelAtPeriodEnd && (
-            <div>
-              <button className={styles.cancelBtn} onClick={handleCancel} disabled={cancelSubscription.isPending}>
-                {cancelSubscription.isPending ? 'Cancelando...' : 'Cancelar suscripción'}
-              </button>
-            </div>
-          )}
+          {subscription.status !== 'CANCELED' &&
+            !subscription.stripeCancelAtPeriodEnd &&
+            subscription.planId !== 'plan_free' && (
+              <div>
+                <button className={styles.cancelBtn} onClick={handleCancel} disabled={cancelSubscription.isPending}>
+                  {cancelSubscription.isPending ? 'Cancelando...' : 'Cancelar suscripción'}
+                </button>
+              </div>
+            )}
         </div>
       )}
 
